@@ -1,0 +1,884 @@
+### 1.1 课程基础信息结构
+```json
+{
+  "id": "course_001",
+  "type": "course",
+  "metadata": {
+    "version": "1.0",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z",
+    "createdBy": "teacher_001"
+  },
+  "basicInfo": {
+    "title": "软件工程导论",
+    "description": "本课程介绍软件工程的基本概念...",
+    "cover": "https://cdn.example.com/courses/course_001.jpg",
+    "duration": 48,
+    "level": "intermediate",
+    "teacher": {
+      "id": "teacher_001",
+      "name": "李教授",
+      "avatar": "https://cdn.example.com/avatars/teacher_001.jpg"
+    },
+    "tags": ["软件工程", "编程", "计算机"]
+  },
+  "schedule": {
+    "startDate": "2024-08-31",
+    "endDate": "2025-06-30",
+    "publishStatus": "published"
+  },
+  "chapters": [
+    {
+      "id": "chapter_001",
+      "number": 1,
+      "title": "第一章：软件工程基础",
+      "description": "介绍软件工程的基本概念",
+      "order": 1,
+      "sections": [
+        {
+          "id": "section_001",
+          "number": "1.1",
+          "title": "软件工程概述",
+          "description": "什么是软件工程",
+          "order": 1,
+          "contentType": "video",
+          "contentUrl": "https://video.example.com/section_001.mp4",
+          "duration": 1800,
+          "resources": {
+            "materials": [
+              {
+                "id": "material_001",
+                "type": "pdf",
+                "title": "课件讲义",
+                "url": "https://cdn.example.com/materials/material_001.pdf"
+              }
+            ],
+            "attachments": []
+          },
+          "practice": {
+            "practiceId": "practice_001",
+            "questions": 5,
+            "optional": false
+          }
+        },
+        {
+          "id": "section_002",
+          "number": "1.2",
+          "title": "第一章作业",
+          "description": "软件工程概述章节作业",
+          "order": 2,
+          "contentType": "homework",
+          "homeworkId": "homework_001",
+          "duration": 0,
+          "resources": {
+            "materials": [],
+            "attachments": []
+          },
+          "practice": {
+            "practiceId": "homework_001",
+            "questions": 0,
+            "optional": false
+          },
+          "homeworkProgress": {
+            "submitted": false,
+            "score": 0,
+            "maxScore": 30,
+            "percentage": 0
+          }
+        }
+      ]
+    }
+  ],
+  "homeworks": [
+    {
+      "id": "homework_001",
+      "type": "homework",
+      "chapterId": "chapter_001",
+      "sectionId": "section_002",
+      "title": "第一章作业：软件工程概述",
+      "description": "完成软件工程概述章节的相关题目",
+      "basicInfo": {
+        "title": "第一章作业：软件工程概述",
+        "description": "本作业包含软件工程基本概念、生命周期模型等相关题目",
+        "type": "chapter_homework",
+        "difficulty": "medium"
+      },
+      "schedule": {
+        "releaseDate": "2024-01-01T00:00:00Z",
+        "dueDate": "2024-12-31T23:59:59Z",
+        "remindDate": "2024-12-30T12:00:00Z"
+      },
+      "questions": [
+        {
+          "id": "q_001",
+          "type": "single",
+          "questionText": "软件工程的核心目标是什么？",
+          "score": 10,
+          "difficulty": "easy",
+          "order": 1,
+          "options": [
+            {
+              "id": "opt_a",
+              "value": "A",
+              "text": "提高开发速度"
+            },
+            {
+              "id": "opt_b",
+              "value": "B",
+              "text": "降低开发成本"
+            },
+            {
+              "id": "opt_c",
+              "value": "C",
+              "text": "提高软件质量和可维护性"
+            },
+            {
+              "id": "opt_d",
+              "value": "D",
+              "text": "增加代码量"
+            }
+          ],
+          "correctAnswer": "C",
+          "explanation": "软件工程的核心目标是通过系统的方法提高软件质量和可维护性"
+        }
+      ],
+      "settings": {
+        "allowLateSubmission": true,
+        "immediateGrading": true,
+        "showCorrectAnswers": true
+      }
+    }
+  ]
+}
+```
+
+### 1.2 章节 (Section) 类型说明
+
+章节中的小节支持以下 `contentType` 类型：
+
+- **`normal`**: 普通课程内容，支持视频、PDF、图片、文本等多种媒体类型的组合
+- **`programming`**: 编程学习内容，包含代码示例、在线编辑器、编程练习等
+- **`homework`**: 作业内容（章节作业）
+
+#### 1.2.1 普通课程 (normal)
+```json
+{
+  "id": "section_001",
+  "contentType": "normal",
+  "contentConfig": {
+    "video": { "enabled": true },
+    "image": { "enabled": true },
+    "pdf": { "enabled": true },
+    "text": { "enabled": true }
+  },
+  "contentUrl": "https://video.example.com/section_001.mp4",
+  "pdfUrl": "https://cdn.example.com/pdfs/section_001.pdf",
+  "textContent": "这是文本学习内容...",
+  "images": [
+    {
+      "id": "img_001",
+      "url": "https://cdn.example.com/images/img_001.jpg",
+      "title": "图片标题"
+    }
+  ]
+}
+```
+
+#### 1.2.2 编程内容 (programming)
+```json
+{
+  "id": "section_002",
+  "contentType": "programming",
+  "programming": {
+    "language": "javascript",
+    "codeExample": "function hello() {\n  console.log('Hello World!');\n}",
+    "description": "学习 JavaScript 基础语法",
+    "enableEditor": true,
+    "enableExecution": true,
+    "enableExercises": false,
+    "hojProblems": [
+      {
+        "problemId": "CF-1001",
+        "title": "Array Sum",
+        "difficulty": 2,
+        "required": true,
+        "order": 1
+      }
+    ]
+  }
+}
+```
+
+### 1.3 章节作业结构说明
+
+当 `contentType` 为 `homework` 时，小节包含以下特殊字段：
+
+- **`homeworkId`**: 关联的作业ID，对应 `homeworks` 数组中的作业
+- **`homeworkProgress`**: 作业进度信息
+  - `submitted`: 是否已提交
+  - `score`: 得分
+  - `maxScore`: 总分
+  - `percentage`: 完成百分比
+- **`homeworkData`**: 作业详细数据（可选，可直接内嵌作业数据）
+  - 包含完整的作业结构，参考作业JSON格式
+- **`hasHomework`**: 是否包含作业（布尔值，用于UI标识）
+- **`homeworkCompleted`**: 作业是否已完成（布尔值）
+- **`homeworkScore`**: 作业得分（数字）
+- **`homeworkMaxScore`**: 作业总分（数字）
+
+### 1.4 章节作业示例
+
+```json
+{
+  "id": "section_002",
+  "number": "1.2",
+  "title": "第一章作业",
+  "description": "软件工程概述章节作业",
+  "order": 2,
+  "contentType": "homework",
+  "homeworkId": "homework_001",
+  "duration": 0,
+  "hasHomework": true,
+  "homeworkCompleted": false,
+  "homeworkScore": 0,
+  "homeworkMaxScore": 30,
+  "homeworkProgress": {
+    "submitted": false,
+    "score": 0,
+    "maxScore": 30,
+    "percentage": 0
+  },
+  "homeworkData": {
+    "id": "homework_001",
+    "type": "chapter_homework",
+    "title": "第一章作业：软件工程概述",
+    "description": "完成软件工程概述章节的相关题目",
+    "questions": [
+      {
+        "id": "q_001",
+        "type": "single",
+        "questionText": "软件工程的核心目标是什么？",
+        "score": 10,
+        "options": [...],
+        "correctAnswer": "C"
+      }
+    ]
+  }
+}
+```
+
+## 2. 作业 (Homework) JSON格式
+
+### 2.1 作业基础信息结构
+
+作业分为两种类型：**传统作业**和**章节作业**。
+
+#### 2.1.1 传统作业结构
+```json
+{
+  "id": "homework_001",
+  "type": "homework",
+  "metadata": {
+    "version": "1.0",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z",
+    "createdBy": "teacher_001",
+    "courseId": "course_001"
+  },
+  "basicInfo": {
+    "title": "第一周作业",
+    "description": "完成软件工程基础的练习题",
+    "type": "exercise",
+    "difficulty": "easy"
+  },
+  "schedule": {
+    "releaseDate": "2024-09-01T00:00:00Z",
+    "dueDate": "2024-09-07T23:59:59Z",
+    "remindDate": "2024-09-06T12:00:00Z"
+  },
+  "questions": [
+    {
+      "id": "question_001",
+      "type": "single",
+      "questionText": "什么是软件工程的三要素？",
+      "score": 5,
+      "difficulty": "easy",
+      "order": 1,
+      "options": [
+        {
+          "id": "opt_a",
+          "value": "A",
+          "text": "方法、工具、过程"
+        },
+        {
+          "id": "opt_b",
+          "value": "B",
+          "text": "代码、文档、测试"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "软件工程的三要素是方法、工具和过程",
+      "knowledgePoints": ["软件工程基础"]
+    }
+  ],
+  "settings": {
+    "allowLateSubmission": true,
+    "immediateGrading": true,
+    "showCorrectAnswers": true
+  }
+}
+```
+
+#### 2.1.2 章节作业结构
+```json
+{
+  "id": "homework_001",
+  "type": "homework",
+  "chapterId": "chapter_001",
+  "sectionId": "section_002",
+  "title": "第一章作业：软件工程概述",
+  "description": "完成软件工程概述章节的相关题目",
+  "basicInfo": {
+    "title": "第一章作业：软件工程概述",
+    "description": "本作业包含软件工程基本概念、生命周期模型等相关题目",
+    "type": "chapter_homework",
+    "difficulty": "medium"
+  },
+  "schedule": {
+    "releaseDate": "2024-01-01T00:00:00Z",
+    "dueDate": "2024-12-31T23:59:59Z",
+    "remindDate": "2024-12-30T12:00:00Z"
+  },
+  "questions": [
+    {
+      "id": "q_001",
+      "type": "single",
+      "questionText": "软件工程的核心目标是什么？",
+      "score": 10,
+      "difficulty": "easy",
+      "order": 1,
+      "options": [
+        {
+          "id": "opt_a",
+          "value": "A",
+          "text": "提高开发速度"
+        },
+        {
+          "id": "opt_b",
+          "value": "B",
+          "text": "降低开发成本"
+        },
+        {
+          "id": "opt_c",
+          "value": "C",
+          "text": "提高软件质量和可维护性"
+        },
+        {
+          "id": "opt_d",
+          "value": "D",
+          "text": "增加代码量"
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "软件工程的核心目标是通过系统的方法提高软件质量和可维护性"
+    }
+  ],
+  "settings": {
+    "allowLateSubmission": true,
+    "immediateGrading": true,
+    "showCorrectAnswers": true
+  }
+}
+```
+
+### 2.2 作业类型说明
+
+#### 2.2.1 作业类型分类
+
+- **传统作业** (`type: "exercise"`): 独立的作业，与章节学习内容分离
+- **章节作业** (`type: "chapter_homework"`): 与特定章节关联的作业，作为章节的一部分
+
+#### 2.2.2 章节作业特点
+
+- **关联章节**: 通过 `chapterId` 和 `sectionId` 字段关联到具体的章节和小节
+- **学习路径**: 作业内容与章节学习内容紧密相关
+- **无缝体验**: 学生在完成章节学习后直接进入作业环节
+- **统一管理**: 在作业系统中与普通作业统一展示和管理
+
+## 3. 考试 (Exam) JSON格式
+
+### 3.1 考试基础信息结构
+```json
+{
+  "id": "exam_001",
+  "type": "exam",
+  "metadata": {
+    "version": "1.0",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z",
+    "createdBy": "teacher_001",
+    "courseId": "course_001"
+  },
+  "basicInfo": {
+    "title": "期中考试",
+    "description": "软件工程课程期中考试",
+    "type": "midterm",
+    "difficulty": "medium"
+  },
+  "schedule": {
+    "startTime": "2024-11-15T10:00:00Z",
+    "endTime": "2024-11-15T11:30:00Z",
+    "duration": 90,
+    "reviewStartTime": "2024-11-20T00:00:00Z"
+  },
+  "settings": {
+    "totalScore": 100,
+    "passingScore": 60,
+    "showScoreAfterSubmit": true,
+    "randomOrder": true,
+    "randomQuestions": true,
+    "questionsPerBank": 50,
+    "allowReview": true,
+    "reviewDelay": 86400,
+    "proctorRequired": false,
+    "cameraRequired": false
+  },
+  "questionBanks": [
+    {
+      "id": "bank_001",
+      "name": "单选题库",
+      "type": "single",
+      "questionCount": 20,
+      "scorePerQuestion": 2,
+      "totalQuestionsNeeded": 10,
+      "questions": [
+        {
+          "id": "question_001",
+          "questionText": "软件工程的核心目标是什么？",
+          "options": [
+            {
+              "id": "opt_a",
+              "value": "A",
+              "text": "提高开发速度"
+            },
+            {
+              "id": "opt_b",
+              "value": "B",
+              "text": "降低开发成本"
+            },
+            {
+              "id": "opt_c",
+              "value": "C",
+              "text": "提高软件质量和可维护性"
+            },
+            {
+              "id": "opt_d",
+              "value": "D",
+              "text": "增加代码量"
+            }
+          ],
+          "correctAnswer": "C",
+          "explanation": "软件工程的核心目标是通过系统的方法提高软件质量和可维护性",
+          "knowledgePoints": ["软件工程基础"],
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "id": "bank_002",
+      "name": "多选题库",
+      "type": "multiple",
+      "questionCount": 15,
+      "scorePerQuestion": 3,
+      "totalQuestionsNeeded": 5,
+      "questions": []
+    },
+    {
+      "id": "bank_003",
+      "name": "填空题库",
+      "type": "fill",
+      "questionCount": 10,
+      "scorePerQuestion": 5,
+      "totalQuestionsNeeded": 5,
+      "questions": []
+    },
+    {
+      "id": "bank_004",
+      "name": "问答题库",
+      "type": "essay",
+      "questionCount": 5,
+      "scorePerQuestion": 15,
+      "totalQuestionsNeeded": 2,
+      "questions": []
+    }
+  ],
+  "grading": {
+    "autoGrade": true,
+    "manualReviewRequired": true,
+    "essayReviewers": ["teacher_001", "teacher_002"],
+    "gradingDeadline": "2024-11-25T23:59:59Z"
+  }
+}
+```
+
+## 4. 题目类型规范
+
+### 4.1 单选题 (single)
+```json
+{
+  "type": "single",
+  "questionText": "题目内容",
+  "options": [
+    {
+      "id": "opt_a",
+      "value": "A",
+      "text": "选项内容"
+    }
+  ],
+  "correctAnswer": "A"
+}
+```
+
+### 4.2 多选题 (multiple)
+```json
+{
+  "type": "multiple",
+  "questionText": "题目内容",
+  "options": [
+    {
+      "id": "opt_a",
+      "value": "A",
+      "text": "选项内容"
+    }
+  ],
+  "correctAnswers": ["A", "B", "C"]
+}
+```
+
+### 4.3 填空题 (fill)
+```json
+{
+  "type": "fill",
+  "questionText": "题目内容",
+  "correctAnswers": ["答案1", "答案2"]
+}
+```
+
+### 4.4 问答题 (essay)
+```json
+{
+  "type": "essay",
+  "questionText": "题目内容",
+  "referenceAnswer": "参考答案"
+}
+```
+
+### 4.5 HOJ 编程题 (hoj)
+```json
+{
+  "type": "hoj",
+  "problemId": "CF-1001",
+  "title": "A. Array Sum",
+  "description": "Given an array of integers, find the sum of all elements.",
+  "input": "First line contains n (1 ≤ n ≤ 100000). Second line contains n integers.",
+  "output": "Output the sum of all elements.",
+  "examples": "Input:\n3\n1 2 3\nOutput:\n6",
+  "timeLimit": 1000,
+  "memoryLimit": 128,
+  "difficulty": 2,
+  "score": 20,
+  "language": ["cpp", "java", "python"],
+  "tags": ["array", "implementation"],
+  "testCases": [
+    {
+      "id": "case_001",
+      "input": "3\n1 2 3",
+      "output": "6",
+      "sample": true,
+      "order": 1
+    }
+  ],
+  "solution": {
+    "approach": "使用循环累加所有元素",
+    "complexity": "时间复杂度 O(n)，空间复杂度 O(1)",
+    "code": "int sumArray(vector<int>& arr) {\n    int sum = 0;\n    for(int x : arr) sum += x;\n    return sum;\n}"
+  }
+}
+```
+
+## 5. 图片模块规范
+
+### 5.1 图片材料结构
+```json
+{
+  "id": "material_002",
+  "type": "image",
+  "title": "课程相关图片",
+  "images": [
+    {
+      "id": "img_001",
+      "url": "https://cdn.example.com/images/img_001.jpg",
+      "title": "软件工程概述图",
+      "description": "这张图片展示了软件工程的基本概念和主要组成部分",
+      "alt": "软件工程概述图"
+    }
+  ]
+}
+```
+
+1. 颜色应用规范：
+
+禁止渐变：全局禁止使用渐变色。index.scss  中所有background: var的定义必须替换为background-color: var。   
+
+容器一致性：所有卡片 (el-card)、弹窗 (el-dialog)、抽屉 (el-drawer) 和表格 (el-table) 必须使用background-color: var作为背景色，并使用border: 1px solid var(--color-border-base)作为边框。
+
+操作层级：
+
+主要操作（如“保存”、“确认”、“创建”）必须使用el-button--primary。
+
+破坏性操作（如“删除”）必须使用el-button--danger。
+
+所有其他次要操作必须使用默认按钮样式，以符合“简约化”原则 。   
+
+2. 布局治理规范（遵循 rule.txt ）：   
+
+列表-详情视图：用于管理（如课程、题目）的页面。左侧列表/树状导航区必须具有统一宽度（例如 240px），右侧详情区背景必须为var(--color-bg-primary)。
+
+仪表盘视图：用于数据分析（如工作台、学习报告）。所有数据小部件必须被包裹在el-card中，以确保网格布局的视觉一致性。
+
+向导/步骤条视图：用于复杂任务（如创建课程、制定提分计划）。必须使用el-steps组件，其激活状态必须使用
+
+3. 字体排版规范：
+
+标题（H1, H2, el-dialog__title）
+
+辅助文本（el-form-item__label,.description,.tips）
+
+链接（a, el-link）
+
+## 6. HOJ 题库格式规范
+
+### 6.1 HOJ 题目核心数据模型
+
+HOJ 题库采用标准化的编程题目格式，支持在线评测和自动代码评判。
+
+#### 6.1.1 oj题目 基础结构
+```java
+public class Problem {
+    private Long id;                    // 数据库主键
+    private String problemId;           // 题目编号（JUDGE-ID 格式）
+    private String title;               // 题目标题
+    private String description;         // 题目描述
+    private String input;               // 输入说明
+    private String output;              // 输出说明
+    private String examples;            // 示例（格式化）
+    private String hint;                // 提示
+    private Integer timeLimit;          // 时间限制（ms）
+    private Integer memoryLimit;        // 内存限制（MB）
+    private Integer type;               // 题目类型（0=编程题）
+    private Integer auth;               // 权限（1=公开）
+    private Boolean isRemote;           // 是否远程题目
+    private String source;              // 题目来源
+    private Boolean isGroup;            // 是否分组题
+    private Integer difficulty;         // 难度（1-3）
+    private List<Tag> tags;             // 标签列表
+    private List<TestCase> testCases;   // 测试用例
+}
+```
+
+#### 6.1.2 HOJ 题目 JSON 格式
+```json
+{
+  "id": "1001",
+  "problemId": "CF-1001",
+  "title": "A. Array Sum",
+  "description": "Given an array of integers, find the sum of all elements.\n\n**Input:**\nThe first line contains an integer n (1 ≤ n ≤ 100000) — the number of elements in the array.\nThe second line contains n integers a₁, a₂, ..., aₙ (−10⁹ ≤ aᵢ ≤ 10⁹) — the array elements.\n\n**Output:**\nPrint the sum of all elements of the array.",
+  "input": "First line contains n (1 ≤ n ≤ 100000). Second line contains n integers a₁, a₂, ..., aₙ (−10⁹ ≤ aᵢ ≤ 10⁹).",
+  "output": "Output the sum of all elements.",
+  "examples": "Input:\n3\n1 2 3\n\nOutput:\n6\n\nInput:\n5\n-1 2 -3 4\n\nOutput:\n2",
+  "hint": "Use simple loop to sum all elements. Be careful with integer overflow for large values.",
+  "timeLimit": 1000,
+  "memoryLimit": 128,
+  "type": 0,
+  "auth": 1,
+  "isRemote": true,
+  "source": "CodeForces Round #123",
+  "difficulty": 2,
+  "tags": [
+    {
+      "id": "tag_001",
+      "name": "array",
+      "color": "#409EFF"
+    },
+    {
+      "id": "tag_002",
+      "name": "implementation",
+      "color": "#67C23A"
+    }
+  ],
+  "testCases": [
+    {
+      "id": "case_001",
+      "input": "3\n1 2 3",
+      "output": "6",
+      "sample": true,
+      "order": 1
+    },
+    {
+      "id": "case_002",
+      "input": "5\n-1 2 -3 4",
+      "output": "2",
+      "sample": true,
+      "order": 2
+    },
+    {
+      "id": "case_003",
+      "input": "100000\n" + "1 ".repeat(100000).trim(),
+      "output": "100000",
+      "sample": false,
+      "order": 3
+    }
+  ]
+}
+```
+
+### 6.2 HOJ 字段详细说明
+
+#### 6.2.1 基础信息字段
+- **`id`**: 数据库主键，字符串类型的唯一标识符
+- **`problemId`**: 题目编号，遵循 JUDGE-ID 格式（如 CF-1001, LU-1234）
+- **`title`**: 题目标题，支持 Markdown 格式
+- **`description`**: 题目详细描述，支持 LaTeX 数学公式和 Markdown
+- **`input`**: 输入格式说明，支持数据范围描述
+- **`output`**: 输出格式说明，包含精度要求等
+- **`examples`**: 示例输入输出，支持多组示例
+- **`hint`**: 解题提示，可选字段
+
+#### 6.2.2 技术参数字段
+- **`timeLimit`**: 时间限制，单位毫秒（ms），通常为 1000-2000ms
+- **`memoryLimit`**: 内存限制，单位兆字节（MB），通常为 64-1024MB
+- **`type`**: 题目类型，0 表示编程题，1 表示选择题
+- **`auth`**: 权限等级，1=公开，2=私有，3=团队
+
+#### 6.2.3 元数据字段
+- **`isRemote`**: 是否远程题目，true 表示从其他 OJ 同步
+- **`source`**: 题目来源，如 "CodeForces Round #123"、"AtCoder ABC 234"
+- **`isGroup`**: 是否为题目组/比赛题目
+- **`difficulty`**: 难度等级，1=简单，2=中等，3=困难
+
+#### 6.2.4 标签字段
+```json
+"tags": [
+  {
+    "id": "tag_001",
+    "name": "array",
+    "color": "#409EFF",
+    "description": "数组相关算法"
+  },
+  {
+    "id": "tag_002",
+    "name": "dp",
+    "color": "#E6A23C",
+    "description": "动态规划"
+  }
+]
+```
+
+#### 6.2.5 测试用例字段
+```json
+"testCases": [
+  {
+    "id": "case_001",
+    "input": "3\n1 2 3",
+    "output": "6",
+    "sample": true,
+    "order": 1,
+    "timeLimit": 1000,
+    "memoryLimit": 128
+  }
+]
+```
+
+### 6.3 HOJ 题目类型扩展
+
+#### 6.3.1 算法题 (type: 0)
+标准的算法编程题，需要编写完整的程序解决问题。
+
+#### 6.3.2 交互题 (type: 1)
+需要与评测系统进行交互的题目，包含特殊的交互库。
+
+#### 6.3.3 答题题 (type: 2)
+只要求输出结果，不需要完整程序的题目。
+
+### 6.4 在课程中的集成方式
+
+#### 6.4.1 编程章节中的 HOJ 题目
+```json
+{
+  "id": "section_001",
+  "contentType": "programming",
+  "programming": {
+    "language": "cpp",
+    "codeExample": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // 学生代码区域\n}",
+    "hojProblems": [
+      {
+        "problemId": "CF-1001",
+        "title": "Array Sum",
+        "difficulty": 2,
+        "required": true,
+        "order": 1
+      }
+    ]
+  }
+}
+```
+
+#### 6.4.2 作业中的 HOJ 题目
+```json
+{
+  "id": "homework_001",
+  "questions": [
+    {
+      "id": "hoj_001",
+      "type": "hoj",
+      "problemId": "CF-1001",
+      "title": "Array Sum",
+      "score": 20,
+      "difficulty": 2,
+      "language": ["cpp", "java", "python"],
+      "timeLimit": 1000,
+      "memoryLimit": 128,
+      "testCases": [...],
+      "submissions": [...]
+    }
+  ]
+}
+```
+
+### 6.5 HOJ 题目同步机制
+
+#### 6.5.1 远程题目同步
+```json
+{
+  "syncConfig": {
+    "source": "codeforces",
+    "contestId": "123",
+    "problemIndex": "A",
+    "syncTime": "2024-01-15T10:30:00Z",
+    "autoUpdate": true
+  }
+}
+```
+
+#### 6.5.2 题目导入配置
+```json
+{
+  "importConfig": {
+    "batchSize": 50,
+    "includeTestCases": true,
+    "translateToChinese": true,
+    "adjustDifficulty": true,
+    "filterTags": ["interactive", "special"]
+  }
+}
+```

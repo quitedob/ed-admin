@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "WebSearch",
+      "mcp__web-search-prime__webSearchPrime"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,219 @@
+// ==========================================
+// Color Design System for ed-admin
+// Purple Gradient Theme with Light/Dark Support
+// ==========================================
+
+// CSS Custom Properties for Theme Colors
+:root {
+  // Primary Colors - Blue Gradient System
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6; // Main primary color
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  // Primary Gradient
+  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  --gradient-primary-hover: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+
+  // Secondary Colors
+  --color-secondary-50: #f8f9fa;
+  --color-secondary-100: #e9ecef;
+  --color-secondary-200: #dee2e6;
+  --color-secondary-300: #ced4da;
+  --color-secondary-400: #adb5bd;
+  --color-secondary-500: #6c757d;
+  --color-secondary-600: #495057;
+  --color-secondary-700: #343a40;
+  --color-secondary-800: #212529;
+  --color-secondary-900: #1a1d20;
+
+  // Semantic Colors
+  --color-success: #4ecdc4;
+  --color-success-light: #e6f7f6;
+  --color-success-hover: #44a08d;
+  --gradient-success: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+
+  --color-warning: #ff9ff3;
+  --color-warning-light: #ffe6fb;
+  --color-warning-hover: #f368e0;
+  --gradient-warning: linear-gradient(135deg, #ff9ff3 0%, #f368e0 100%);
+
+  --color-danger: #ff6b6b;
+  --color-danger-light: #ffe6e6;
+  --color-danger-hover: #ee5a52;
+  --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+
+  --color-info: #909399;
+  --color-info-light: #f4f4f5;
+  --color-info-hover: #73767a;
+  --gradient-info: linear-gradient(135deg, #909399 0%, #73767a 100%);
+
+  // Background Colors
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #f9f9f9;
+  --color-bg-overlay: rgba(255, 255, 255, 0.8);
+  --color-bg-mask: rgba(0, 0, 0, 0.5);
+
+  // Text Colors
+  --color-text-primary: #303133;
+  --color-text-secondary: #606266;
+  --color-text-tertiary: #909399;
+  --color-text-placeholder: #c0c4cc;
+  --color-text-inverse: #ffffff;
+
+  // Border Colors
+  --color-border-light: #f0f0f0;
+  --color-border-base: #dcdfe6;
+  --color-border-dark: #e4e7ed;
+
+  // Shadow Colors
+  --color-shadow-light: rgba(0, 0, 0, 0.04);
+  --color-shadow-base: rgba(0, 0, 0, 0.08);
+  --color-shadow-medium: rgba(0, 0, 0, 0.12);
+  --color-shadow-dark: rgba(0, 0, 0, 0.15);
+  --color-shadow-primary: rgba(59, 130, 246, 0.3);
+  --color-shadow-primary-hover: rgba(59, 130, 246, 0.4);
+
+  // Chart Colors
+  --color-chart-1: #3b82f6;
+  --color-chart-2: #2563eb;
+  --color-chart-3: #4ecdc4;
+  --color-chart-4: #ff9ff3;
+  --color-chart-5: #ff6b6b;
+  --color-chart-6: #feca57;
+
+  // State Colors for Education System
+  --color-score-excellent: #67c23a;
+  --color-score-good: var(--color-success);
+  --color-score-average: #e6a23c;
+  --color-score-poor: #f56c6c;
+  --color-score-fail: #d54a4a;
+
+  // Status Score Threshold Colors (for dynamic score-based coloring)
+  --color-score-90-plus: var(--color-score-excellent);
+  --color-score-80-89: #409eff;
+  --color-score-70-79: var(--color-score-average);
+  --color-score-60-69: var(--color-score-poor);
+  --color-score-below-60: var(--color-score-fail);
+
+  // Animation
+  --transition: all 0.3s ease;
+  --transition-fast: all 0.2s ease;
+  --transition-slow: all 0.4s ease;
+
+  // Shadows
+  --shadow-light: 0 2px 8px var(--color-shadow-light);
+  --shadow-base: 0 4px 20px var(--color-shadow-base);
+  --shadow-medium: 0 8px 32px var(--color-shadow-medium);
+  --shadow-dark: 0 16px 48px var(--color-shadow-dark);
+
+  // Border Radius
+  --radius-small: 4px;
+  --radius-base: 8px;
+  --radius-medium: 12px;
+  --radius-large: 16px;
+  --radius-round: 50%;
+
+  // Spacing
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+}
+
+// Dark Theme Variables
+[data-theme="dark"] {
+  // Background Colors
+  --color-bg-primary: #1a1a1a;
+  --color-bg-secondary: #2a2a2a;
+  --color-bg-tertiary: #333333;
+  --color-bg-overlay: rgba(26, 26, 26, 0.8);
+  --color-bg-mask: rgba(0, 0, 0, 0.7);
+
+  // Text Colors
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #b0b0b0;
+  --color-text-tertiary: #808080;
+  --color-text-placeholder: #606060;
+
+  // Border Colors
+  --color-border-light: #333333;
+  --color-border-base: #404040;
+  --color-border-dark: #4a4a4a;
+
+  // Shadow Colors
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-base: rgba(0, 0, 0, 0.3);
+  --color-shadow-medium: rgba(0, 0, 0, 0.4);
+  --color-shadow-dark: rgba(0, 0, 0, 0.5);
+
+  // Secondary Colors (adjusted for dark mode)
+  --color-secondary-50: #2a2a2a;
+  --color-secondary-100: #333333;
+  --color-secondary-200: #404040;
+  --color-secondary-300: #4a4a4a;
+  --color-secondary-400: #606060;
+  --color-secondary-500: #808080;
+  --color-secondary-600: #b0b0b0;
+  --color-secondary-700: #d0d0d0;
+  --color-secondary-800: #e0e0e0;
+  --color-secondary-900: #f0f0f0;
+}
+
+// SCSS Variables for Dynamic Usage
+$primary: var(--color-primary-500);
+$primary-gradient: var(--gradient-primary);
+$success: var(--color-success);
+$warning: var(--color-warning);
+$danger: var(--color-danger);
+$info: var(--color-info);
+
+// Text Colors
+$text-primary: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary);
+$text-tertiary: var(--color-text-tertiary);
+$text-inverse: var(--color-text-inverse);
+
+// Background Colors
+$bg-primary: var(--color-bg-primary);
+$bg-secondary: var(--color-bg-secondary);
+$bg-tertiary: var(--color-bg-tertiary);
+
+// Border Colors
+$border-light: var(--color-border-light);
+$border-base: var(--color-border-base);
+$border-dark: var(--color-border-dark);
+
+// Shadows
+$shadow-light: var(--color-shadow-light);
+$shadow-base: var(--color-shadow-base);
+$shadow-medium: var(--color-shadow-medium);
+$shadow-dark: var(--color-shadow-dark);
+
+// Border Radius
+$radius-sm: var(--radius-small);
+$radius: var(--radius-base);
+$radius-md: var(--radius-medium);
+$radius-lg: var(--radius-large);
+
+// Transitions
+$transition: var(--transition-base);
+$transition-fast: var(--transition-fast);
+$transition-slow: var(--transition-slow);
+
+// Spacing
+$spacing-xs: var(--spacing-xs);
+$spacing-sm: var(--spacing-sm);
+$spacing-md: var(--spacing-md);
+$spacing-lg: var(--spacing-lg);
+$spacing-xl: var(--spacing-xl);
+$spacing-xxl: var(--spacing-xxl);
