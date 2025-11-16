@@ -288,8 +288,9 @@
   "basicInfo": {
     "title": "第一周作业",
     "description": "完成软件工程基础的练习题",
-    "type": "exercise",
-    "difficulty": "easy"
+    "type": "homework",
+    "difficulty": "easy",
+    "completionRequirement": 100
   },
   "schedule": {
     "releaseDate": "2024-09-01T00:00:00Z",
@@ -323,8 +324,15 @@
   ],
   "settings": {
     "allowLateSubmission": true,
-    "immediateGrading": true,
+    "completionBased": true,
     "showCorrectAnswers": true
+  },
+  "statistics": {
+    "totalStudents": 30,
+    "submittedCount": 15,
+    "completionRate": 50,
+    "gradedCount": 12,
+    "gradingRate": 80
   }
 }
 ```
@@ -573,7 +581,7 @@
 }
 ```
 
-### 4.5 HOJ 编程题 (hoj)
+### 4.5 HOJ 编程题 (HOJ)
 ```json
 {
   "type": "hoj",

@@ -66,7 +66,8 @@
                   style="margin-left: 12px"
                 />
               </el-form-item>
-              <el-form-item label="及格分数">
+              <!-- 考试类才有及格分数设置 -->
+              <el-form-item v-if="['exam', 'quiz'].includes(settingsData.type)" label="及格分数">
                 <el-input-number
                   v-model="settingsData.passingScore"
                   :min="0"
@@ -74,10 +75,21 @@
                   placeholder="60"
                 />
               </el-form-item>
+
+              <!-- 作业类显示完成度要求 -->
+              <el-form-item v-else label="完成度要求">
+                <el-input-number
+                  v-model="settingsData.completionRequirement"
+                  :min="0"
+                  :max="100"
+                  placeholder="100"
+                />
+                <span style="margin-left: 8px; color: #909399;">%</span>
+              </el-form-item>
               <el-form-item label="选项">
                 <el-checkbox-group v-model="settingsData.options">
                   <el-checkbox
-                    v-for="option in advancedOptions"
+                    v-for="option in getFilteredOptions()"
                     :key="option.value"
                     :label="option.value"
                   >
@@ -198,6 +210,7 @@ const settingsData = reactive({
   enableTimeLimit: false,
   timeLimit: 60,
   passingScore: 60,
+  completionRequirement: 100,
   options: [],
   theme: 'light',
   fontSize: 14,
@@ -214,6 +227,7 @@ const defaultSettings = {
   enableTimeLimit: false,
   timeLimit: 60,
   passingScore: 60,
+  completionRequirement: 100,
   options: [],
   theme: 'light',
   fontSize: 14,
@@ -232,6 +246,18 @@ watch(settingsData, () => {
 }, { deep: true })
 
 // 方法
+const getFilteredOptions = () => {
+  if (['exam', 'quiz'].includes(settingsData.type)) {
+    // 考试类显示所有选项
+    return props.advancedOptions
+  } else {
+    // 作业类移除评分相关选项
+    return props.advancedOptions.filter(option =>
+      !['autoGrading', 'showAnswers'].includes(option.value)
+    )
+  }
+}
+
 const resetSettings = () => {
   Object.assign(settingsData, defaultSettings)
   emit('reset')

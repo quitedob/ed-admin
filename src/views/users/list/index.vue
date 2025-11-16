@@ -13,14 +13,6 @@
           <el-icon><Plus /></el-icon>
           新建学生
         </el-button>
-        <el-button @click="handleImport">
-          <el-icon><Upload /></el-icon>
-          导入学生
-        </el-button>
-        <el-button @click="handleExport">
-          <el-icon><Download /></el-icon>
-          导出学生
-        </el-button>
         <el-button
           type="danger"
           :disabled="selectedStudents.length === 0"
@@ -118,11 +110,11 @@
     </div>
 
     <!-- 新建/编辑学生对话框 -->
-    <!-- <StudentDialog
+    <StudentDialog
       v-model="studentDialogVisible"
       :student-data="currentStudent"
       @save="handleSaveStudent"
-    /> -->
+    />
   </div>
 </template>
 
@@ -132,12 +124,10 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Plus,
-  Upload,
-  Download,
   Delete,
   Search
 } from '@element-plus/icons-vue'
-// import StudentDialog from './components/StudentDialog.vue'
+import StudentDialog from './components/StudentDialog.vue'
 
 const router = useRouter()
 
@@ -263,15 +253,13 @@ const initMockData = () => {
 
 // 方法
 const handleCreate = () => {
-  // currentStudent.value = null
-  // studentDialogVisible.value = true
-  ElMessage.info('新建功能暂时禁用')
+  currentStudent.value = null
+  studentDialogVisible.value = true
 }
 
 const handleEdit = (student) => {
-  // currentStudent.value = { ...student }
-  // studentDialogVisible.value = true
-  ElMessage.info('编辑功能暂时禁用')
+  currentStudent.value = { ...student }
+  studentDialogVisible.value = true
 }
 
 const handleViewDetail = (student) => {
@@ -317,12 +305,8 @@ const handleBatchDelete = () => {
   })
 }
 
-const handleImport = () => {
-  ElMessage.info('导入功能开发中...')
-}
-
-const handleExport = () => {
-  ElMessage.info('导出功能开发中...')
+const handleSelectionChange = (selection) => {
+  selectedStudents.value = selection
 }
 
 const handleReset = () => {
@@ -331,40 +315,37 @@ const handleReset = () => {
   filterStatus.value = ''
 }
 
-const handleSelectionChange = (selection) => {
-  selectedStudents.value = selection
-}
 
-// const handleSaveStudent = (studentData) => {
-//   if (currentStudent.value) {
-//     // 更新学生
-//     const index = students.value.findIndex(s => s.id === currentStudent.value.id)
-//     if (index > -1) {
-//       students.value[index] = { ...students.value[index], ...studentData }
-//     }
-//     ElMessage.success('学生信息更新成功')
-//   } else {
-//     // 新建学生
-//     const newStudent = {
-//       id: `stu_${Date.now()}`,
-//       ...studentData,
-//       courses: [],
-//       statistics: {
-//         totalHomeworks: 0,
-//         completedHomeworks: 0,
-//         totalExams: 0,
-//         completedExams: 0,
-//         averageScore: 0,
-//         learningTime: 0
-//       },
-//       status: 'active',
-//       createdAt: new Date().toISOString()
-//     }
-//     students.value.push(newStudent)
-//     ElMessage.success('学生创建成功')
-//   }
-//   studentDialogVisible.value = false
-// }
+const handleSaveStudent = (studentData) => {
+  if (currentStudent.value) {
+    // 更新学生
+    const index = students.value.findIndex(s => s.id === currentStudent.value.id)
+    if (index > -1) {
+      students.value[index] = { ...students.value[index], ...studentData }
+    }
+    ElMessage.success('学生信息更新成功')
+  } else {
+    // 新建学生
+    const newStudent = {
+      id: `stu_${Date.now()}`,
+      ...studentData,
+      courses: [],
+      statistics: {
+        totalHomeworks: 0,
+        completedHomeworks: 0,
+        totalExams: 0,
+        completedExams: 0,
+        averageScore: 0,
+        learningTime: 0
+      },
+      status: 'active',
+      createdAt: new Date().toISOString()
+    }
+    students.value.push(newStudent)
+    ElMessage.success('学生创建成功')
+  }
+  studentDialogVisible.value = false
+}
 
 const getClassesDisplay = (classes) => {
   if (!classes || classes.length === 0) {

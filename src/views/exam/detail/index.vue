@@ -9,17 +9,17 @@
     <div class="exam-header">
       <div class="exam-info">
         <div class="exam-title">
-          <h1>{{ examInfo.basicInfo?.title }}</h1>
+          <h1>{{ examInfo.basicInfo && examInfo.basicInfo.title }}</h1>
           <div class="exam-meta">
-            <el-tag :type="getTypeTagType(examInfo.basicInfo?.type)">
-              {{ getTypeText(examInfo.basicInfo?.type) }}
+            <el-tag :type="getTypeTagType(examInfo.basicInfo && examInfo.basicInfo.type)">
+              {{ getTypeText(examInfo.basicInfo && examInfo.basicInfo.type) }}
             </el-tag>
-            <el-tag :type="getDifficultyTagType(examInfo.basicInfo?.difficulty)">
-              {{ getDifficultyText(examInfo.basicInfo?.difficulty) }}
+            <el-tag :type="getDifficultyTagType(examInfo.basicInfo && examInfo.basicInfo.difficulty)">
+              {{ getDifficultyText(examInfo.basicInfo && examInfo.basicInfo.difficulty) }}
             </el-tag>
           </div>
         </div>
-        <div class="exam-desc">{{ examInfo.basicInfo?.description }}</div>
+        <div class="exam-desc">{{ examInfo.basicInfo && examInfo.basicInfo.description }}</div>
       </div>
       <div class="exam-actions toolbar-actions">
         <el-button type="primary" @click="toExamEdit">编辑考试</el-button>
@@ -33,11 +33,11 @@
       <h3>元数据信息</h3>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="考试ID">{{ examInfo.id }}</el-descriptions-item>
-        <el-descriptions-item label="版本">{{ examInfo.metadata?.version }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间">{{ formatDate(examInfo.metadata?.createdAt) }}</el-descriptions-item>
-        <el-descriptions-item label="更新时间">{{ formatDate(examInfo.metadata?.updatedAt) }}</el-descriptions-item>
-        <el-descriptions-item label="创建者">{{ examInfo.metadata?.createdBy }}</el-descriptions-item>
-        <el-descriptions-item label="所属课程">{{ getCourseName(examInfo.metadata?.courseId) }}</el-descriptions-item>
+        <el-descriptions-item label="版本">{{ examInfo.metadata && examInfo.metadata.version }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ formatDate(examInfo.metadata && examInfo.metadata.createdAt) }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ formatDate(examInfo.metadata && examInfo.metadata.updatedAt) }}</el-descriptions-item>
+        <el-descriptions-item label="创建者">{{ examInfo.metadata && examInfo.metadata.createdBy }}</el-descriptions-item>
+        <el-descriptions-item label="所属课程">{{ getCourseName(examInfo.metadata && examInfo.metadata.courseId) }}</el-descriptions-item>
       </el-descriptions>
     </div>
 
@@ -45,10 +45,10 @@
     <div class="schedule-section">
       <h3>时间安排</h3>
       <el-descriptions :column="3" border>
-        <el-descriptions-item label="开始时间">{{ formatDate(examInfo.schedule?.startTime) }}</el-descriptions-item>
-        <el-descriptions-item label="结束时间">{{ formatDate(examInfo.schedule?.endTime) }}</el-descriptions-item>
-        <el-descriptions-item label="考试时长">{{ examInfo.schedule?.duration }}分钟</el-descriptions-item>
-        <el-descriptions-item label="查看开始时间">{{ formatDate(examInfo.schedule?.reviewStartTime) }}</el-descriptions-item>
+        <el-descriptions-item label="开始时间">{{ formatDate(examInfo.schedule && examInfo.schedule.startTime) }}</el-descriptions-item>
+        <el-descriptions-item label="结束时间">{{ formatDate(examInfo.schedule && examInfo.schedule.endTime) }}</el-descriptions-item>
+        <el-descriptions-item label="考试时长">{{ examInfo.schedule && examInfo.schedule.duration }}分钟</el-descriptions-item>
+        <el-descriptions-item label="查看开始时间">{{ formatDate(examInfo.schedule && examInfo.schedule.reviewStartTime) }}</el-descriptions-item>
       </el-descriptions>
     </div>
 
@@ -56,38 +56,38 @@
     <div class="settings-section">
       <h3>考试设置</h3>
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="总分值">{{ examInfo.settings?.totalScore }}</el-descriptions-item>
-        <el-descriptions-item label="及格分数">{{ examInfo.settings?.passingScore }}</el-descriptions-item>
+        <el-descriptions-item label="总分值">{{ examInfo.settings && examInfo.settings.totalScore }}</el-descriptions-item>
+        <el-descriptions-item label="及格分数">{{ examInfo.settings && examInfo.settings.passingScore }}</el-descriptions-item>
         <el-descriptions-item label="提交后显示分数">
-          <el-tag :type="examInfo.settings?.showScoreAfterSubmit ? 'success' : 'info'">
-            {{ examInfo.settings?.showScoreAfterSubmit ? '是' : '否' }}
+          <el-tag :type="examInfo.settings && examInfo.settings.showScoreAfterSubmit ? 'success' : 'info'">
+            {{ examInfo.settings && examInfo.settings.showScoreAfterSubmit ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="随机题目顺序">
-          <el-tag :type="examInfo.settings?.randomOrder ? 'success' : 'info'">
-            {{ examInfo.settings?.randomOrder ? '是' : '否' }}
+          <el-tag :type="examInfo.settings && examInfo.settings.randomOrder ? 'success' : 'info'">
+            {{ examInfo.settings && examInfo.settings.randomOrder ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="随机题目">
-          <el-tag :type="examInfo.settings?.randomQuestions ? 'success' : 'info'">
-            {{ examInfo.settings?.randomQuestions ? '是' : '否' }}
+          <el-tag :type="examInfo.settings && examInfo.settings.randomQuestions ? 'success' : 'info'">
+            {{ examInfo.settings && examInfo.settings.randomQuestions ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="每题库题目数">{{ examInfo.settings?.questionsPerBank }}</el-descriptions-item>
+        <el-descriptions-item label="每题库题目数">{{ examInfo.settings && examInfo.settings.questionsPerBank }}</el-descriptions-item>
         <el-descriptions-item label="允许查看">
-          <el-tag :type="examInfo.settings?.allowReview ? 'success' : 'info'">
-            {{ examInfo.settings?.allowReview ? '是' : '否' }}
+          <el-tag :type="examInfo.settings && examInfo.settings.allowReview ? 'success' : 'info'">
+            {{ examInfo.settings && examInfo.settings.allowReview ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="查看延迟(秒)">{{ examInfo.settings?.reviewDelay }}</el-descriptions-item>
+        <el-descriptions-item label="查看延迟(秒)">{{ examInfo.settings && examInfo.settings.reviewDelay }}</el-descriptions-item>
         <el-descriptions-item label="需要监考">
-          <el-tag :type="examInfo.settings?.proctorRequired ? 'warning' : 'success'">
-            {{ examInfo.settings?.proctorRequired ? '是' : '否' }}
+          <el-tag :type="examInfo.settings && examInfo.settings.proctorRequired ? 'warning' : 'success'">
+            {{ examInfo.settings && examInfo.settings.proctorRequired ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="需要摄像头">
-          <el-tag :type="examInfo.settings?.cameraRequired ? 'warning' : 'success'">
-            {{ examInfo.settings?.cameraRequired ? '是' : '否' }}
+          <el-tag :type="examInfo.settings && examInfo.settings.cameraRequired ? 'warning' : 'success'">
+            {{ examInfo.settings && examInfo.settings.cameraRequired ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
       </el-descriptions>
@@ -98,21 +98,21 @@
       <h3>评分设置</h3>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="自动批改">
-          <el-tag :type="examInfo.grading?.autoGrade ? 'success' : 'info'">
-            {{ examInfo.grading?.autoGrade ? '是' : '否' }}
+          <el-tag :type="examInfo.grading && examInfo.grading.autoGrade ? 'success' : 'info'">
+            {{ examInfo.grading && examInfo.grading.autoGrade ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="需要人工批改">
-          <el-tag :type="examInfo.grading?.manualReviewRequired ? 'warning' : 'success'">
-            {{ examInfo.grading?.manualReviewRequired ? '是' : '否' }}
+          <el-tag :type="examInfo.grading && examInfo.grading.manualReviewRequired ? 'warning' : 'success'">
+            {{ examInfo.grading && examInfo.grading.manualReviewRequired ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="问答题批改老师">
-          <el-tag v-if="examInfo.grading?.essayReviewers" v-for="teacher in examInfo.grading.essayReviewers" :key="teacher" size="small" type="info">
+          <el-tag v-if="examInfo.grading && examInfo.grading.essayReviewers" v-for="teacher in examInfo.grading.essayReviewers" :key="teacher" size="small" type="info">
             {{ teacher }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="批改截止时间">{{ formatDate(examInfo.grading?.gradingDeadline) }}</el-descriptions-item>
+        <el-descriptions-item label="批改截止时间">{{ formatDate(examInfo.grading && examInfo.grading.gradingDeadline) }}</el-descriptions-item>
       </el-descriptions>
     </div>
 
@@ -160,11 +160,11 @@
                   <div
                     v-for="student in filteredStudents"
                     :key="student.id"
-                    :class="['student-item', { active: selectedStudent?.id === student.id }]"
+                    :class="['student-item', { active: selectedStudent && selectedStudent.id === student.id }]"
                     @click="selectedStudent = student"
                   >
                     <div class="student-name">{{ student.name }}</div>
-                    <div class="student-score">{{ student.score }}/{{ examInfo.settings?.totalScore }}</div>
+                    <div class="student-score">{{ student.score }}/{{ examInfo.settings && examInfo.settings.totalScore }}</div>
                   </div>
                 </div>
               </div>
@@ -174,7 +174,7 @@
                 <h4>{{ selectedStudent.name }} 的答题详情</h4>
                 <el-descriptions :column="2" border size="small" class="student-info">
                   <el-descriptions-item label="学号">{{ selectedStudent.studentId }}</el-descriptions-item>
-                  <el-descriptions-item label="得分">{{ selectedStudent.score }}/{{ examInfo.settings?.totalScore }}</el-descriptions-item>
+                  <el-descriptions-item label="得分">{{ selectedStudent.score }}/{{ examInfo.settings && examInfo.settings.totalScore }}</el-descriptions-item>
                   <el-descriptions-item label="提交时间">{{ formatDate(selectedStudent.submitTime) }}</el-descriptions-item>
                   <el-descriptions-item label="用时">{{ selectedStudent.duration }}分钟</el-descriptions-item>
                 </el-descriptions>
@@ -211,7 +211,7 @@
                   <div
                     v-for="(question, index) in examQuestions"
                     :key="question.id"
-                    :class="['question-item-card', { active: selectedQuestion?.id === question.id }]"
+                    :class="['question-item-card', { active: selectedQuestion && selectedQuestion.id === question.id }]"
                     @click="selectedQuestion = question"
                   >
                     <div class="question-num">第{{ index + 1 }}题</div>
@@ -277,79 +277,80 @@
               <div class="bank-content">
                 <div class="bank-questions">
                   <div
-                        v-for="(question, qIndex) in bank.questions"
-                        :key="question.id"
-                        class="question-item"
-                      >
-                        <span class="question-index">{{ qIndex + 1 }}.</span>
-                        <span class="question-type">{{ getQuestionTypeText(question.type) }}</span>
-                        <span class="question-score">{{ question.score }}分</span>
-                        <span class="question-difficulty">{{ getDifficultyText(question.difficulty) }}</span>
-                      </div>
-                      
-                      <!-- 题目内容 -->
-                      <div class="question-content">
-                        <div class="question-text">{{ question.questionText }}</div>
-                        
-                        <!-- 单选题和多选题选项 -->
-                        <div v-if="question.type === 'single' || question.type === 'multiple'" class="question-options">
-                          <div
-                                v-for="option in question.options"
-                                :key="option.id"
-                                class="option-item"
-                              >
-                            <span class="option-value">{{ option.value }}.</span>
-                            <span class="option-text">{{ option.text }}</span>
-                            <span v-if="isCorrectOption(question, option)" class="correct-mark">✓</span>
-                          </div>
-                        </div>
-                        
-                        <!-- 填空题 -->
-                        <div v-else-if="question.type === 'fill'" class="question-fill">
-                          <div class="fill-hint">填空题，请直接在答题区域填写答案</div>
-                          <div class="fill-answers">
-                            <div
-                                  v-for="(answer, ansIndex) in question.correctAnswers"
-                                  :key="ansIndex"
-                                  class="fill-answer"
-                                >
-                              <span class="fill-index">答案{{ ansIndex + 1 }}:</span>
-                              <span class="fill-value">{{ answer }}</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <!-- 问答题 -->
-                        <div v-else-if="question.type === 'essay'" class="question-essay">
-                          <div class="essay-hint">问答题，请详细回答以下问题</div>
-                          <div class="essay-answer">
-                            <span class="answer-label">参考答案:</span>
-                            <div class="answer-content">{{ question.referenceAnswer }}</div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <!-- 题目解析 -->
-                      <div v-if="question.explanation" class="question-explanation">
-                        <span class="explanation-label">题目解析:</span>
-                        <div class="explanation-content">{{ question.explanation }}</div>
-                      </div>
-                      
-                      <!-- 知识点 -->
-                      <div v-if="question.knowledgePoints && question.knowledgePoints.length > 0" class="question-knowledge">
-                        <span class="knowledge-label">知识点:</span>
-                        <el-tag
-                          v-for="point in question.knowledgePoints"
-                          :key="point"
-                          size="small"
-                          class="knowledge-tag"
+                    v-for="(question, qIndex) in bank.questions"
+                    :key="question.id"
+                    class="question-item"
+                  >
+                    <div class="question-header">
+                      <span class="question-index">{{ qIndex + 1 }}.</span>
+                      <span class="question-type">{{ getQuestionTypeText(question.type) }}</span>
+                      <span class="question-score">{{ question.score }}分</span>
+                      <span class="question-difficulty">{{ getDifficultyText(question.difficulty) }}</span>
+                    </div>
+
+                    <!-- 题目内容 -->
+                    <div class="question-content">
+                      <div class="question-text">{{ question.questionText }}</div>
+
+                      <!-- 单选题和多选题选项 -->
+                      <div v-if="question.type === 'single' || question.type === 'multiple'" class="question-options">
+                        <div
+                          v-for="option in question.options"
+                          :key="option.id"
+                          class="option-item"
                         >
-                          {{ point }}
-                        </el-tag>
+                          <span class="option-value">{{ option.value }}.</span>
+                          <span class="option-text">{{ option.text }}</span>
+                          <span v-if="isCorrectOption(question, option)" class="correct-mark">✓</span>
+                        </div>
                       </div>
+
+                      <!-- 填空题 -->
+                      <div v-else-if="question.type === 'fill'" class="question-fill">
+                        <div class="fill-hint">填空题，请直接在答题区域填写答案</div>
+                        <div class="fill-answers">
+                          <div
+                            v-for="(answer, ansIndex) in question.correctAnswers"
+                            :key="ansIndex"
+                            class="fill-answer"
+                          >
+                            <span class="fill-index">答案{{ ansIndex + 1 }}:</span>
+                            <span class="fill-value">{{ answer }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 问答题 -->
+                      <div v-else-if="question.type === 'essay'" class="question-essay">
+                        <div class="essay-hint">问答题，请详细回答以下问题</div>
+                        <div class="essay-answer">
+                          <span class="answer-label">参考答案:</span>
+                          <div class="answer-content">{{ question.referenceAnswer }}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 题目解析 -->
+                    <div v-if="question.explanation" class="question-explanation">
+                      <span class="explanation-label">题目解析:</span>
+                      <div class="explanation-content">{{ question.explanation }}</div>
+                    </div>
+
+                    <!-- 知识点 -->
+                    <div v-if="question.knowledgePoints && question.knowledgePoints.length > 0" class="question-knowledge">
+                      <span class="knowledge-label">知识点:</span>
+                      <el-tag
+                        v-for="point in question.knowledgePoints"
+                        :key="point"
+                        size="small"
+                        class="knowledge-tag"
+                      >
+                        {{ point }}
+                      </el-tag>
                     </div>
                   </div>
                 </div>
+              </div>
             </div>
           </div>
           <el-empty v-else description="暂无题目库，请添加题目库" />
@@ -697,7 +698,7 @@ const viewSubmission = (submission) => {
 // 工具方法
 const getCourseName = (courseId) => {
   const course = courseOptions.value.find(c => c.id === courseId)
-  return course ? course.basicInfo?.title : ''
+  return course && course.basicInfo ? course.basicInfo.title : ''
 }
 
 const getTypeText = (type) => {

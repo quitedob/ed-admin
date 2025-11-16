@@ -79,8 +79,8 @@
       </div>
     </div>
 
-    <!-- 新建/编辑题目对话框 -->
-    <QuestionEditDialog
+    <!-- V2 新建/编辑题目对话框 -->
+    <V2QuestionEditDialog
       v-model="questionDialogVisible"
       :question-data="currentQuestion"
       @save="handleSaveQuestion"
@@ -92,7 +92,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Upload } from '@element-plus/icons-vue'
-import QuestionEditDialog from './components/QuestionEditDialog.vue'
+import V2QuestionEditDialog from '@/components/V2QuestionEditDialog.vue'
 
 // 题型定义
 const questionTypes = [

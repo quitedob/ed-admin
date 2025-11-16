@@ -3,7 +3,8 @@
     "allow": [
       "Bash(tree:*)",
       "WebSearch",
-      "mcp__web-search-prime__webSearchPrime"
+      "mcp__web-search-prime__webSearchPrime",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

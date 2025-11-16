@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps({
@@ -208,7 +208,10 @@ const handleSave = async () => {
 }
 
 // 监听props变化来初始化表单
-const unwatch = computed(() => props.studentData)
+watch(() => props.studentData, () => {
+  initFormData()
+}, { immediate: true })
+
 initFormData()
 </script>
 

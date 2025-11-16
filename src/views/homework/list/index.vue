@@ -89,6 +89,23 @@
               </div>
             </div>
 
+            <!-- 作业完成度统计 -->
+            <div class="homework-stats">
+              <div class="completion-info">
+                <span class="stat-label">完成进度:</span>
+                <div class="progress-container">
+                  <el-progress
+                    :percentage="homework.completionRate || 0"
+                    :color="getProgressColor(homework.completionRate || 0)"
+                    :show-text="false"
+                    :stroke-width="8"
+                  />
+                  <span class="progress-text">{{ homework.submittedCount || 0 }}/{{ homework.totalStudents || 0 }}</span>
+                </div>
+                <span class="percentage">{{ homework.completionRate || 0 }}%</span>
+              </div>
+            </div>
+
             <div class="homework-actions card-actions">
               <el-button link type="primary" @click="handleEdit(homework)">
                 <el-icon><Edit /></el-icon>
@@ -502,6 +519,47 @@ onMounted(() => {
       .el-icon {
         font-size: 14px;
         color: var(--color-primary);
+      }
+    }
+  }
+
+  .homework-stats {
+    margin-bottom: 12px;
+    padding: 8px;
+    background-color: var(--color-bg-primary);
+    border-radius: 6px;
+
+    .completion-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+
+      .stat-label {
+        color: var(--color-text-secondary);
+        font-weight: 500;
+        min-width: 60px;
+      }
+
+      .progress-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .progress-text {
+          font-size: 11px;
+          color: var(--color-text-secondary);
+          min-width: 40px;
+          text-align: right;
+        }
+      }
+
+      .percentage {
+        font-weight: 600;
+        color: var(--color-text-primary);
+        min-width: 35px;
+        text-align: right;
       }
     }
   }

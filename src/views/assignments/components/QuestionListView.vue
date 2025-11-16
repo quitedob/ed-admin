@@ -79,8 +79,8 @@
       />
     </div>
 
-    <!-- 新建/编辑题目对话框 -->
-    <QuestionEditDialog
+    <!-- V2 新建/编辑题目对话框 -->
+    <V2QuestionEditDialog
       v-model="questionDialogVisible"
       :question-data="currentQuestion"
       @save="handleSaveQuestion"
@@ -99,7 +99,7 @@
 import { ref, computed } from 'vue'
 import { Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import QuestionEditDialog from './QuestionEditDialog.vue'
+import V2QuestionEditDialog from '@/components/V2QuestionEditDialog.vue'
 import TagManageDialog from './TagManageDialog.vue'
 
 const props = defineProps({

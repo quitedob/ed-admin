@@ -36,7 +36,7 @@ const constantRoutes = [
       },
       {
         path: 'chapter',
-        component: () => import('@/views/course/chapter/index.vue'),
+        component: () => import('@/views/course/update/ModernCourseUpdate.vue'),
         meta: { title: '章节管理' }
       }
     ]
@@ -176,7 +176,8 @@ export function createNewRouter(data) {
     { path: '/ai', redirect: '/ai/assistant' },
     { path: '/class', redirect: '/class/management' },
     { path: '/homework', redirect: '/homework/list' },
-    { path: '/exam', redirect: '/exam/list' }
+    { path: '/exam', redirect: '/exam/list' },
+    { path: '/assignments', redirect: '/assignments/v2-list' }
   ]
 
   // 添加新功能路由
@@ -352,6 +353,12 @@ export function createNewRouter(data) {
           meta: { title: '批改考试' }
         },
         {
+          path: 'grade/:id/paper/:submissionId',
+          name: 'ExamPaperView',
+          component: () => import('@/views/exam/grade/StudentPaper.vue'),
+          meta: { title: '查看答卷' }
+        },
+        {
           path: 'monitor',
           name: 'ExamMonitor',
           component: () => import('@/views/exam/monitor/index.vue'),
@@ -365,7 +372,21 @@ export function createNewRouter(data) {
         }
       ]
     }
-  ]
+  },
+  {
+    path: '/assignments',
+    component: Layout,
+    redirect: '/assignments/v2-list',
+    children: [
+      {
+        path: 'v2-list',
+        name: 'V2AssignmentList',
+        component: () => import('@/views/assignments/v2-list.vue'),
+        meta: { title: '作业管理' }
+      }
+    ]
+  }
+]
 
 
   // 添加新功能路由
