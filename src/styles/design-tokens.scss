@@ -221,3 +221,72 @@ $breakpoint-xl: 1920px;
 .shadow { box-shadow: var(--shadow-base) !important; }
 .shadow-md { box-shadow: var(--shadow-md) !important; }
 .shadow-lg { box-shadow: var(--shadow-lg) !important; }
+
+
+// ========== 操作栏工具类 ==========
+
+/* 通用操作按钮行：统一保证一行展示 */
+.toolbar-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  
+  .el-button {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+/* 小屏幕下允许换行，避免挤爆布局 */
+@media (max-width: 768px) {
+  .toolbar-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+/* 卡片内操作栏：保证按钮一行展示 */
+.card-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  
+  .el-button {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* 表格操作列：保证按钮一行展示 */
+.table-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  
+  .el-button {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}

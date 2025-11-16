@@ -174,10 +174,12 @@
         </el-table-column>
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
           <template #default="scope">
-            <el-button link type="primary" @click="handleView(scope.row)">查看</el-button>
-            <el-button link type="primary" @click="handleRejudge(scope.row)">重测</el-button>
-            <el-button link type="primary" @click="handleCompare(scope.row)">对比</el-button>
-            <el-button link type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <div class="table-actions">
+              <el-button link type="primary" @click="handleView(scope.row)">查看</el-button>
+              <el-button link type="primary" @click="handleRejudge(scope.row)">重测</el-button>
+              <el-button link type="primary" @click="handleCompare(scope.row)">对比</el-button>
+              <el-button link type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>

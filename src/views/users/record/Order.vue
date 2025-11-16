@@ -58,7 +58,9 @@
       </el-table-column>
       <el-table-column :width="100" fixed="right" label="操作" prop="address">
         <template #default="scope">
-          <el-button v-permission="'order:remark'" text type="primary" @click="openFormModal(scope.row)">写备注</el-button>
+          <div class="table-actions">
+            <el-button v-permission="'order:remark'" text type="primary" @click="openFormModal(scope.row)">写备注</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>

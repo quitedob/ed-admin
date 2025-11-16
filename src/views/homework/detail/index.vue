@@ -21,7 +21,7 @@
         </div>
         <div class="homework-desc">{{ homeworkInfo.basicInfo?.description }}</div>
       </div>
-      <div class="homework-actions">
+      <div class="homework-actions toolbar-actions">
         <el-button type="primary" @click="toHomeworkEdit">编辑作业</el-button>
         <el-button type="success" @click="toHomeworkGrade">批改作业</el-button>
       </div>

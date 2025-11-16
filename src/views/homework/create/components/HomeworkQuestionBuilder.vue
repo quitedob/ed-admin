@@ -1,54 +1,24 @@
 <template>
-  <el-card shadow="never">
-    <template #header>
-      <div class="header-section">
-        <span class="step-title">组建试卷</span>
-        <el-button type="primary" @click="handleAddFromBank">
-          <el-icon><Plus /></el-icon>
-          从题库添加
-        </el-button>
+  <div class="question-builder">
+    <div class="builder-header">
+      <div class="stats">
+        <span>总题数: {{ questions.length }}</span>
       </div>
-    </template>
-
-    <!-- 试卷统计 -->
-    <div class="paper-stats">
-      <el-row :gutter="20">
-        <el-col :span="8">
-          <div class="stat-card">
-            <div class="stat-label">总题数</div>
-            <div class="stat-value">{{ totalQuestions }}</div>
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="stat-card">
-            <div class="stat-label">总分值</div>
-            <div class="stat-value">{{ totalScore }}</div>
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="stat-card">
-            <div class="stat-label">及格分</div>
-            <el-input-number
-              v-model="passingScoreValue"
-              :min="0"
-              :max="totalScore"
-              size="small"
-              @change="handlePassingScoreChange"
-            />
-          </div>
-        </el-col>
-      </el-row>
+      <el-button type="primary" @click="handleAddFromBank">
+        <el-icon><Plus /></el-icon>
+        从题库添加
+      </el-button>
     </div>
 
     <!-- 题目列表 -->
     <div class="question-list">
-      <div v-if="questionBanksValue.length === 0" class="empty-state">
+      <div v-if="questions.length === 0" class="empty-state">
         <el-empty description="暂无题目，请从题库添加" />
       </div>
 
       <div v-else>
         <div
-          v-for="(question, index) in questionBanksValue"
+          v-for="(question, index) in questions"
           :key="question.id"
           class="question-item"
         >
@@ -59,14 +29,6 @@
             </el-tag>
             <span class="question-text">{{ question.questionText }}</span>
             <div class="question-actions">
-              <el-input-number
-                v-model="question.score"
-                :min="1"
-                :max="100"
-                size="small"
-                @change="updateTotalScore"
-              />
-              <span style="margin: 0 8px">分</span>
               <el-button
                 type="danger"
                 size="small"
@@ -109,7 +71,6 @@
                   </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column label="默认分值" prop="score" width="100" />
             </el-table>
           </el-tab-pane>
         </el-tabs>
@@ -122,39 +83,26 @@
         </el-button>
       </template>
     </el-dialog>
-  </el-card>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 
 const props = defineProps({
-  questionBanks: {
+  questions: {
     type: Array,
     default: () => []
-  },
-  totalScore: {
-    type: Number,
-    default: 0
-  },
-  passingScore: {
-    type: Number,
-    default: 60
   }
 })
 
-const emit = defineEmits(['update:questionBanks', 'update:totalScore', 'update:passingScore'])
+const emit = defineEmits(['update:questions'])
 
-const questionBanksValue = computed({
-  get: () => props.questionBanks,
-  set: (val) => emit('update:questionBanks', val)
-})
-
-const passingScoreValue = computed({
-  get: () => props.passingScore,
-  set: (val) => emit('update:passingScore', val)
+const questionsValue = computed({
+  get: () => props.questions,
+  set: (val) => emit('update:questions', val)
 })
 
 const selectDialogVisible = ref(false)
@@ -176,47 +124,39 @@ const mockQuestionBank = ref([
     id: 'q_001',
     type: 'single',
     questionText: '以下哪个不是JavaScript的数据类型？',
-    difficulty: 'easy',
-    score: 2
+    difficulty: 'easy'
   },
   {
     id: 'q_002',
     type: 'multiple',
     questionText: '以下哪些是Java的基本数据类型？',
-    difficulty: 'easy',
-    score: 3
+    difficulty: 'easy'
   },
   {
     id: 'q_003',
     type: 'fill',
     questionText: 'Java中，___是所有类的父类',
-    difficulty: 'medium',
-    score: 4
+    difficulty: 'medium'
   },
   {
     id: 'q_004',
     type: 'judge',
     questionText: 'Java中，接口可以包含方法的实现。',
-    difficulty: 'medium',
-    score: 2
+    difficulty: 'medium'
   },
   {
     id: 'q_005',
     type: 'programming',
     questionText: '实现一个函数，判断一个字符串是否为回文串',
-    difficulty: 'medium',
-    score: 10
+    difficulty: 'medium'
   },
   {
     id: 'q_006',
     type: 'essay',
     questionText: '请简述MVC设计模式的核心思想及其优点。',
-    difficulty: 'hard',
-    score: 10
+    difficulty: 'hard'
   }
 ])
-
-const totalQuestions = computed(() => questionBanksValue.value.length)
 
 const handleAddFromBank = () => {
   selectDialogVisible.value = true
@@ -237,8 +177,7 @@ const handleConfirmSelect = () => {
   }
 
   const newQuestions = selectedQuestions.value.map(q => ({ ...q }))
-  questionBanksValue.value = [...questionBanksValue.value, ...newQuestions]
-  updateTotalScore()
+  questionsValue.value = [...questionsValue.value, ...newQuestions]
   
   selectDialogVisible.value = false
   selectedQuestions.value = []
@@ -246,17 +185,7 @@ const handleConfirmSelect = () => {
 }
 
 const handleRemove = (index) => {
-  questionBanksValue.value.splice(index, 1)
-  updateTotalScore()
-}
-
-const updateTotalScore = () => {
-  const total = questionBanksValue.value.reduce((sum, q) => sum + (q.score || 0), 0)
-  emit('update:totalScore', total)
-}
-
-const handlePassingScoreChange = (val) => {
-  emit('update:passingScore', val)
+  questionsValue.value.splice(index, 1)
 }
 
 const getTypeLabel = (type) => {
@@ -303,80 +232,60 @@ const getDifficultyTagType = (difficulty) => {
 </script>
 
 <style lang="scss" scoped>
-.header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.question-builder {
+  .builder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 
-  .step-title {
-    font-size: 16px;
-    font-weight: 600;
-  }
-}
-
-.paper-stats {
-  margin-bottom: 24px;
-
-  .stat-card {
-    text-align: center;
-    padding: 16px;
-    background: var(--color-bg-secondary);
-    border-radius: 8px;
-
-    .stat-label {
+    .stats {
       font-size: 14px;
       color: var(--color-text-secondary);
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--color-primary);
     }
   }
-}
 
-.question-list {
-  .empty-state {
-    padding: 40px 0;
-  }
-
-  .question-item {
-    padding: 16px;
-    margin-bottom: 12px;
-    background: var(--color-bg-secondary);
-    border-radius: 8px;
-    transition: all 0.3s;
-
-    &:hover {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  .question-list {
+    .empty-state {
+      padding: 40px 0;
     }
 
-    .question-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .question-item {
+      padding: 16px;
+      margin-bottom: 12px;
+      background: var(--color-bg-secondary);
+      border-radius: 8px;
+      transition: all 0.3s;
 
-      .question-num {
-        font-weight: 600;
-        color: var(--color-text-primary);
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
 
-      .question-text {
-        flex: 1;
-        color: var(--color-text-regular);
-      }
-
-      .question-actions {
+      .question-header {
         display: flex;
         align-items: center;
+        gap: 12px;
+
+        .question-num {
+          font-weight: 600;
+          color: var(--color-text-primary);
+        }
+
+        .question-text {
+          flex: 1;
+          color: var(--color-text-regular);
+        }
+
+        .question-actions {
+          display: flex;
+          align-items: center;
+        }
       }
     }
   }
-}
 
-.bank-selector {
-  min-height: 400px;
+  .bank-selector {
+    min-height: 400px;
+  }
 }
 </style>

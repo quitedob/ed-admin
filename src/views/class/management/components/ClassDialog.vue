@@ -19,50 +19,21 @@
         />
       </el-form-item>
 
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="年级" prop="grade">
-            <el-select v-model="form.grade" placeholder="请选择年级">
-              <el-option label="大一" value="freshman" />
-              <el-option label="大二" value="sophomore" />
-              <el-option label="大三" value="junior" />
-              <el-option label="大四" value="senior" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="专业" prop="major">
-            <el-select v-model="form.major" placeholder="请选择专业">
-              <el-option label="前端开发" value="frontend" />
-              <el-option label="后端开发" value="backend" />
-              <el-option label="数据科学" value="data-science" />
-              <el-option label="云计算" value="cloud" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="年份" prop="year">
-            <el-date-picker
-              v-model="form.year"
-              type="year"
-              placeholder="选择年份"
-              style="width: 100%"
-              value-format="YYYY"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="学期" prop="semester">
-            <el-select v-model="form.semester" placeholder="请选择学期">
-              <el-option label="春季" value="spring" />
-              <el-option label="秋季" value="fall" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <el-form-item label="年级" prop="grade">
+        <el-select v-model="form.grade" placeholder="请选择年级">
+          <el-option label="一年级" value="grade1" />
+          <el-option label="二年级" value="grade2" />
+          <el-option label="三年级" value="grade3" />
+          <el-option label="四年级" value="grade4" />
+          <el-option label="五年级" value="grade5" />
+          <el-option label="初一" value="grade7" />
+          <el-option label="初二" value="grade8" />
+          <el-option label="初三" value="grade9" />
+          <el-option label="高一" value="grade10" />
+          <el-option label="高二" value="grade11" />
+          <el-option label="高三" value="grade12" />
+        </el-select>
+      </el-form-item>
 
       <el-form-item label="班主任" prop="headTeacherId">
         <el-select v-model="form.headTeacherId" placeholder="请选择班主任" filterable>
@@ -109,9 +80,6 @@ const form = ref({
   name: '',
   description: '',
   grade: '',
-  major: '',
-  year: new Date().getFullYear().toString(),
-  semester: 'fall',
   headTeacherId: '',
   headTeacherName: ''
 })
@@ -119,9 +87,6 @@ const form = ref({
 const rules = {
   name: [{ required: true, message: '请输入班级名称', trigger: 'blur' }],
   grade: [{ required: true, message: '请选择年级', trigger: 'change' }],
-  major: [{ required: true, message: '请选择专业', trigger: 'change' }],
-  year: [{ required: true, message: '请选择年份', trigger: 'change' }],
-  semester: [{ required: true, message: '请选择学期', trigger: 'change' }],
   headTeacherId: [{ required: true, message: '请选择班主任', trigger: 'change' }]
 }
 
@@ -143,9 +108,6 @@ watch(() => props.classData, (newData) => {
       name: newData.name || '',
       description: newData.description || '',
       grade: newData.grade || '',
-      major: newData.major || '',
-      year: newData.year?.toString() || new Date().getFullYear().toString(),
-      semester: newData.semester || 'fall',
       headTeacherId: newData.headTeacherId || '',
       headTeacherName: newData.headTeacherName || ''
     }
@@ -154,9 +116,6 @@ watch(() => props.classData, (newData) => {
       name: '',
       description: '',
       grade: '',
-      major: '',
-      year: new Date().getFullYear().toString(),
-      semester: 'fall',
       headTeacherId: '',
       headTeacherName: ''
     }
@@ -166,10 +125,7 @@ watch(() => props.classData, (newData) => {
 const handleSave = () => {
   formRef.value.validate((valid) => {
     if (valid) {
-      emit('save', {
-        ...form.value,
-        year: parseInt(form.value.year)
-      })
+      emit('save', form.value)
     }
   })
 }

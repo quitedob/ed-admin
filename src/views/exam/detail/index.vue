@@ -21,7 +21,7 @@
         </div>
         <div class="exam-desc">{{ examInfo.basicInfo?.description }}</div>
       </div>
-      <div class="exam-actions">
+      <div class="exam-actions toolbar-actions">
         <el-button type="primary" @click="toExamEdit">编辑考试</el-button>
         <el-button type="success" @click="toExamGrade">批改考试</el-button>
         <el-button type="warning" @click="toExamMonitor">监控考试</el-button>
@@ -384,7 +384,9 @@
             <el-table-column label="设备信息" prop="deviceInfo" />
             <el-table-column label="操作" width="120">
               <template #default="scope">
-                <el-button text type="primary" @click="viewSubmission(scope.row)">查看</el-button>
+                <div class="table-actions">
+                  <el-button text type="primary" @click="viewSubmission(scope.row)">查看</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -475,7 +477,7 @@ const studentAnswers = ref([])
 
 // 获取考试详情
 const getExamDetail = () => {
-  const examId = route.query.id
+  const examId = route.params.id
   if (!examId) {
     return
   }

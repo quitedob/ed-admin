@@ -22,30 +22,17 @@
             <div class="filter-label">年级</div>
             <el-select v-model="filterGrade" placeholder="全部年级" clearable>
               <el-option label="全部年级" value="" />
-              <el-option label="大一" value="freshman" />
-              <el-option label="大二" value="sophomore" />
-              <el-option label="大三" value="junior" />
-              <el-option label="大四" value="senior" />
-            </el-select>
-          </div>
-
-          <div class="filter-section">
-            <div class="filter-label">专业</div>
-            <el-select v-model="filterMajor" placeholder="全部专业" clearable>
-              <el-option label="全部专业" value="" />
-              <el-option label="前端开发" value="frontend" />
-              <el-option label="后端开发" value="backend" />
-              <el-option label="数据科学" value="data-science" />
-              <el-option label="云计算" value="cloud" />
-            </el-select>
-          </div>
-
-          <div class="filter-section">
-            <div class="filter-label">学期</div>
-            <el-select v-model="filterSemester" placeholder="全部学期" clearable>
-              <el-option label="全部学期" value="" />
-              <el-option label="春季" value="spring" />
-              <el-option label="秋季" value="fall" />
+              <el-option label="一年级" value="grade1" />
+              <el-option label="二年级" value="grade2" />
+              <el-option label="三年级" value="grade3" />
+              <el-option label="四年级" value="grade4" />
+              <el-option label="五年级" value="grade5" />
+              <el-option label="初一" value="grade7" />
+              <el-option label="初二" value="grade8" />
+              <el-option label="初三" value="grade9" />
+              <el-option label="高一" value="grade10" />
+              <el-option label="高二" value="grade11" />
+              <el-option label="高三" value="grade12" />
             </el-select>
           </div>
         </div>
@@ -109,9 +96,22 @@
                     <el-icon><Reading /></el-icon>
                     <span>课程: {{ classItem.courseCount }}门</span>
                   </div>
-                  <div class="stat-item">
-                    <el-icon><Calendar /></el-icon>
-                    <span>{{ classItem.year }}年{{ getSemesterLabel(classItem.semester) }}</span>
+                  <div class="stat-item class-code-item">
+                    <span class="code-label">班级码:</span>
+                    <el-input
+                      v-model="classItem.code"
+                      size="small"
+                      class="code-input"
+                      readonly
+                    />
+                    <el-button
+                      type="primary"
+                      size="small"
+                      text
+                      @click="editClassCode(classItem)"
+                    >
+                      编辑
+                    </el-button>
                   </div>
                 </div>
 
@@ -145,9 +145,6 @@
                   </el-button>
                   <el-button link type="primary" size="small" @click="handleAuthorizeExams(classItem)">
                     授权考试
-                  </el-button>
-                  <el-button link type="primary" size="small" @click="handleClassCode(classItem)">
-                    班级码/审核申请
                   </el-button>
                 </div>
               </el-card>
@@ -282,16 +279,13 @@ const initMockData = () => {
   classes.value = [
     {
       id: 'class_001',
-      name: '前端开发一班',
-      description: '2024年秋季前端开发基础班',
+      name: '一年级一班',
+      description: '小学一年级基础班',
       headTeachers: [
         { id: 'teacher_001', name: '王老师' },
         { id: 'teacher_005', name: '陈老师' }
       ],
-      year: 2024,
-      semester: 'fall',
-      major: 'frontend',
-      grade: 'junior',
+      grade: 'grade1',
       studentCount: 30,
       teacherCount: 3,
       courseCount: 3,
@@ -300,15 +294,12 @@ const initMockData = () => {
     },
     {
       id: 'class_002',
-      name: '前端开发二班',
-      description: '2024年秋季前端开发进阶班',
+      name: '五年级二班',
+      description: '小学五年级进阶班',
       headTeachers: [
         { id: 'teacher_002', name: '李老师' }
       ],
-      year: 2024,
-      semester: 'fall',
-      major: 'frontend',
-      grade: 'junior',
+      grade: 'grade5',
       studentCount: 28,
       teacherCount: 2,
       courseCount: 2,
@@ -317,15 +308,12 @@ const initMockData = () => {
     },
     {
       id: 'class_003',
-      name: '数据科学班',
-      description: '2024年春季数据科学基础班',
+      name: '初二一班',
+      description: '初中二年级班',
       headTeachers: [
         { id: 'teacher_003', name: '张老师' }
       ],
-      year: 2024,
-      semester: 'spring',
-      major: 'data-science',
-      grade: 'sophomore',
+      grade: 'grade8',
       studentCount: 25,
       teacherCount: 2,
       courseCount: 4,
@@ -334,16 +322,13 @@ const initMockData = () => {
     },
     {
       id: 'class_004',
-      name: '云计算班',
-      description: '2024年秋季云计算技术班',
+      name: '高三三班',
+      description: '高中三年级毕业班',
       headTeachers: [
         { id: 'teacher_004', name: '赵老师' },
         { id: 'teacher_006', name: '刘老师' }
       ],
-      year: 2024,
-      semester: 'fall',
-      major: 'cloud',
-      grade: 'senior',
+      grade: 'grade12',
       studentCount: 22,
       teacherCount: 3,
       courseCount: 3,
@@ -392,9 +377,19 @@ const handleAuthorizeExams = (classItem) => {
   authorizationDialogVisible.value = true
 }
 
-const handleClassCode = (classItem) => {
-  ElMessage.info(`班级码功能开发中：${classItem.name}`)
-  // 这里会打开班级码和待审核学生列表
+const editClassCode = (classItem) => {
+  ElMessageBox.prompt('请输入新的班级码', '编辑班级码', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputValue: classItem.code
+  }).then(({ value }) => {
+    if (value) {
+      classItem.code = value
+      ElMessage.success('班级码已更新')
+    }
+  }).catch(() => {
+    ElMessage.info('已取消编辑')
+  })
 }
 
 const handleStudentsSave = (data) => {
@@ -447,10 +442,17 @@ const handleSaveClass = (classData) => {
 
 const getGradeLabel = (grade) => {
   const map = {
-    freshman: '大一',
-    sophomore: '大二',
-    junior: '大三',
-    senior: '大四'
+    grade1: '一年级',
+    grade2: '二年级',
+    grade3: '三年级',
+    grade4: '四年级',
+    grade5: '五年级',
+    grade7: '初一',
+    grade8: '初二',
+    grade9: '初三',
+    grade10: '高一',
+    grade11: '高二',
+    grade12: '高三'
   }
   return map[grade] || grade
 }
@@ -635,6 +637,37 @@ onMounted(() => {
 
       .el-icon {
         color: var(--color-primary);
+      }
+
+      &.class-code-item {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .code-label {
+          color: var(--color-text-secondary);
+          font-weight: 500;
+          min-width: 50px;
+        }
+
+        .code-input {
+          flex: 1;
+          max-width: 150px;
+
+          :deep(.el-input__wrapper) {
+            padding: 4px 8px;
+          }
+
+          :deep(.el-input__inner) {
+            font-size: 12px;
+            font-family: monospace;
+          }
+        }
+
+        .el-button {
+          margin-left: 8px;
+        }
       }
     }
   }

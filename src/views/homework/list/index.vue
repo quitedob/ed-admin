@@ -77,45 +77,26 @@
             <div class="homework-info">
               <div class="info-item">
                 <el-icon><Calendar /></el-icon>
-                <span>{{ formatDate(homework.schedule.dueTime) }}</span>
+                <span>开始: {{ formatDate(homework.schedule.releaseTime) }}</span>
+              </div>
+              <div class="info-item">
+                <el-icon><Calendar /></el-icon>
+                <span>截止: {{ formatDate(homework.schedule.dueTime) }}</span>
               </div>
               <div class="info-item">
                 <el-icon><Document /></el-icon>
                 <span>{{ homework.questions.length }}道题</span>
               </div>
-              <div class="info-item">
-                <el-icon><User /></el-icon>
-                <span>{{ homework.totalStudents }}人</span>
-              </div>
             </div>
 
-            <div class="homework-stats">
-              <div class="stat-item">
-                <span class="stat-label">完成度</span>
-                <span class="stat-value">{{ homework.completionRate || 0 }}%</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">提交人数</span>
-                <span class="stat-value">{{ homework.submittedCount || 0 }}/{{ homework.totalStudents }}</span>
-              </div>
-            </div>
-
-            <div class="homework-actions">
+            <div class="homework-actions card-actions">
               <el-button link type="primary" @click="handleEdit(homework)">
                 <el-icon><Edit /></el-icon>
                 编辑
               </el-button>
               <el-button link type="success" @click="handleGrade(homework)">
                 <el-icon><Document /></el-icon>
-                答题情况
-              </el-button>
-              <el-button link type="info" @click="handleAnalysis(homework)">
-                <el-icon><DataAnalysis /></el-icon>
-                分析
-              </el-button>
-              <el-button link type="warning" @click="handleCopy(homework)">
-                <el-icon><CopyDocument /></el-icon>
-                复制
+                批改
               </el-button>
               <el-button link type="danger" @click="handleDelete(homework)">
                 <el-icon><Delete /></el-icon>
@@ -151,11 +132,8 @@ import {
   Search,
   Edit,
   Document,
-  DataAnalysis,
-  CopyDocument,
   Delete,
-  Calendar,
-  User
+  Calendar
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -332,20 +310,6 @@ const handleEdit = (homework) => {
 
 const handleGrade = (homework) => {
   router.push(`/homework/grading?id=${homework.id}`)
-}
-
-const handleAnalysis = (homework) => {
-  router.push(`/homework/statistics?id=${homework.id}`)
-}
-
-const handleCopy = (homework) => {
-  ElMessageBox.confirm('确定要复制该作业吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'info'
-  }).then(() => {
-    ElMessage.success('作业复制成功')
-  })
 }
 
 const handleDelete = (homework) => {
@@ -542,43 +506,11 @@ onMounted(() => {
     }
   }
 
-  .homework-stats {
-    display: flex;
-    justify-content: space-around;
-    padding: 12px;
-    background: var(--color-bg-secondary);
-    border-radius: 6px;
-    margin-bottom: 12px;
-
-    .stat-item {
-      text-align: center;
-
-      .stat-label {
-        display: block;
-        font-size: 12px;
-        color: var(--color-text-secondary);
-        margin-bottom: 4px;
-      }
-
-      .stat-value {
-        display: block;
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--color-primary);
-      }
-    }
-  }
-
   .homework-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
     padding-top: 12px;
     border-top: 1px solid var(--color-border-lighter);
 
     .el-button {
-      flex: 1;
-      min-width: 60px;
       font-size: 12px;
     }
   }

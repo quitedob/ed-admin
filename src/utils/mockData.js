@@ -356,3 +356,115 @@ export function generateAllMockData() {
     generatedAt: new Date().toISOString()
   }
 }
+
+// Mock API
+export const mockApi = {
+  getCourseDetail(courseId) {
+    return Promise.resolve({
+      id: courseId,
+      name: '示例课程',
+      description: '这是一个示例课程',
+      chapters: [
+        {
+          id: 'chapter_001',
+          name: '第一章',
+          description: '第一章内容',
+          order: 1
+        },
+        {
+          id: 'chapter_002',
+          name: '第二章',
+          description: '第二章内容',
+          order: 2
+        }
+      ],
+      createdAt: new Date().toISOString()
+    })
+  },
+  
+  getCourses() {
+    return Promise.resolve({
+      records: [
+        { id: 'course_001', basicInfo: { title: 'JavaScript基础' } },
+        { id: 'course_002', basicInfo: { title: 'Vue.js框架' } },
+        { id: 'course_003', basicInfo: { title: 'React基础' } }
+      ]
+    })
+  },
+  
+  getExamDetail(examId) {
+    return Promise.resolve({
+      id: examId,
+      basicInfo: {
+        title: 'JavaScript期中考试',
+        description: 'JavaScript基础知识期中测试',
+        type: 'midterm',
+        difficulty: 'medium'
+      },
+      metadata: {
+        version: '1.0',
+        createdAt: '2024-12-01T10:00:00Z',
+        updatedAt: '2024-12-15T15:30:00Z',
+        createdBy: '张老师',
+        courseId: 'course_001'
+      },
+      schedule: {
+        startTime: '2024-12-15T10:00:00Z',
+        endTime: '2024-12-15T11:30:00Z',
+        duration: 90,
+        reviewStartTime: '2024-12-15T12:00:00Z'
+      },
+      settings: {
+        totalScore: 100,
+        passingScore: 60,
+        showScoreAfterSubmit: true,
+        randomOrder: false,
+        randomQuestions: false,
+        questionsPerBank: 10,
+        allowReview: true,
+        reviewDelay: 0,
+        proctorRequired: false,
+        cameraRequired: false
+      },
+      grading: {
+        autoGrade: true,
+        manualReviewRequired: false,
+        essayReviewers: ['张老师', '李老师'],
+        gradingDeadline: '2024-12-20T23:59:59Z'
+      },
+      questionBanks: [
+        {
+          id: 'bank_001',
+          name: '单选题库',
+          type: 'single',
+          questionCount: 10,
+          questions: [
+            {
+              id: 'q1',
+              type: 'single',
+              questionText: '以下哪个不是JavaScript的数据类型？',
+              score: 10,
+              difficulty: 'easy',
+              options: [
+                { id: 'opt1', value: 'A', text: 'String', isCorrect: false },
+                { id: 'opt2', value: 'B', text: 'Number', isCorrect: false },
+                { id: 'opt3', value: 'C', text: 'Character', isCorrect: true },
+                { id: 'opt4', value: 'D', text: 'Boolean', isCorrect: false }
+              ],
+              correctAnswer: 'C',
+              explanation: 'JavaScript没有Character类型',
+              knowledgePoints: ['数据类型', '基础语法']
+            }
+          ]
+        },
+        {
+          id: 'bank_002',
+          name: '多选题库',
+          type: 'multiple',
+          questionCount: 5,
+          questions: []
+        }
+      ]
+    })
+  }
+}

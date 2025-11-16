@@ -1,32 +1,31 @@
 <template>
   <el-drawer
     v-model="visible"
-    :title="teacherData?.id ? `编辑老师 - ${teacherData?.name}` : '新建老师'"
+    :title="`老师详情 - ${teacherData?.name}`"
     size="60%"
     @close="handleClose"
   >
     <div class="teacher-detail-container">
-      <!-- 上半部分：个人信息（可编辑） -->
+      <!-- 上半部分：个人信息（只读） -->
       <div class="info-section">
         <h4>个人信息</h4>
         <el-form :model="formData" label-width="100px" class="teacher-form">
           <el-form-item label="老师姓名">
-            <el-input v-model="formData.name" placeholder="请输入老师姓名" />
+            <span>{{ formData.name }}</span>
           </el-form-item>
           <el-form-item label="工号">
-            <el-input v-model="formData.teacherId" placeholder="请输入工号" />
+            <span>{{ formData.teacherId }}</span>
           </el-form-item>
           <el-form-item label="手机号">
-            <el-input v-model="formData.phone" placeholder="请输入手机号" />
+            <span>{{ formData.phone }}</span>
           </el-form-item>
           <el-form-item label="邮箱">
-            <el-input v-model="formData.email" placeholder="请输入邮箱" />
+            <span>{{ formData.email }}</span>
           </el-form-item>
           <el-form-item label="账号状态">
-            <el-select v-model="formData.status" placeholder="请选择状态">
-              <el-option label="活跃" value="active" />
-              <el-option label="停用" value="inactive" />
-            </el-select>
+            <el-tag :type="getStatusTagType(formData.status)">
+              {{ getStatusLabel(formData.status) }}
+            </el-tag>
           </el-form-item>
         </el-form>
       </div>
@@ -43,7 +42,6 @@
                   v-for="cls in formData.authorizedClasses"
                   :key="cls.id"
                   class="list-item"
-                  @click="navigateToClass(cls)"
                 >
                   <div class="item-header">
                     <span class="item-name">{{ cls.name }}</span>
@@ -79,8 +77,13 @@
 
     <template #footer>
       <div style="flex: auto;">
-        <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleSave">保存</el-button>
+        <el-button 
+          :type="formData.status === 'active' ? 'warning' : 'success'"
+          @click="handleToggleStatus"
+        >
+          {{ formData.status === 'active' ? '停用老师' : '激活老师' }}
+        </el-button>
+        <el-button @click="handleClose">关闭</el-button>
       </div>
     </template>
   </el-drawer>
@@ -88,7 +91,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -96,7 +99,7 @@ const props = defineProps({
   teacherData: Object
 })
 
-const emit = defineEmits(['update:modelValue', 'save'])
+const emit = defineEmits(['update:modelValue', 'toggle-status'])
 
 const router = useRouter()
 
@@ -138,6 +141,22 @@ watch(
 )
 
 // 方法
+const getStatusLabel = (status) => {
+  const map = {
+    active: '活跃',
+    inactive: '停用'
+  }
+  return map[status] || status
+}
+
+const getStatusTagType = (status) => {
+  const map = {
+    active: 'success',
+    inactive: 'info'
+  }
+  return map[status] || ''
+}
+
 const getRoleLabel = (role) => {
   const map = {
     headTeacher: '班主任',
@@ -154,31 +173,26 @@ const getRoleTagType = (role) => {
   return map[role] || ''
 }
 
-const navigateToClass = (cls) => {
-  ElMessage.info(`跳转到班级管理：${cls.name}`)
-  // router.push(`/class/management/${cls.id}`)
-}
-
 const handleClose = () => {
   visible.value = false
 }
 
-const handleSave = () => {
-  if (!formData.value.name) {
-    ElMessage.warning('请输入老师姓名')
-    return
-  }
-  if (!formData.value.teacherId) {
-    ElMessage.warning('请输入工号')
-    return
-  }
-  if (!formData.value.phone) {
-    ElMessage.warning('请输入手机号')
-    return
-  }
-
-  emit('save', formData.value)
-  handleClose()
+const handleToggleStatus = () => {
+  const newStatus = formData.value.status === 'active' ? 'inactive' : 'active'
+  const action = newStatus === 'active' ? '激活' : '停用'
+  
+  ElMessageBox.confirm(
+    `确定要${action}老师"${formData.value.name}"吗？`,
+    '确认',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
+    emit('toggle-status', { ...formData.value, status: newStatus })
+    handleClose()
+  })
 }
 </script>
 

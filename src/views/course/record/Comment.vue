@@ -19,7 +19,9 @@
       <el-table-column label="内容" prop="commentText" />
       <el-table-column label="操作" width="100">
         <template #default="scope">
-          <el-button type="primary" @click="handleDelete(scope.row)">删除</el-button>
+          <div class="table-actions">
+            <el-button type="primary" @click="handleDelete(scope.row)">删除</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>

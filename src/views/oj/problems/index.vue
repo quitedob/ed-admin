@@ -134,9 +134,11 @@
         </el-table-column>
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
           <template #default="scope">
-            <el-button link type="primary" @click="handleView(scope.row)">查看</el-button>
-            <el-button link type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button link type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <div class="table-actions">
+              <el-button link type="primary" @click="handleView(scope.row)">查看</el-button>
+              <el-button link type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button link type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>

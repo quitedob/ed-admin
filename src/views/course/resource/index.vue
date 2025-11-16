@@ -68,27 +68,29 @@
           </el-table-column>
           <el-table-column :width="230" fixed="right" label="操作" prop="address">
             <template #default="scope">
-              <el-button v-permission="'resource:edit'" text type="primary" @click="openFormModal(scope.row)">编辑</el-button>
-              <el-divider direction="vertical" />
-              <el-dropdown>
-                <el-button text type="primary">
-                  更多操作
-                  <el-icon class="el-icon--right">
-                    <arrow-down />
-                  </el-icon>
-                </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item @click="handleStatus(scope.row)">
-                      <el-button v-if="scope.row.statusId == 0" v-permission="'resource:edit'" text type="primary">启用</el-button>
-                      <el-button v-if="scope.row.statusId == 1" v-permission="'resource:edit'" text type="primary">禁用</el-button>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button v-permission="'resource:delete'" text type="primary" @click="handleDelete(scope.row)">删除</el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+              <div class="table-actions">
+                <el-button v-permission="'resource:edit'" text type="primary" @click="openFormModal(scope.row)">编辑</el-button>
+                <el-divider direction="vertical" />
+                <el-dropdown>
+                  <el-button text type="primary">
+                    更多操作
+                    <el-icon class="el-icon--right">
+                      <arrow-down />
+                    </el-icon>
+                  </el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item @click="handleStatus(scope.row)">
+                        <el-button v-if="scope.row.statusId == 0" v-permission="'resource:edit'" text type="primary">启用</el-button>
+                        <el-button v-if="scope.row.statusId == 1" v-permission="'resource:edit'" text type="primary">禁用</el-button>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-button v-permission="'resource:delete'" text type="primary" @click="handleDelete(scope.row)">删除</el-button>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
             </template>
           </el-table-column>
         </el-table>

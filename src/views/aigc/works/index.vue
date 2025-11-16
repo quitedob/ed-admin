@@ -409,8 +409,8 @@ import { aigcApi } from '@/api/aigc'
       title: 'Stable Diffusion生成的艺术作品',
         type: 'image',
       description: '使用Stable Diffusion生成的赛博朋克风格城市景观',
-      fileUrl: 'https://via.placeholder.com/800x600?text=AI+Art',
-      thumbnailUrl: 'https://via.placeholder.com/300x200?text=AI+Art',
+      fileUrl: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600"%3E%3Crect fill="%23ddd" width="800" height="600"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="30" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3EAI Art%3C/text%3E%3C/svg%3E',
+      thumbnailUrl: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect fill="%23ddd" width="300" height="200"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="20" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3EAI Art%3C/text%3E%3C/svg%3E',
       auditStatus: 'approved',
       createTime: new Date('2024-01-14T14:20:00')
       },

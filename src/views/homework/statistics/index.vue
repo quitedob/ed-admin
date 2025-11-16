@@ -179,9 +179,11 @@
           </el-table-column>
           <el-table-column label="操作" width="120" align="center" fixed="right">
             <template #default="{ row }">
-              <el-button link type="primary" size="small" @click="handleViewQuestionDetail(row)">
-                详细分析
-              </el-button>
+              <div class="table-actions">
+                <el-button link type="primary" size="small" @click="handleViewQuestionDetail(row)">
+                  详细分析
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -248,9 +250,11 @@
           </el-table-column>
           <el-table-column label="操作" width="150" align="center" fixed="right">
             <template #default="{ row }">
-              <el-button link type="primary" size="small" @click="handleViewStudentDetail(row)">
-                查看详情
-              </el-button>
+              <div class="table-actions">
+                <el-button link type="primary" size="small" @click="handleViewStudentDetail(row)">
+                  查看详情
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>

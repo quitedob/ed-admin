@@ -6,414 +6,328 @@
     </el-breadcrumb>
 
     <div class="main-content">
-      <!-- 左侧题库列表 -->
-      <div class="left-sidebar">
-        <!-- 操作按钮区 -->
-        <div class="action-buttons">
-          <el-button type="primary" class="new-bank-btn" @click="handleCreateBank">
+      <!-- 题库头部 -->
+      <div class="bank-header">
+        <div class="header-left">
+          <h2 class="bank-title">{{ questionBank.name }}</h2>
+          <el-tag type="info">总题数: {{ questionBank.totalQuestions }}道</el-tag>
+        </div>
+        <div class="header-right">
+          <el-button type="primary" @click="handleAddQuestion">
             <el-icon><Plus /></el-icon>
-            新建题库
+            添加题目
           </el-button>
-          <div class="secondary-actions">
-            <el-button link @click="handleImport">导入</el-button>
-            <el-button link @click="handleExport">导出</el-button>
-          </div>
-        </div>
-
-        <!-- 题库列表 -->
-        <div class="bank-list">
-          <div
-            v-for="bank in questionBanks"
-            :key="bank.id"
-            :class="['bank-item', { active: selectedBankId === bank.id }]"
-            @click="selectBank(bank.id)"
+          <el-upload
+            ref="uploadRef"
+            :auto-upload="false"
+            :show-file-list="false"
+            accept=".json"
+            :on-change="handleImportFile"
           >
-            <div class="bank-name">{{ bank.name }}</div>
-            <div class="bank-meta">
-              <span class="question-count">{{ bank.totalQuestions }}道题</span>
-              <span class="last-modified">{{ formatDate(bank.updatedAt) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 搜索和筛选 -->
-        <div class="search-filter">
-          <el-input
-            v-model="searchKeyword"
-            placeholder="搜索题库..."
-            clearable
-            @input="handleSearch"
-          >
-            <template #prefix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
-          <el-select v-model="filterType" placeholder="筛选" class="filter-select" @change="handleFilter">
-            <el-option label="全部" value="all" />
-            <el-option label="按题量" value="size" />
-            <el-option label="按时间" value="time" />
-          </el-select>
+            <el-button>
+              <el-icon><Upload /></el-icon>
+              导入题目
+            </el-button>
+          </el-upload>
         </div>
       </div>
 
-      <!-- 右侧内容区 -->
-      <div class="right-content">
-        <div v-if="selectedBank" class="bank-detail-card">
-          <!-- 题库基本信息 -->
-          <div class="bank-header">
-            <h2 class="bank-title">{{ selectedBank.name }}</h2>
-            <div class="bank-info">
-              <el-tag type="info">总题数: {{ selectedBank.totalQuestions }}道</el-tag>
-              <span class="last-modified-text">最后修改: {{ formatDateTime(selectedBank.updatedAt) }}</span>
-            </div>
-            <p v-if="selectedBank.description" class="bank-description">{{ selectedBank.description }}</p>
-          </div>
-
-          <!-- 题型分布统计 -->
-          <div class="statistics-section">
-            <h3 class="section-title">题型分布统计</h3>
-            <el-row :gutter="20" class="stats-grid">
-              <el-col :span="8">
-                <div class="stat-item">
-                  <div class="stat-label">单选题</div>
-                  <div class="stat-value">{{ selectedBank.statistics.singleChoice }}题</div>
-                </div>
-              </el-col>
-              <el-col :span="8">
-                <div class="stat-item">
-                  <div class="stat-label">多选题</div>
-                  <div class="stat-value">{{ selectedBank.statistics.multipleChoice }}题</div>
-                </div>
-              </el-col>
-              <el-col :span="8">
-                <div class="stat-item">
-                  <div class="stat-label">填空题</div>
-                  <div class="stat-value">{{ selectedBank.statistics.fillBlank }}题</div>
-                </div>
-              </el-col>
-              <el-col :span="8">
-                <div class="stat-item">
-                  <div class="stat-label">问答题</div>
-                  <div class="stat-value">{{ selectedBank.statistics.essay }}题</div>
-                </div>
-              </el-col>
-              <el-col :span="8">
-                <div class="stat-item">
-                  <div class="stat-label">编程题</div>
-                  <div class="stat-value">{{ selectedBank.statistics.programming }}题</div>
-                </div>
-              </el-col>
-            </el-row>
-          </div>
-
-          <!-- 快速操作 -->
-          <div class="quick-actions">
-            <el-button type="primary" @click="handleEditBank">编辑</el-button>
-            <el-button @click="handleViewAllQuestions">查看全部题目</el-button>
-            <el-button type="danger" @click="handleDeleteBank">删除</el-button>
-          </div>
+      <!-- 题型分类标签 -->
+      <div class="type-tabs">
+        <div
+          v-for="type in questionTypes"
+          :key="type.value"
+          :class="['type-tab', { active: selectedType === type.value }]"
+          @click="selectedType = type.value"
+        >
+          <span class="type-label">{{ type.label }}</span>
+          <span class="type-count">{{ getTypeCount(type.value) }}</span>
         </div>
+      </div>
 
-        <!-- 未选择题库时的提示 -->
-        <el-empty v-else description="请选择一个题库查看详情" />
+      <!-- 题目列表 -->
+      <div class="question-list">
+        <el-table :data="filteredQuestions" stripe>
+          <el-table-column type="index" label="序号" width="60" />
+          <el-table-column prop="type" label="题型" width="100">
+            <template #default="{ row }">
+              <el-tag :type="getTypeTagType(row.type)" size="small">
+                {{ getTypeLabel(row.type) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="questionText" label="题目内容" min-width="300" show-overflow-tooltip />
+          <el-table-column prop="difficulty" label="难度" width="100">
+            <template #default="{ row }">
+              <el-tag :type="getDifficultyTagType(row.difficulty)" size="small">
+                {{ getDifficultyLabel(row.difficulty) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="score" label="分值" width="80" />
+          <el-table-column label="操作" width="150" fixed="right">
+            <template #default="{ row }">
+              <el-button link type="primary" size="small" @click="handleEditQuestion(row)">
+                编辑
+              </el-button>
+              <el-button link type="danger" size="small" @click="handleDeleteQuestion(row)">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </div>
 
-    <!-- 新建/编辑题库对话框 -->
-    <el-dialog
-      v-model="bankDialogVisible"
-      :title="isEditMode ? '编辑题库' : '新建题库'"
-      width="600px"
-      @close="resetBankForm"
-    >
-      <el-form ref="bankFormRef" :model="bankForm" :rules="bankRules" label-width="100px">
-        <el-form-item label="题库名称" prop="name">
-          <el-input v-model="bankForm.name" placeholder="请输入题库名称" />
-        </el-form-item>
-        <el-form-item label="题库描述" prop="description">
-          <el-input
-            v-model="bankForm.description"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入题库描述"
-          />
-        </el-form-item>
-        <el-form-item label="关联课程" prop="courseId">
-          <el-select v-model="bankForm.courseId" placeholder="请选择课程" clearable>
-            <el-option label="软件工程" value="course_001" />
-            <el-option label="数据结构" value="course_002" />
-            <el-option label="算法设计" value="course_003" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="bankDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSaveBank">保存</el-button>
-      </template>
-    </el-dialog>
-
-    <!-- 题目列表对话框 -->
-    <el-dialog
-      v-model="questionListDialogVisible"
-      title="题目列表"
-      width="90%"
-      top="5vh"
-    >
-      <QuestionListView
-        v-if="questionListDialogVisible"
-        :bank-id="selectedBankId"
-        :questions="currentBankQuestions"
-        @edit="handleEditQuestion"
-        @delete="handleDeleteQuestion"
-      />
-    </el-dialog>
+    <!-- 新建/编辑题目对话框 -->
+    <QuestionEditDialog
+      v-model="questionDialogVisible"
+      :question-data="currentQuestion"
+      @save="handleSaveQuestion"
+    />
   </div>
 </template>
 
 <script setup name="QuestionBank">
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search } from '@element-plus/icons-vue'
-import QuestionListView from './components/QuestionListView.vue'
+import { Plus, Upload } from '@element-plus/icons-vue'
+import QuestionEditDialog from './components/QuestionEditDialog.vue'
+
+// 题型定义
+const questionTypes = [
+  { label: '全部', value: 'all' },
+  { label: '单选题', value: 'single' },
+  { label: '多选题', value: 'multiple' },
+  { label: '填空题', value: 'fill' },
+  { label: '判断题', value: 'judge' },
+  { label: 'OJ题', value: 'programming' },
+  { label: '简答题', value: 'essay' }
+]
 
 // 响应式数据
-const questionBanks = ref([])
-const selectedBankId = ref(null)
-const searchKeyword = ref('')
-const filterType = ref('all')
-const bankDialogVisible = ref(false)
-const questionListDialogVisible = ref(false)
-const isEditMode = ref(false)
-const bankFormRef = ref()
+const selectedType = ref('all')
+const questionDialogVisible = ref(false)
+const currentQuestion = ref(null)
+const uploadRef = ref()
 
-// 题库表单
-const bankForm = ref({
-  name: '',
-  description: '',
-  courseId: ''
+// 题库数据
+const questionBank = ref({
+  id: 'bank_001',
+  name: '题库',
+  totalQuestions: 0,
+  questions: []
 })
-
-const bankRules = {
-  name: [{ required: true, message: '请输入题库名称', trigger: 'blur' }]
-}
 
 // 计算属性
-const selectedBank = computed(() => {
-  return questionBanks.value.find(bank => bank.id === selectedBankId.value)
-})
-
-const currentBankQuestions = computed(() => {
-  if (!selectedBank.value) return []
-  return selectedBank.value.questions || []
+const filteredQuestions = computed(() => {
+  if (selectedType.value === 'all') {
+    return questionBank.value.questions
+  }
+  return questionBank.value.questions.filter(q => q.type === selectedType.value)
 })
 
 // 初始化模拟数据
 const initMockData = () => {
-  questionBanks.value = [
+  questionBank.value.questions = [
     {
-      id: 'bank_001',
-      name: '第一章基础题库',
-      description: '第一章的基础知识题目集合',
-      courseId: 'course_001',
-      totalQuestions: 50,
-      createdAt: '2024-12-01T10:00:00Z',
-      updatedAt: '2024-12-20T15:30:00Z',
-      createdBy: 'teacher_001',
-      tags: ['基础', '第一章'],
-      statistics: {
-        singleChoice: 20,
-        multipleChoice: 15,
-        fillBlank: 10,
-        essay: 5,
-        programming: 0
-      },
-      availableTags: [
-        { id: 'tag_001', name: '基础', color: '#409EFF', usage: 45 },
-        { id: 'tag_002', name: '第一章', color: '#67C23A', usage: 50 }
+      id: 'q_001',
+      type: 'single',
+      questionText: '以下哪个不是面向对象编程的特性？',
+      difficulty: 'easy',
+      score: 2,
+      options: [
+        { value: 'A', text: '封装', isCorrect: false },
+        { value: 'B', text: '继承', isCorrect: false },
+        { value: 'C', text: '多态', isCorrect: false },
+        { value: 'D', text: '编译', isCorrect: true }
       ],
-      questions: []
+      correctAnswer: 'D',
+      explanation: '编译是程序执行过程，不是面向对象的特性'
     },
     {
-      id: 'bank_002',
-      name: '第二章进阶题库',
-      description: '第二章进阶知识题目',
-      courseId: 'course_001',
-      totalQuestions: 35,
-      createdAt: '2024-12-05T10:00:00Z',
-      updatedAt: '2024-12-18T15:30:00Z',
-      createdBy: 'teacher_001',
-      tags: ['进阶', '第二章'],
-      statistics: {
-        singleChoice: 15,
-        multipleChoice: 10,
-        fillBlank: 5,
-        essay: 3,
-        programming: 2
-      },
-      availableTags: [],
-      questions: []
+      id: 'q_002',
+      type: 'multiple',
+      questionText: '以下哪些是Java的基本数据类型？',
+      difficulty: 'easy',
+      score: 3,
+      options: [
+        { value: 'A', text: 'int', isCorrect: true },
+        { value: 'B', text: 'String', isCorrect: false },
+        { value: 'C', text: 'boolean', isCorrect: true },
+        { value: 'D', text: 'double', isCorrect: true }
+      ],
+      correctAnswer: ['A', 'C', 'D'],
+      explanation: 'String是引用类型，不是基本数据类型'
     },
     {
-      id: 'bank_003',
-      name: '编程题库',
-      description: 'HOJ编程题目集合',
-      courseId: 'course_002',
-      totalQuestions: 25,
-      createdAt: '2024-12-10T10:00:00Z',
-      updatedAt: '2024-12-15T15:30:00Z',
-      createdBy: 'teacher_001',
-      tags: ['编程', 'HOJ'],
-      statistics: {
-        singleChoice: 0,
-        multipleChoice: 0,
-        fillBlank: 0,
-        essay: 0,
-        programming: 25
-      },
-      availableTags: [],
-      questions: []
+      id: 'q_003',
+      type: 'fill',
+      questionText: 'Java中，___是所有类的父类，___方法用于比较两个对象是否相等。',
+      difficulty: 'medium',
+      score: 4,
+      fillBlanks: [
+        { answers: ['Object'] },
+        { answers: ['equals'] }
+      ],
+      explanation: 'Object类是Java类层次结构的根，equals方法用于对象比较'
+    },
+    {
+      id: 'q_004',
+      type: 'judge',
+      questionText: 'Java中，接口可以包含方法的实现。',
+      difficulty: 'medium',
+      score: 2,
+      correctAnswer: true,
+      explanation: 'Java 8之后，接口可以包含默认方法和静态方法的实现'
+    },
+    {
+      id: 'q_005',
+      type: 'programming',
+      questionText: '实现一个函数，判断一个字符串是否为回文串',
+      difficulty: 'medium',
+      score: 10,
+      hojProblemId: '1001',
+      timeLimit: 1000,
+      memoryLimit: 256,
+      required: true,
+      multipleSubmit: true,
+      explanation: '可以使用双指针法，从两端向中间比较'
+    },
+    {
+      id: 'q_006',
+      type: 'essay',
+      questionText: '请简述MVC设计模式的核心思想及其优点。',
+      difficulty: 'hard',
+      score: 10,
+      referenceAnswer: 'MVC将应用分为Model（模型）、View（视图）、Controller（控制器）三层。优点包括：1.分离关注点 2.提高代码复用性 3.便于维护和测试',
+      gradingCriteria: '需要说明三层的作用，至少列举两个优点',
+      aiGrading: false,
+      explanation: 'MVC是一种经典的软件架构模式'
     }
   ]
-
-  // 默认选中第一个题库
-  if (questionBanks.value.length > 0) {
-    selectedBankId.value = questionBanks.value[0].id
-  }
+  questionBank.value.totalQuestions = questionBank.value.questions.length
 }
 
 // 方法
-const selectBank = (bankId) => {
-  selectedBankId.value = bankId
-}
-
-const handleCreateBank = () => {
-  isEditMode.value = false
-  bankForm.value = {
-    name: '',
-    description: '',
-    courseId: ''
+const getTypeCount = (type) => {
+  if (type === 'all') {
+    return questionBank.value.totalQuestions
   }
-  bankDialogVisible.value = true
+  return questionBank.value.questions.filter(q => q.type === type).length
 }
 
-const handleEditBank = () => {
-  if (!selectedBank.value) return
-  isEditMode.value = true
-  bankForm.value = {
-    name: selectedBank.value.name,
-    description: selectedBank.value.description,
-    courseId: selectedBank.value.courseId
-  }
-  bankDialogVisible.value = true
+const handleAddQuestion = () => {
+  currentQuestion.value = null
+  questionDialogVisible.value = true
 }
 
-const handleSaveBank = () => {
-  bankFormRef.value.validate((valid) => {
-    if (valid) {
-      if (isEditMode.value) {
-        // 更新题库
-        const bank = questionBanks.value.find(b => b.id === selectedBankId.value)
-        if (bank) {
-          bank.name = bankForm.value.name
-          bank.description = bankForm.value.description
-          bank.courseId = bankForm.value.courseId
-          bank.updatedAt = new Date().toISOString()
-        }
-        ElMessage.success('题库更新成功')
-      } else {
-        // 新建题库
-        const newBank = {
-          id: `bank_${Date.now()}`,
-          name: bankForm.value.name,
-          description: bankForm.value.description,
-          courseId: bankForm.value.courseId,
-          totalQuestions: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          createdBy: 'teacher_001',
-          tags: [],
-          statistics: {
-            singleChoice: 0,
-            multipleChoice: 0,
-            fillBlank: 0,
-            essay: 0,
-            programming: 0
-          },
-          availableTags: [],
-          questions: []
-        }
-        questionBanks.value.push(newBank)
-        selectedBankId.value = newBank.id
-        ElMessage.success('题库创建成功')
-      }
-      bankDialogVisible.value = false
+const handleEditQuestion = (question) => {
+  currentQuestion.value = { ...question }
+  questionDialogVisible.value = true
+}
+
+const handleSaveQuestion = (questionData) => {
+  if (currentQuestion.value && currentQuestion.value.id) {
+    // 编辑现有题目
+    const index = questionBank.value.questions.findIndex(q => q.id === currentQuestion.value.id)
+    if (index > -1) {
+      questionBank.value.questions[index] = { ...questionData, id: currentQuestion.value.id }
+      ElMessage.success('题目更新成功')
     }
-  })
+  } else {
+    // 新增题目
+    const newQuestion = {
+      ...questionData,
+      id: `q_${Date.now()}`
+    }
+    questionBank.value.questions.push(newQuestion)
+    questionBank.value.totalQuestions++
+    ElMessage.success('题目添加成功')
+  }
+  questionDialogVisible.value = false
 }
 
-const handleDeleteBank = () => {
-  ElMessageBox.confirm('确定要删除该题库吗？', '提示', {
+const handleDeleteQuestion = (question) => {
+  ElMessageBox.confirm('确定要删除该题目吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    const index = questionBanks.value.findIndex(b => b.id === selectedBankId.value)
+    const index = questionBank.value.questions.findIndex(q => q.id === question.id)
     if (index > -1) {
-      questionBanks.value.splice(index, 1)
-      selectedBankId.value = questionBanks.value.length > 0 ? questionBanks.value[0].id : null
+      questionBank.value.questions.splice(index, 1)
+      questionBank.value.totalQuestions--
       ElMessage.success('删除成功')
     }
   })
 }
 
-const handleViewAllQuestions = () => {
-  questionListDialogVisible.value = true
-}
-
-const handleImport = () => {
-  ElMessage.info('导入功能开发中...')
-}
-
-const handleExport = () => {
-  ElMessage.info('导出功能开发中...')
-}
-
-const handleSearch = () => {
-  // 搜索逻辑
-  console.log('搜索:', searchKeyword.value)
-}
-
-const handleFilter = () => {
-  // 筛选逻辑
-  console.log('筛选:', filterType.value)
-}
-
-const handleEditQuestion = (question) => {
-  ElMessage.info('编辑题目功能开发中...')
-}
-
-const handleDeleteQuestion = (question) => {
-  ElMessage.info('删除题目功能开发中...')
-}
-
-const resetBankForm = () => {
-  bankForm.value = {
-    name: '',
-    description: '',
-    courseId: ''
+const handleImportFile = (file) => {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result)
+      if (Array.isArray(data)) {
+        // 导入题目数组
+        data.forEach(q => {
+          questionBank.value.questions.push({
+            ...q,
+            id: `q_${Date.now()}_${Math.random()}`
+          })
+        })
+        questionBank.value.totalQuestions = questionBank.value.questions.length
+        ElMessage.success(`成功导入 ${data.length} 道题目`)
+      } else {
+        ElMessage.error('JSON格式不正确，应为题目数组')
+      }
+    } catch (error) {
+      ElMessage.error('文件解析失败，请检查JSON格式')
+    }
   }
+  reader.readAsText(file.raw)
 }
 
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN')
+const getTypeLabel = (type) => {
+  const map = {
+    single: '单选',
+    multiple: '多选',
+    fill: '填空',
+    judge: '判断',
+    essay: '简答',
+    programming: 'OJ'
+  }
+  return map[type] || type
 }
 
-const formatDateTime = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleString('zh-CN')
+const getTypeTagType = (type) => {
+  const map = {
+    single: 'primary',
+    multiple: 'success',
+    fill: 'warning',
+    judge: 'info',
+    essay: '',
+    programming: 'danger'
+  }
+  return map[type] || ''
+}
+
+const getDifficultyLabel = (difficulty) => {
+  const map = {
+    easy: '简单',
+    medium: '中等',
+    hard: '困难'
+  }
+  return map[difficulty] || difficulty
+}
+
+const getDifficultyTagType = (difficulty) => {
+  const map = {
+    easy: 'success',
+    medium: 'warning',
+    hard: 'danger'
+  }
+  return map[difficulty] || ''
 }
 
 onMounted(() => {
@@ -426,7 +340,7 @@ onMounted(() => {
   height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-primary);
+  background: #f5f7fa;
   padding: 20px;
 }
 
@@ -436,176 +350,89 @@ onMounted(() => {
 }
 
 .main-content {
-  display: flex;
-  gap: 20px;
   flex: 1;
-  overflow: hidden;
-}
-
-/* 左侧栏样式 */
-.left-sidebar {
-  width: 240px;
-  background: var(--color-bg-secondary);
-  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-}
-
-.action-buttons {
-  padding: 16px;
-  border-bottom: 1px solid var(--color-border-light);
-
-  .new-bank-btn {
-    width: 100%;
-    margin-bottom: 12px;
-  }
-
-  .secondary-actions {
-    display: flex;
-    justify-content: space-around;
-  }
-}
-
-.bank-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0;
-
-  .bank-item {
-    padding: 12px 16px;
-    cursor: pointer;
-    transition: all 0.3s;
-    border-left: 3px solid transparent;
-
-    &:hover {
-      background: var(--color-bg-tertiary);
-    }
-
-    &.active {
-      background: var(--color-primary-light-9);
-      border-left-color: var(--color-primary);
-
-      .bank-name {
-        color: var(--color-primary);
-        font-weight: 600;
-      }
-    }
-
-    .bank-name {
-      font-size: 14px;
-      color: var(--color-text-primary);
-      margin-bottom: 6px;
-    }
-
-    .bank-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--color-text-secondary);
-
-      .question-count {
-        font-weight: 500;
-      }
-    }
-  }
-}
-
-.search-filter {
-  padding: 16px;
-  border-top: 1px solid var(--color-border-light);
-
-  .el-input {
-    margin-bottom: 8px;
-  }
-
-  .filter-select {
-    width: 100%;
-  }
-}
-
-/* 右侧内容区样式 */
-.right-content {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.bank-detail-card {
   background: white;
-  border-radius: 12px;
-  border: 1px solid var(--color-border-light);
-  box-shadow: var(--shadow-base);
-  padding: 24px;
+  border-radius: 8px;
+  padding: 20px;
+  overflow: hidden;
 }
 
 .bank-header {
-  margin-bottom: 24px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--color-border-lighter);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e4e7ed;
 
-  .bank-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin-bottom: 12px;
-  }
-
-  .bank-info {
+  .header-left {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 12px;
 
-    .last-modified-text {
-      font-size: 14px;
-      color: var(--color-text-secondary);
+    .bank-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #303133;
+      margin: 0;
     }
   }
 
-  .bank-description {
-    font-size: 14px;
-    color: var(--color-text-regular);
-    line-height: 1.6;
+  .header-right {
+    display: flex;
+    gap: 12px;
   }
 }
 
-.statistics-section {
-  margin-bottom: 24px;
-
-  .section-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin-bottom: 16px;
-  }
-
-  .stats-grid {
-    .stat-item {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      color: white;
-      margin-bottom: 12px;
-
-      .stat-label {
-        font-size: 13px;
-        opacity: 0.9;
-        margin-bottom: 8px;
-      }
-
-      .stat-value {
-        font-size: 20px;
-        font-weight: 600;
-      }
-    }
-  }
-}
-
-.quick-actions {
+.type-tabs {
   display: flex;
-  gap: 12px;
-  padding-top: 20px;
-  border-top: 1px solid var(--color-border-lighter);
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  .type-tab {
+    padding: 8px 16px;
+    border-radius: 4px;
+    background: #f5f7fa;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &:hover {
+      background: #e4e7ed;
+    }
+
+    &.active {
+      background: #409eff;
+      color: white;
+
+      .type-count {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+      }
+    }
+
+    .type-label {
+      font-size: 14px;
+    }
+
+    .type-count {
+      background: #e4e7ed;
+      color: #606266;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+}
+
+.question-list {
+  flex: 1;
+  overflow-y: auto;
 }
 </style>

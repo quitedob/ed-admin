@@ -87,22 +87,7 @@
               </div>
             </div>
 
-            <div class="exam-stats">
-              <div class="stat-item">
-                <span class="stat-label">参考人数</span>
-                <span class="stat-value">{{ exam.participantCount || 0 }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">已提交</span>
-                <span class="stat-value">{{ exam.submittedCount || 0 }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">平均分</span>
-                <span class="stat-value">{{ exam.averageScore || 0 }}</span>
-              </div>
-            </div>
-
-            <div class="exam-actions">
+            <div class="exam-actions card-actions">
               <el-button link type="primary" @click="handleEdit(exam)">
                 <el-icon><Edit /></el-icon>
                 编辑
@@ -114,10 +99,6 @@
               <el-button link type="info" @click="handleGrade(exam)">
                 <el-icon><DocumentChecked /></el-icon>
                 批改
-              </el-button>
-              <el-button link type="warning" @click="handleStats(exam)">
-                <el-icon><DataAnalysis /></el-icon>
-                统计
               </el-button>
               <el-button link type="danger" @click="handleDelete(exam)">
                 <el-icon><Delete /></el-icon>
@@ -158,7 +139,6 @@ import {
   Edit,
   View,
   DocumentChecked,
-  DataAnalysis,
   Delete
 } from '@element-plus/icons-vue'
 
@@ -285,10 +265,6 @@ const handleView = (exam) => {
 
 const handleGrade = (exam) => {
   router.push(`/exam/grade/${exam.id}`)
-}
-
-const handleStats = (exam) => {
-  router.push(`/exam/statistics/${exam.id}`)
 }
 
 const handleDelete = (exam) => {
@@ -453,38 +429,8 @@ onMounted(() => {
     }
   }
 
-  .exam-stats {
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 0;
-    margin-bottom: 16px;
-    border-top: 1px solid var(--color-border-lighter);
-    border-bottom: 1px solid var(--color-border-lighter);
-
-    .stat-item {
-      text-align: center;
-
-      .stat-label {
-        display: block;
-        font-size: 12px;
-        color: var(--color-text-secondary);
-        margin-bottom: 4px;
-      }
-
-      .stat-value {
-        display: block;
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--color-primary);
-      }
-    }
-  }
-
   .exam-actions {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 8px;
+    /* 使用全局 card-actions 工具类 */
   }
 }
 

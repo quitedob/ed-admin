@@ -90,15 +90,17 @@
         </el-table-column>
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="scope">
-            <el-button link type="primary" size="small" @click="handleViewDetail(scope.row)">
-              查看
-            </el-button>
-            <el-button link type="warning" size="small" @click="handleEdit(scope.row)">
-              编辑
-            </el-button>
-            <el-button link type="danger" size="small" @click="handleDelete(scope.row)">
-              删除
-            </el-button>
+            <div class="table-actions">
+              <el-button link type="primary" size="small" @click="handleViewDetail(scope.row)">
+                查看
+              </el-button>
+              <el-button link type="warning" size="small" @click="handleEdit(scope.row)">
+                编辑
+              </el-button>
+              <el-button link type="danger" size="small" @click="handleDelete(scope.row)">
+                删除
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>

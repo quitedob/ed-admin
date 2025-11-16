@@ -40,10 +40,6 @@
           </div>
           <div class="stats-section">
             <div class="stat-item">
-              <div class="stat-value">{{ studentInfo?.statistics.averageScore }}</div>
-              <div class="stat-label">平均分</div>
-            </div>
-            <div class="stat-item">
               <div class="stat-value">{{ studentInfo?.statistics.completedHomeworks }}</div>
               <div class="stat-label">完成作业</div>
             </div>
@@ -174,11 +170,6 @@
                   <el-tag type="success" size="small">已提交</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column label="得分" width="150" align="center">
-                <template #default="{ row }">
-                  <span class="score-display">{{ row.score }}/{{ row.maxScore }}</span>
-                </template>
-              </el-table-column>
               <el-table-column label="完成度" width="180">
                 <template #default="{ row }">
                   <el-progress
@@ -194,9 +185,11 @@
               </el-table-column>
               <el-table-column label="操作" width="150" fixed="right">
                 <template #default="{ row }">
-                  <el-button link type="primary" size="small" @click="handleViewRecord(row)">
-                    查看详情
-                  </el-button>
+                  <div class="table-actions">
+                    <el-button link type="primary" size="small" @click="handleViewRecord(row)">
+                      查看详情
+                    </el-button>
+                  </div>
                 </template>
               </el-table-column>
             </el-table>

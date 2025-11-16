@@ -1,372 +1,471 @@
+<!-- 文件路径: views/users/lecturer/index.vue -->
 <template>
-  <div class="teacher-management-container">
-    <!-- 顶部操作栏 -->
-    <div class="top-bar">
-      <div class="title-section">
-        <h2>老师管理</h2>
-        <div class="stats">
-          <span>共 {{ filteredTeachers.length }} 名老师</span>
-        </div>
+  <div class="app-container">
+    <div class="page_head">
+      <div class="search_bar clearfix">
+        <el-form :model="query" inline label-width="80px">
+          <el-form-item>
+            <el-input v-model="query.lecturerName" placeholder="请输入讲师名称" prefix-icon="Search" clearable />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleQuery()"> 查询</el-button>
+            <el-button @click="resetQuery()">重置</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-      <div class="action-buttons">
-        <el-button type="primary" @click="handleCreateTeacher">
-          <el-icon><Plus /></el-icon>
-          新建老师
-        </el-button>
-        <el-button @click="handleImport">
-          <el-icon><Upload /></el-icon>
-          导入老师
-        </el-button>
+      <div class="button_bar">
+        <el-button v-permission="'lecturer:save'" type="primary" @click="openFormModal()">添加讲师</el-button>
       </div>
     </div>
-
-    <!-- 搜索和筛选 -->
-    <div class="filter-bar">
-      <el-input
-        v-model="searchText"
-        placeholder="搜索老师姓名、工号..."
-        clearable
-        style="width: 300px"
-      >
-        <template #prefix>
-          <el-icon><Search /></el-icon>
+    <el-table v-loading="page.loading" :data="page.list" row-key="id" class="drag-table">
+      <el-table-column label="讲师信息">
+        <template #default="scope">
+          <img :alt="scope.row.lecturerName" :src="scope.row.lecturerHead" style="height: 40px; width: auto; border-radius: 50%; vertical-align: middle" />
+          &nbsp;{{ scope.row.lecturerName }}
         </template>
-      </el-input>
-
-      <el-select v-model="filterStatus" placeholder="账号状态" clearable style="width: 150px">
-        <el-option label="全部状态" value="" />
-        <el-option label="活跃" value="active" />
-        <el-option label="停用" value="inactive" />
-      </el-select>
-
-      <el-button @click="handleReset">重置</el-button>
-    </div>
-
-    <!-- 老师表格 -->
-    <div class="table-container">
-      <el-table :data="paginatedTeachers" stripe>
-        <el-table-column prop="name" label="老师姓名" width="150" />
-        <el-table-column label="工号/手机号" width="180">
-          <template #default="scope">
-            <div>{{ scope.row.teacherId }}</div>
-            <div class="secondary-text">{{ scope.row.phone }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column label="账号状态" width="120" align="center">
-          <template #default="scope">
-            <el-tag :type="getStatusTagType(scope.row.status)">
-              {{ getStatusLabel(scope.row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="负责班级数量" width="120" align="center">
-          <template #default="scope">
-            {{ scope.row.classCount }}
-          </template>
-        </el-table-column>
-        <el-table-column label="负责课程数量" width="120" align="center">
-          <template #default="scope">
-            {{ scope.row.courseCount }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
-          <template #default="scope">
-            <el-button link type="primary" size="small" @click="handleViewDetail(scope.row)">
-              详情
-            </el-button>
-            <el-button link type="danger" size="small" @click="handleDelete(scope.row)">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :total="filteredTeachers.length"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-        />
-      </div>
-    </div>
-
-    <!-- 老师详情抽屉 -->
-    <TeacherDetailDrawer
-      v-model="detailDrawerVisible"
-      :teacher-data="selectedTeacher"
-      @save="handleSaveTeacher"
-    />
+      </el-table-column>
+      <el-table-column label="职位" prop="lecturerPosition" />
+      <el-table-column label="状态">
+        <template #default="scope">
+          <enum-view :enum-name="'StatusIdEnum'" :enum-value="scope.row.statusId" />
+        </template>
+      </el-table-column>
+      <el-table-column :width="210" fixed="right" label="操作" prop="address">
+        <template #default="scope">
+          <div class="table-actions">
+            <el-button v-permission="'lecturer:edit'" text type="primary" @click="openFormModal(scope.row)">编辑</el-button>
+            <el-divider direction="vertical" />
+            <el-dropdown>
+              <el-button text type="primary">
+                更多操作
+                <el-icon class="el-icon--right">
+                  <arrow-down />
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="handleStatus(scope.row)">
+                    <el-button v-if="scope.row.statusId === 0" v-permission="'lecturer:edit'" text type="primary">启用</el-button>
+                    <el-button v-if="scope.row.statusId === 1" v-permission="'lecturer:edit'" text type="primary">禁用</el-button>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <el-button v-permission="'lecturer:delete'" text type="primary" @click="handleDelete(scope.row)">删除</el-button>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+    <pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
+    <lecturer-form ref="formRef" @refresh="handlePage" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Upload, Search } from '@element-plus/icons-vue'
-import TeacherDetailDrawer from './components/TeacherDetailDrawer.vue'
+  import useTable from '@/utils/table'
+  import { ref, onMounted } from 'vue'
+  import { usersApi } from '@/api/users'
+  import LecturerForm from './LecturerForm.vue'
+  import Pagination from '@/components/Pagination/index.vue'
+  import EnumView from '@/components/Enum/View/index.vue'
+  import { ArrowDown } from '@element-plus/icons-vue'
 
-// 响应式数据
-const searchText = ref('')
-const filterStatus = ref('')
-const currentPage = ref(1)
-const pageSize = ref(10)
-const detailDrawerVisible = ref(false)
-const selectedTeacher = ref(null)
-
-const teachers = ref([])
-
-// 计算属性
-const filteredTeachers = computed(() => {
-  let result = teachers.value
-
-  if (searchText.value) {
-    result = result.filter(t =>
-      t.name.includes(searchText.value) ||
-      t.teacherId.includes(searchText.value) ||
-      t.phone.includes(searchText.value)
-    )
+  // 添加/修改表单
+  const formRef = ref()
+  const openFormModal = (item) => {
+    formRef.value.onOpen(item)
   }
 
-  if (filterStatus.value) {
-    result = result.filter(t => t.status === filterStatus.value)
-  }
-
-  return result
-})
-
-const paginatedTeachers = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return filteredTeachers.value.slice(start, end)
-})
-
-// 初始化模拟数据
-const initMockData = () => {
-  teachers.value = [
-    {
-      id: 'teacher_001',
-      name: '王老师',
-      teacherId: 'T001',
-      phone: '13800138000',
-      email: 'wang@example.com',
-      status: 'active',
-      classCount: 3,
-      courseCount: 5,
-      authorizedClasses: [
-        { id: 'cls_001', name: '前端开发一班', role: 'headTeacher' },
-        { id: 'cls_002', name: '前端开发二班', role: 'teacher' },
-        { id: 'cls_003', name: '数据科学班', role: 'teacher' }
-      ],
-      authorizedCourses: [
-        { id: 'c_001', name: 'JavaScript基础' },
-        { id: 'c_002', name: 'Vue.js框架' },
-        { id: 'c_003', name: 'React框架' },
-        { id: 'c_004', name: 'Node.js后端' },
-        { id: 'c_005', name: 'TypeScript进阶' }
-      ]
-    },
-    {
-      id: 'teacher_002',
-      name: '李老师',
-      teacherId: 'T002',
-      phone: '13900139000',
-      email: 'li@example.com',
-      status: 'active',
-      classCount: 2,
-      courseCount: 3,
-      authorizedClasses: [
-        { id: 'cls_001', name: '前端开发一班', role: 'teacher' },
-        { id: 'cls_004', name: '云计算班', role: 'headTeacher' }
-      ],
-      authorizedCourses: [
-        { id: 'c_006', name: '数据库设计' },
-        { id: 'c_007', name: '前端工程化' },
-        { id: 'c_008', name: '性能优化' }
-      ]
-    },
-    {
-      id: 'teacher_003',
-      name: '张老师',
-      teacherId: 'T003',
-      phone: '13700137000',
-      email: 'zhang@example.com',
-      status: 'active',
-      classCount: 1,
-      courseCount: 2,
-      authorizedClasses: [
-        { id: 'cls_003', name: '数据科学班', role: 'headTeacher' }
-      ],
-      authorizedCourses: [
-        { id: 'c_009', name: '数据分析' },
-        { id: 'c_010', name: '机器学习' }
-      ]
-    },
-    {
-      id: 'teacher_004',
-      name: '赵老师',
-      teacherId: 'T004',
-      phone: '13600136000',
-      email: 'zhao@example.com',
-      status: 'inactive',
-      classCount: 0,
-      courseCount: 0,
-      authorizedClasses: [],
-      authorizedCourses: []
-    }
-  ]
-}
-
-// 方法
-const handleCreateTeacher = () => {
-  selectedTeacher.value = null
-  detailDrawerVisible.value = true
-}
-
-const handleViewDetail = (teacher) => {
-  selectedTeacher.value = { ...teacher }
-  detailDrawerVisible.value = true
-}
-
-const handleDelete = (teacher) => {
-  ElMessageBox.confirm(
-    `确定要删除老师"${teacher.name}"吗？删除后无法恢复。`,
-    '警告',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'error'
-    }
-  ).then(() => {
-    const index = teachers.value.findIndex(t => t.id === teacher.id)
-    if (index > -1) {
-      teachers.value.splice(index, 1)
-      ElMessage.success('删除成功')
-    }
+  // 基础功能：分页、查询、重置、删除、状态切换
+  const { page, handlePage, query, handleQuery, resetQuery, handleDelete, handleStatus } = useTable({
+    page: usersApi.lecturerPage,
+    delete: usersApi.lecturerDelete,
+    status: usersApi.lecturerEdit,
+    sort: usersApi.lecturerSort
   })
-}
 
-const handleImport = () => {
-  ElMessage.info('导入功能开发中...')
-}
+  onMounted(() => {
+    console.log(`打开文件: ${location.pathname} -> views/users/lecturer/index.vue`);
+  });
 
-const handleReset = () => {
-  searchText.value = ''
-  filterStatus.value = ''
-}
-
-const handleSaveTeacher = (teacherData) => {
-  if (selectedTeacher.value?.id) {
-    // 更新老师
-    const index = teachers.value.findIndex(t => t.id === selectedTeacher.value.id)
-    if (index > -1) {
-      teachers.value[index] = { ...teachers.value[index], ...teacherData }
-    }
-    ElMessage.success('老师信息更新成功')
-  } else {
-    // 新建老师
-    const newTeacher = {
-      id: `teacher_${Date.now()}`,
-      ...teacherData,
-      classCount: 0,
-      courseCount: 0,
-      authorizedClasses: [],
-      authorizedCourses: [],
-      status: 'active'
-    }
-    teachers.value.push(newTeacher)
-    ElMessage.success('老师创建成功')
-  }
-  detailDrawerVisible.value = false
-}
-
-const getStatusLabel = (status) => {
-  const map = {
-    active: '活跃',
-    inactive: '停用'
-  }
-  return map[status] || status
-}
-
-const getStatusTagType = (status) => {
-  const map = {
-    active: 'success',
-    inactive: 'info'
-  }
-  return map[status] || ''
-}
-
-onMounted(() => {
-  console.log(`打开文件: ${location.pathname} -> views/users/teacher/index.vue`)
-  initMockData()
-})
 </script>
 
 <style lang="scss" scoped>
-.teacher-management-container {
-  padding: 24px;
-  background: var(--color-bg-primary);
-  min-height: calc(100vh - 60px);
-}
-
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-  .title-section {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-
-    h2 {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--color-text-primary);
-      margin: 0;
-    }
-
-    .stats {
-      font-size: 14px;
-      color: var(--color-text-secondary);
-    }
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 12px;
-  }
-}
-
-.filter-bar {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: var(--shadow-base);
-}
-
-.table-container {
-  background: white;
+/* ==================== 容器样式 ==================== */
+.app-container {
+  /* 主容器背景渐变色 */
+  background: linear-gradient(135deg, #f5f7fa 0%, #f8f9fc 100%);
   padding: 20px;
+  min-height: calc(100vh - 120px);
   border-radius: 8px;
-  box-shadow: var(--shadow-base);
+}
 
-  .secondary-text {
-    color: var(--color-text-secondary);
-    font-size: 12px;
-    margin-top: 4px;
+/* ==================== 顶部区域样式 ==================== */
+.page_head {
+  /* 顶部区域背景白色卡片效果 */
+  background: #ffffff;
+  padding: 24px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+
+.page_head:hover {
+  /* 悬停时增强阴影效果 */
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== 搜索栏样式 ==================== */
+.search_bar {
+  margin-bottom: 16px;
+}
+
+.search_bar :deep(.el-form-item) {
+  /* 表单项间距优化 */
+  margin-bottom: 0;
+  margin-right: 16px;
+}
+
+.search_bar :deep(.el-input) {
+  /* 输入框宽度优化 */
+  width: 240px;
+  transition: all 0.3s ease;
+}
+
+.search_bar :deep(.el-input:hover) {
+  /* 输入框悬停效果 */
+  transform: translateY(-1px);
+}
+
+.search_bar :deep(.el-input__wrapper) {
+  /* 输入框圆角和阴影 */
+  border-radius: 8px;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.search_bar :deep(.el-input__wrapper:hover) {
+  /* 输入框悬停时阴影增强 */
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== 按钮区域样式 ==================== */
+.button_bar {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.button_bar :deep(.el-button) {
+  /* 按钮圆角优化 */
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.button_bar :deep(.el-button--primary) {
+  /* 主按钮渐变背景 */
+  background: linear-gradient(135deg, #409eff 0%, #5ba4ff 100%);
+  border: none;
+  box-shadow: 0 2px 8px 0 rgba(64, 158, 255, 0.3);
+}
+
+.button_bar :deep(.el-button--primary:hover) {
+  /* 主按钮悬停效果 */
+  background: linear-gradient(135deg, #5ba4ff 0%, #409eff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px 0 rgba(64, 158, 255, 0.4);
+}
+
+.search_bar :deep(.el-button) {
+  /* 搜索栏按钮样式 */
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.search_bar :deep(.el-button--primary) {
+  /* 搜索按钮渐变背景 */
+  background: linear-gradient(135deg, #409eff 0%, #5ba4ff 100%);
+  border: none;
+  box-shadow: 0 2px 8px 0 rgba(64, 158, 255, 0.3);
+}
+
+.search_bar :deep(.el-button--primary:hover) {
+  /* 搜索按钮悬停效果 */
+  background: linear-gradient(135deg, #5ba4ff 0%, #409eff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px 0 rgba(64, 158, 255, 0.4);
+}
+
+.search_bar :deep(.el-button:not(.el-button--primary)) {
+  /* 重置按钮边框和颜色 */
+  border: 1px solid #dcdfe6;
+  color: #606266;
+  background: #ffffff;
+}
+
+.search_bar :deep(.el-button:not(.el-button--primary):hover) {
+  /* 重置按钮悬停效果 */
+  border-color: #409eff;
+  color: #409eff;
+  background: #ecf5ff;
+  transform: translateY(-1px);
+}
+
+/* ==================== 表格样式 ==================== */
+.drag-table {
+  /* 表格背景白色卡片效果 */
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.drag-table:hover {
+  /* 表格悬停时阴影增强 */
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* 表格头部样式 */
+.drag-table :deep(.el-table__header-wrapper) {
+  /* 表头背景渐变 */
+  background: linear-gradient(135deg, #f8f9fc 0%, #f0f2f7 100%);
+}
+
+.drag-table :deep(.el-table__header th) {
+  /* 表头单元格样式 */
+  background: transparent;
+  color: #303133;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px 0;
+  border-bottom: 2px solid #e4e7ed;
+}
+
+/* 表格主体样式 */
+.drag-table :deep(.el-table__body tr) {
+  /* 表格行过渡效果 */
+  transition: all 0.3s ease;
+}
+
+.drag-table :deep(.el-table__body tr:hover) {
+  /* 表格行悬停效果 */
+  background: #f5f7fa !important;
+  transform: translateX(2px);
+}
+
+/* 斑马条纹效果 */
+.drag-table :deep(.el-table__body tr:nth-child(even)) {
+  /* 偶数行背景色 */
+  background: #fafafa;
+}
+
+.drag-table :deep(.el-table__body tr:nth-child(odd)) {
+  /* 奇数行背景色 */
+  background: #ffffff;
+}
+
+.drag-table :deep(.el-table__body td) {
+  /* 表格单元格样式 */
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #606266;
+}
+
+/* 讲师信息列样式 */
+.drag-table :deep(.el-table__body td:first-child) {
+  /* 第一列左内边距 */
+  padding-left: 20px;
+}
+
+.drag-table :deep(.el-table__body img) {
+  /* 讲师头像样式增强 */
+  border: 2px solid #e4e7ed;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.drag-table :deep(.el-table__body img:hover) {
+  /* 讲师头像悬停效果 */
+  transform: scale(1.1);
+  border-color: #409eff;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+/* 操作列按钮样式 */
+.drag-table :deep(.el-button--text) {
+  /* 文本按钮样式 */
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.drag-table :deep(.el-button--text:hover) {
+  /* 文本按钮悬停效果 */
+  background: #ecf5ff;
+  transform: scale(1.05);
+}
+
+.drag-table :deep(.el-divider--vertical) {
+  /* 分隔线样式 */
+  margin: 0 8px;
+  background: #e4e7ed;
+}
+
+/* 下拉菜单样式 */
+.drag-table :deep(.el-dropdown) {
+  /* 下拉菜单容器 */
+  cursor: pointer;
+}
+
+/* ==================== 分页器样式 ==================== */
+:deep(.pagination-container) {
+  /* 分页器容器样式 */
+  background: #ffffff;
+  padding: 20px 24px;
+  margin-top: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+
+:deep(.pagination-container:hover) {
+  /* 分页器悬停效果 */
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
+}
+
+:deep(.el-pagination) {
+  /* 分页器按钮圆角优化 */
+  justify-content: center;
+}
+
+:deep(.el-pagination .el-pager li) {
+  /* 分页按钮样式 */
+  border-radius: 6px;
+  margin: 0 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+:deep(.el-pagination .el-pager li:hover) {
+  /* 分页按钮悬停效果 */
+  background: #ecf5ff;
+  color: #409eff;
+  transform: translateY(-2px);
+}
+
+:deep(.el-pagination .el-pager li.is-active) {
+  /* 当前页按钮样式 */
+  background: linear-gradient(135deg, #409eff 0%, #5ba4ff 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(64, 158, 255, 0.3);
+}
+
+:deep(.el-pagination button) {
+  /* 分页器箭头按钮 */
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-pagination button:hover) {
+  /* 分页器箭头按钮悬停 */
+  background: #ecf5ff;
+  color: #409eff;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media screen and (max-width: 768px) {
+  .app-container {
+    /* 移动端容器内边距减小 */
+    padding: 12px;
+  }
+
+  .page_head {
+    /* 移动端顶部区域内边距减小 */
+    padding: 16px;
+  }
+
+  .search_bar :deep(.el-input) {
+    /* 移动端输入框宽度自适应 */
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .search_bar :deep(.el-form-item) {
+    /* 移动端表单项独占一行 */
+    display: block;
+    margin-right: 0;
+    margin-bottom: 12px;
+  }
+
+  .button_bar {
+    /* 移动端按钮区域调整 */
+    flex-direction: column;
+  }
+
+  .button_bar :deep(.el-button) {
+    /* 移动端按钮宽度自适应 */
+    width: 100%;
   }
 }
 
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
+/* ==================== 动画效果 ==================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-container {
+  /* 页面加载动画 */
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* ==================== 加载状态样式 ==================== */
+:deep(.el-loading-mask) {
+  /* 加载遮罩背景 */
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+}
+
+:deep(.el-loading-spinner .path) {
+  /* 加载动画颜色 */
+  stroke: #409eff;
+}
+
+/* ==================== 下拉菜单全局样式 ==================== */
+:deep(.el-dropdown-menu) {
+  /* 下拉菜单圆角和阴影 */
+  border-radius: 8px;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.12);
+  border: none;
+  padding: 8px 0;
+}
+
+:deep(.el-dropdown-menu__item) {
+  /* 下拉菜单项样式 */
+  padding: 8px 20px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-dropdown-menu__item:hover) {
+  /* 下拉菜单项悬停效果 */
+  background: #ecf5ff;
+  color: #409eff;
 }
 </style>

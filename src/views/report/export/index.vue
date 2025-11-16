@@ -121,36 +121,38 @@
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button
-              v-if="row.status === 'completed'"
-              type="primary"
-              size="small"
-              @click="downloadReport(row)"
-            >
-              下载
-            </el-button>
-            <el-button
-              v-if="row.status === 'completed'"
-              type="success"
-              size="small"
-              @click="shareReport(row)"
-            >
-              分享
-            </el-button>
-            <el-button
-              v-if="row.status === 'failed'"
-              type="warning"
-              size="small"
-              @click="regenerateReport(row)"
-            >
-              重试
-            </el-button>
-            <el-button type="info" size="small" @click="viewReportDetail(row)">
-              详情
-            </el-button>
-            <el-button type="danger" size="small" @click="deleteReport(row)">
-              删除
-            </el-button>
+            <div class="table-actions">
+              <el-button
+                v-if="row.status === 'completed'"
+                type="primary"
+                size="small"
+                @click="downloadReport(row)"
+              >
+                下载
+              </el-button>
+              <el-button
+                v-if="row.status === 'completed'"
+                type="success"
+                size="small"
+                @click="shareReport(row)"
+              >
+                分享
+              </el-button>
+              <el-button
+                v-if="row.status === 'failed'"
+                type="warning"
+                size="small"
+                @click="regenerateReport(row)"
+              >
+                重试
+              </el-button>
+              <el-button type="info" size="small" @click="viewReportDetail(row)">
+                详情
+              </el-button>
+              <el-button type="danger" size="small" @click="deleteReport(row)">
+                删除
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>

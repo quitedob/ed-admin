@@ -20,8 +20,9 @@
               <el-option label="单选题" value="single" />
               <el-option label="多选题" value="multiple" />
               <el-option label="填空题" value="fill" />
-              <el-option label="问答题" value="essay" />
-              <el-option label="编程题(HOJ)" value="programming" />
+              <el-option label="判断题" value="judge" />
+              <el-option label="OJ题" value="programming" />
+              <el-option label="简答题" value="essay" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -121,6 +122,17 @@
         <el-button type="primary" plain @click="addOption" style="margin-top: 12px">
           添加选项
         </el-button>
+      </template>
+
+      <!-- 判断题 -->
+      <template v-if="form.type === 'judge'">
+        <el-divider content-position="left">判断题答案</el-divider>
+        <el-form-item label="正确答案">
+          <el-radio-group v-model="form.correctAnswer">
+            <el-radio :label="true">正确</el-radio>
+            <el-radio :label="false">错误</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </template>
 
       <!-- 填空题 -->

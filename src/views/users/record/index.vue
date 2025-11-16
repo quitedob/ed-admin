@@ -94,9 +94,11 @@
                 </el-table-column>
                 <el-table-column label="操作" width="100" align="center" fixed="right">
                   <template #default="scope">
-                    <el-button text type="primary" size="small" @click="viewHomeworkDetail(scope.row)">
-                      查看
-                    </el-button>
+                    <div class="table-actions">
+                      <el-button text type="primary" size="small" @click="viewHomeworkDetail(scope.row)">
+                        查看
+                      </el-button>
+                    </div>
                   </template>
                 </el-table-column>
               </el-table>
@@ -125,9 +127,11 @@
                 </el-table-column>
                 <el-table-column label="操作" width="100" align="center" fixed="right">
                   <template #default="scope">
-                    <el-button text type="primary" size="small" @click="viewExamDetail(scope.row)">
-                      查看
-                    </el-button>
+                    <div class="table-actions">
+                      <el-button text type="primary" size="small" @click="viewExamDetail(scope.row)">
+                        查看
+                      </el-button>
+                    </div>
                   </template>
                 </el-table-column>
               </el-table>

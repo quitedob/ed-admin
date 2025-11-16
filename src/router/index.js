@@ -279,6 +279,30 @@ export function createNewRouter(data) {
           meta: { title: '作业列表' }
         },
         {
+          path: 'create',
+          name: 'HomeworkCreate',
+          component: () => import('@/views/homework/create/index.vue'),
+          meta: { title: '创建作业' }
+        },
+        {
+          path: 'edit/:id',
+          name: 'HomeworkEdit',
+          component: () => import('@/views/homework/edit/index.vue'),
+          meta: { title: '编辑作业' }
+        },
+        {
+          path: 'detail/:id',
+          name: 'HomeworkDetail',
+          component: () => import('@/views/homework/detail/index.vue'),
+          meta: { title: '作业详情' }
+        },
+        {
+          path: 'grading',
+          name: 'HomeworkGrading',
+          component: () => import('@/views/homework/grading/index.vue'),
+          meta: { title: '批改作业' }
+        },
+        {
           path: 'review',
           name: 'HomeworkReview',
           component: () => import('@/views/homework/review/index.vue'),
@@ -302,6 +326,30 @@ export function createNewRouter(data) {
           name: 'ExamList',
           component: () => import('@/views/exam/list/index.vue'),
           meta: { title: '考试列表' }
+        },
+        {
+          path: 'create',
+          name: 'ExamCreate',
+          component: () => import('@/views/exam/create/index.vue'),
+          meta: { title: '创建考试' }
+        },
+        {
+          path: 'edit/:id',
+          name: 'ExamEdit',
+          component: () => import('@/views/exam/create/index.vue'),
+          meta: { title: '编辑考试' }
+        },
+        {
+          path: 'detail/:id',
+          name: 'ExamDetail',
+          component: () => import('@/views/exam/detail/index.vue'),
+          meta: { title: '考试详情' }
+        },
+        {
+          path: 'grade/:id',
+          name: 'ExamGrade',
+          component: () => import('@/views/exam/grades/index.vue'),
+          meta: { title: '批改考试' }
         },
         {
           path: 'monitor',
@@ -346,6 +394,27 @@ export function createNewRouter(data) {
         name: 'UserDetail',
         component: () => import('@/views/users/detail/index.vue'),
         meta: { title: '用户详情' }
+      }
+    ]
+  })
+
+  // 添加老师管理路由
+  router.addRoute({
+    path: '/users/lecturer',
+    component: Layout,
+    redirect: '/users/lecturer/list',
+    children: [
+      {
+        path: 'list',
+        name: 'LecturerList',
+        component: () => import('@/views/users/lecturer/list/index.vue'),
+        meta: { title: '老师列表' }
+      },
+      {
+        path: 'detail/:id',
+        name: 'LecturerDetail',
+        component: () => import('@/views/users/lecturer/detail/index.vue'),
+        meta: { title: '老师详情' }
       }
     ]
   })

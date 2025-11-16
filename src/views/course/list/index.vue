@@ -56,11 +56,13 @@
       </el-table-column>
       <el-table-column :width="200" fixed="right" label="操作" prop="address">
         <template #default="scope">
-          <el-button v-permission="'course:view'" text type="primary" @click="toCourseDetail(scope.row)">详情</el-button>
-          <el-divider direction="vertical" />
-          <el-button v-permission="'course:edit'" text type="primary" @click="toCourseUpdate(scope.row)">编辑</el-button>
-          <el-divider direction="vertical" />
-          <el-button v-permission="'course:delete'" text type="danger" @click="handleDelete(scope.row)">删除</el-button>
+          <div class="table-actions">
+            <el-button v-permission="'course:view'" text type="primary" @click="toCourseDetail(scope.row)">详情</el-button>
+            <el-divider direction="vertical" />
+            <el-button v-permission="'course:edit'" text type="primary" @click="toCourseUpdate(scope.row)">编辑</el-button>
+            <el-divider direction="vertical" />
+            <el-button v-permission="'course:delete'" text type="danger" @click="handleDelete(scope.row)">删除</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
