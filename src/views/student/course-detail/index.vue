@@ -2,11 +2,23 @@
   <div class="course-detail-container">
     <!-- AI助教组件 -->
     <chat-interface
+      v-if="currentLesson"
       :context="'video'"
       :course-id="courseInfo.id"
       :video-id="currentLesson?.id"
     />
-    <!-- 课程头部信息 -->
+    
+    <!-- 使用课程内容渲染器 -->
+    <div v-if="useRenderer" class="renderer-view">
+      <div class="renderer-header">
+        <el-button @click="useRenderer = false" :icon="ArrowLeft">返回传统视图</el-button>
+      </div>
+      <CourseContentRenderer :course-data="formattedCourseData" />
+    </div>
+
+    <!-- 传统学习视图 -->
+    <div v-else class="traditional-view">
+      <!-- 课程头部信息 -->
     <div class="course-header">
       <div class="course-info">
         <img :src="courseInfo.coverImage" :alt="courseInfo.courseName" class="course-cover" />
@@ -26,6 +38,9 @@
       <div class="course-actions">
         <el-button type="primary" size="large" @click="continueLearning">
           继续学习
+        </el-button>
+        <el-button size="large" @click="useRenderer = true">
+          预览模式
         </el-button>
       </div>
     </div>
@@ -158,6 +173,7 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -165,8 +181,9 @@
   import { ref, onMounted, computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { ElMessage } from 'element-plus'
-  import { ArrowRight, ArrowDown, VideoPlay, Document, ChatDotRound, Check, Lock, Unlock } from '@element-plus/icons-vue'
+  import { ArrowRight, ArrowDown, ArrowLeft, VideoPlay, Document, ChatDotRound, Check, Lock, Unlock } from '@element-plus/icons-vue'
   import ChatInterface from '@/components/ai/ChatInterface.vue'
+  import CourseContentRenderer from '@/components/Renderer/CourseContentRenderer.vue'
 
   const route = useRoute()
   const router = useRouter()
@@ -263,6 +280,53 @@
 
   const currentLessonId = ref(null)
   const videoPlayer = ref(null)
+  const useRenderer = ref(false)
+
+  // 格式化课程数据供渲染器使用
+  const formattedCourseData = computed(() => {
+    return {
+      id: courseInfo.value.id,
+      basicInfo: {
+        title: courseInfo.value.courseName,
+        teacher: {
+          name: courseInfo.value.lecturerName
+        },
+        duration: courseInfo.value.totalLessons,
+        level: 'intermediate',
+        description: '本课程将带你从零开始学习Vue.js框架，掌握现代前端开发技能。',
+        cover: courseInfo.value.coverImage
+      },
+      schedule: {
+        publishStatus: 'published'
+      },
+      chapters: courseChapters.value.map(chapter => ({
+        id: chapter.id,
+        number: chapter.id,
+        title: chapter.chapterName,
+        sections: chapter.lessons.map(lesson => ({
+          id: lesson.id,
+          number: lesson.title.split(' ')[0],
+          title: lesson.title,
+          contentType: lesson.type === 'video' ? 'video' : lesson.type === 'document' ? 'document' : 'image',
+          contentUrl: lesson.videoUrl || '',
+          duration: parseDuration(lesson.duration),
+          practice: lesson.type === 'practice' ? {
+            questions: 5
+          } : null,
+          resources: {
+            materials: []
+          }
+        }))
+      }))
+    }
+  })
+
+  // 解析时长字符串为秒数
+  const parseDuration = (durationStr) => {
+    if (!durationStr) return 0
+    const parts = durationStr.split(':')
+    return parseInt(parts[0]) * 60 + parseInt(parts[1])
+  }
 
   // 当前课时
   const currentLesson = computed(() => {
@@ -390,6 +454,18 @@
   .course-detail-container {
     min-height: 100vh;
     background: #f5f7fa;
+  }
+
+  .renderer-view {
+    padding: 20px;
+
+    .renderer-header {
+      margin-bottom: 20px;
+    }
+  }
+
+  .traditional-view {
+    // Existing styles
   }
 
   .course-header {

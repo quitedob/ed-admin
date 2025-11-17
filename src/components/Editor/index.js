@@ -1,11 +1,35 @@
 import { Boot } from '@wangeditor/editor'
 import ImageMenu from './Custom/image.js'
+import FormulaMenu from './Custom/formula.js'
+import CodeMenu from './Custom/code.js'
+import HighlightMenu from './Custom/highlight.js'
+import TableMenu from './Custom/table.js'
 
 const MenusList = [
   {
     index: 20,
     key: 'ImageMenu',
     class: ImageMenu
+  },
+  {
+    index: 21,
+    key: 'FormulaMenu',
+    class: FormulaMenu
+  },
+  {
+    index: 22,
+    key: 'CodeMenu',
+    class: CodeMenu
+  },
+  {
+    index: 23,
+    key: 'HighlightMenu',
+    class: HighlightMenu
+  },
+  {
+    index: 24,
+    key: 'TableMenu',
+    class: TableMenu
   }
 ]
 

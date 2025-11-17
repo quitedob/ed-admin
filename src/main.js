@@ -12,6 +12,10 @@ import 'virtual:svg-icons-register'
 import Icon from '@/components/Icon/index.vue'
 import Pagination from '@/components/Pagination/index.vue'
 import { hasPermission } from '@/utils/permission.js'
+import { setupGlobalErrorHandler } from '@/utils/errorHandler.js'
+
+// 初始化全局错误处理
+setupGlobalErrorHandler()
 
 // 初始化
 setupInit()

@@ -3,6 +3,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getToken, removeToken } from '@/utils/cookie.js'
 import router from '@/router/index.js'
 import { PATH } from '@/utils/constants/system'
+import { NetworkError, ApiError, handleError } from './errorHandler.js'
 
 const pending = [] // 声明一个数组用于存储每个ajax请求的取消函数和ajax标识
 const CancelToken = axios.CancelToken
@@ -13,9 +14,40 @@ const request = axios.create({
   timeout: 60000 // request timeout
 })
 
+// Mock data responses (when backend is not available)
+const mockResponses = {
+  '/system/api/sys/config/website': {
+    code: 200,
+    data: {
+      websiteCopyright: '© 2024 芝麻信奥教育系统',
+      websiteIcp: '浙ICP备12345678号',
+      websitePrn: '浙公网安备330000000000号',
+      websitePrnNo: '330000000000'
+    }
+  },
+  '/system/api/common/code': {
+    code: 200,
+    data: {
+      verToken: 'mock-token-' + Date.now(),
+      img: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjEwIiB5PSIyNSIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzQwOUVGRiI+MTIzNDwvdGV4dD48L3N2Zz4='
+    }
+  }
+}
+
 // request interceptor
 request.interceptors.request.use(
   (config) => {
+    // Check if we should use mock data
+    const mockData = mockResponses[config.url]
+    if (mockData) {
+      // Return mock response immediately
+      return Promise.reject({
+        config,
+        response: { data: mockData },
+        __isMock: true
+      })
+    }
+    
     removePending(config, true) // 在一个ajax发送前执行一下取消操作
     const token = getToken()
     if (token) {
@@ -28,7 +60,11 @@ request.interceptors.request.use(
     return config
   },
   (error) => {
-    console.error(error)
+    // Handle mock responses
+    if (error.__isMock) {
+      return Promise.resolve(error.response)
+    }
+    handleError(error, 'Request Setup Error')
     return Promise.reject(error)
   }
 )
@@ -86,10 +122,15 @@ request.interceptors.response.use(
     return Promise.reject(response)
   },
   (error) => {
-    if (error.response && error.response.status === 500 && error.response.data.msg) {
-      ElMessage.error({ message: error.response.data.msg, duration: 5 * 1000 })
+    if (error.response) {
+      // API错误
+      handleError(new ApiError(error.response), 'API Response Error')
+    } else if (error.request) {
+      // 网络错误
+      handleError(new NetworkError(error), 'Network Error')
     } else {
-      console.error(error)
+      // 其他错误
+      handleError(error, 'Unknown Error')
     }
     return Promise.reject(error)
   }

@@ -25,9 +25,15 @@
               <el-tag :type="getTypeColor(project.type)" size="small">
                 {{ getTypeLabel(project.type) }}
               </el-tag>
+              <el-tag :type="getObjectTypeColor(project.objectType)" size="small">
+                {{ getObjectTypeLabel(project.objectType) }}
+              </el-tag>
               <span class="time">{{ formatTime(project.updatedAt) }}</span>
             </div>
             <div class="project-actions">
+              <el-button type="text" size="small" @click.stop="jumpToDetail(project)">
+                <el-icon><ArrowRight /></el-icon>
+              </el-button>
               <el-button type="text" size="small" @click.stop="deleteProject(project)">
                 <el-icon><Delete /></el-icon>
               </el-button>
@@ -220,7 +226,8 @@ import {
   FolderOpened,
   Document,
   Check,
-  InfoFilled
+  InfoFilled,
+  ArrowRight
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -254,18 +261,24 @@ const getProjectHistory = () => {
       id: 1,
       title: 'JavaScript基础测试卷',
       type: 'upload',
+      objectType: 'exam',
+      objectId: 'exam_001',
       updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
     },
     {
       id: 2,
       title: '数据结构错题练习',
       type: 'error',
+      objectType: 'homework',
+      objectId: 'hw_001',
       updatedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
     },
     {
       id: 3,
       title: '算法期末考试卷',
       type: 'custom',
+      objectType: 'exam',
+      objectId: 'exam_002',
       updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     }
   ]
@@ -430,6 +443,38 @@ const getTypeLabel = (type) => {
     custom: '自定义'
   }
   return labelMap[type] || '未知'
+}
+
+// 获取对象类型颜色
+const getObjectTypeColor = (objectType) => {
+  const colorMap = {
+    exam: 'danger',
+    homework: 'success'
+  }
+  return colorMap[objectType] || 'info'
+}
+
+// 获取对象类型标签
+const getObjectTypeLabel = (objectType) => {
+  const labelMap = {
+    exam: '考试',
+    homework: '作业'
+  }
+  return labelMap[objectType] || '未知'
+}
+
+// 跳转到详情页
+const jumpToDetail = (project) => {
+  const path = project.objectType === 'exam' 
+    ? `/exam/detail/${project.objectId}`
+    : `/homework/detail/${project.objectId}`
+  
+  try {
+    router.push(path)
+    ElMessage.success('正在跳转到详情页...')
+  } catch (error) {
+    ElMessage.error('跳转失败')
+  }
 }
 
 // 获取活动图标

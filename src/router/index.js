@@ -112,8 +112,6 @@ router.beforeEach(async (to, from, next) => {
   next()
 })
 
-export default router
-
 // 创建路由
 export function createNewRouter(data) {
   data = data ? data : useUserStore().routerList || []
@@ -177,7 +175,8 @@ export function createNewRouter(data) {
     { path: '/class', redirect: '/class/management' },
     { path: '/homework', redirect: '/homework/list' },
     { path: '/exam', redirect: '/exam/list' },
-    { path: '/assignments', redirect: '/assignments/v2-list' }
+    { path: '/assignments', redirect: '/assignments/v2-list' },
+    { path: '/question-bank', redirect: '/question-bank' }
   ]
 
   // 添加新功能路由
@@ -201,7 +200,7 @@ export function createNewRouter(data) {
         }
       ]
     },
-        {
+    {
       path: '/ai',
       component: Layout,
       redirect: '/ai/assistant',
@@ -371,23 +370,40 @@ export function createNewRouter(data) {
           meta: { title: '成绩管理' }
         }
       ]
+    },
+    {
+      path: '/assignments',
+      component: Layout,
+      redirect: '/assignments/v2-list',
+      children: [
+        {
+          path: 'v2-list',
+          name: 'V2AssignmentList',
+          component: () => import('@/views/assignments/v2-list.vue'),
+          meta: { title: '作业管理' }
+        }
+      ]
+    },
+    {
+      path: '/question-bank',
+      component: Layout,
+      redirect: '/question-bank',
+      children: [
+        {
+          path: '',
+          name: 'QuestionBank',
+          component: () => import('@/views/question-bank/index.vue'),
+          meta: { title: '题库管理' }
+        },
+        {
+          path: 'analytics',
+          name: 'QuestionBankAnalytics',
+          component: () => import('@/views/question-bank/analytics.vue'),
+          meta: { title: '题库分析' }
+        }
+      ]
     }
-  },
-  {
-    path: '/assignments',
-    component: Layout,
-    redirect: '/assignments/v2-list',
-    children: [
-      {
-        path: 'v2-list',
-        name: 'V2AssignmentList',
-        component: () => import('@/views/assignments/v2-list.vue'),
-        meta: { title: '作业管理' }
-      }
-    ]
-  }
-]
-
+  ]
 
   // 添加新功能路由
   featureRoutes.forEach(route => {
@@ -440,6 +456,66 @@ export function createNewRouter(data) {
     ]
   })
 
+  // 添加员工管理路由
+  router.addRoute({
+    path: '/users/employee',
+    component: Layout,
+    redirect: '/users/employee/list',
+    children: [
+      {
+        path: 'list',
+        name: 'EmployeeList',
+        component: () => import('@/views/users/employee/index.vue'),
+        meta: { title: '员工管理' }
+      }
+    ]
+  })
+
+  // 添加作业管理路由
+  router.addRoute({
+    path: '/homework',
+    component: Layout,
+    redirect: '/homework/list',
+    children: [
+      {
+        path: 'list',
+        name: 'HomeworkList',
+        component: () => import('@/views/homework/index.vue'),
+        meta: { title: '作业管理' }
+      }
+    ]
+  })
+
+  // 添加考试管理路由
+  router.addRoute({
+    path: '/exam',
+    component: Layout,
+    redirect: '/exam/list',
+    children: [
+      {
+        path: 'list',
+        name: 'ExamList',
+        component: () => import('@/views/exam/index.vue'),
+        meta: { title: '考试管理' }
+      }
+    ]
+  })
+
+  // 添加系统设置路由
+  router.addRoute({
+    path: '/system',
+    component: Layout,
+    redirect: '/system/settings',
+    children: [
+      {
+        path: 'settings',
+        name: 'SystemSettings',
+        component: () => import('@/views/system/settings/index.vue'),
+        meta: { title: '系统设置' }
+      }
+    ]
+  })
+
   redirectRoutes.forEach(route => {
     try {
       router.addRoute(route)
@@ -448,3 +524,5 @@ export function createNewRouter(data) {
     }
   })
 }
+
+export default router

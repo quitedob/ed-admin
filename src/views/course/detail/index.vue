@@ -83,14 +83,23 @@
     <!-- 标签页内容 -->
     <el-tabs v-model="activeTab" class="course-tabs">
 
-      <!-- 章节内容 -->
+      <!-- 章节内容 - 使用渲染器组件 -->
       <el-tab-pane label="章节内容" name="chapters">
         <div class="chapters-content">
           <div class="chapter-actions">
             <el-button type="primary" @click="manageChapters">管理章节</el-button>
+            <el-button @click="toggleViewMode">
+              {{ viewMode === 'renderer' ? '切换到列表视图' : '切换到预览视图' }}
+            </el-button>
           </div>
 
-          <div v-if="chapters.length > 0" class="chapter-list">
+          <!-- 渲染器视图 -->
+          <div v-if="viewMode === 'renderer' && chapters.length > 0">
+            <CourseContentRenderer :course-data="courseInfo" />
+          </div>
+
+          <!-- 列表视图 -->
+          <div v-else-if="viewMode === 'list' && chapters.length > 0" class="chapter-list">
             <el-collapse v-model="activeChapters" accordion>
               <el-collapse-item
                 v-for="chapter in chapters"
@@ -198,6 +207,7 @@ import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { parseTime, formatTime } from '@/utils'
+import CourseContentRenderer from '@/components/Renderer/CourseContentRenderer.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -209,6 +219,7 @@ const activeChapters = ref([])
 const courseInfo = ref({})
 const chapters = ref([])
 const studyData = ref([])
+const viewMode = ref('renderer') // 'renderer' or 'list'
 
 // 获取课程详情
 const getCourseDetail = () => {
@@ -273,6 +284,11 @@ const editCourse = () => {
 // 管理章节
 const manageChapters = () => {
   router.push({ path: '/course/chapter', query: { courseId: courseInfo.value.id } })
+}
+
+// 切换视图模式
+const toggleViewMode = () => {
+  viewMode.value = viewMode.value === 'renderer' ? 'list' : 'renderer'
 }
 
 // 工具方法

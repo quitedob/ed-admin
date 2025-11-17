@@ -386,7 +386,8 @@ import { aigcApi } from '@/api/aigc'
     description: '',
     file: null,
     webpageUrl: '',
-    content: ''
+    content: '',
+    editId: null
   })
 
   // 文件列表
@@ -465,6 +466,7 @@ import { aigcApi } from '@/api/aigc'
 
       submitting.value = true
 
+      const isEdit = submitForm.editId
       const workData = {
         ...submitForm,
         author: '当前用户', // 从用户信息中获取
@@ -475,18 +477,31 @@ import { aigcApi } from '@/api/aigc'
 
       // 模拟提交
       setTimeout(() => {
-        const newWork = {
-          ...workData,
-          id: Date.now(),
-          createTime: new Date()
+        if (isEdit) {
+          // 编辑模式：更新现有作品
+          const index = myWorks.value.findIndex(w => w.id === submitForm.editId)
+          if (index !== -1) {
+            myWorks.value[index] = {
+              ...myWorks.value[index],
+              ...workData,
+              updateTime: new Date()
+            }
+          }
+          ElMessage.success('作品更新成功！等待管理员重新审核。')
+        } else {
+          // 创建模式：添加新作品
+          const newWork = {
+            ...workData,
+            id: Date.now(),
+            createTime: new Date()
+          }
+          myWorks.value.unshift(newWork)
+          ElMessage.success('作品提交成功！等待管理员审核。')
         }
 
-        myWorks.value.unshift(newWork)
         submitting.value = false
         showSubmitForm.value = false
         resetForm()
-
-        ElMessage.success('作品提交成功！等待管理员审核。')
       }, 2000)
 
     } catch (error) {
@@ -499,12 +514,13 @@ import { aigcApi } from '@/api/aigc'
     submitFormRef.value?.resetFields()
     fileList.value = []
     Object.assign(submitForm, {
-    title: '',
-    type: '',
+      title: '',
+      type: '',
       description: '',
       file: null,
       webpageUrl: '',
-      content: ''
+      content: '',
+      editId: null
     })
   }
 
@@ -540,8 +556,42 @@ import { aigcApi } from '@/api/aigc'
 
   // 编辑作品
   const editWork = (work) => {
-    // TODO: 实现编辑功能
-    ElMessage.info('编辑功能开发中...')
+    // 只有待审核的作品才能编辑
+    if (work.auditStatus !== 'pending') {
+      ElMessage.warning('只有待审核的作品才能编辑')
+      return
+    }
+
+    // 填充表单数据
+    Object.assign(submitForm, {
+      title: work.title,
+      type: work.type,
+      description: work.description,
+      file: work.file || null,
+      webpageUrl: work.webpageUrl || '',
+      content: work.content || ''
+    })
+
+    // 如果有文件，添加到文件列表
+    if (work.fileUrl) {
+      fileList.value = [{
+        name: work.title,
+        url: work.fileUrl
+      }]
+    }
+
+    // 标记为编辑模式
+    submitForm.editId = work.id
+
+    // 展开表单
+    showSubmitForm.value = true
+
+    // 滚动到表单
+    setTimeout(() => {
+      document.querySelector('.submit-form')?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
+
+    ElMessage.info('已加载作品信息，可进行编辑')
   }
 
   // 工具方法

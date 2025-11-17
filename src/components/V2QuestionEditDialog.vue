@@ -72,13 +72,10 @@
           <section v-if="currentSection === 'content'" class="edit-section">
             <h4>题目内容</h4>
             <div class="content-editor">
-              <el-input
+              <EnhancedEditor
                 v-model="questionData.questionText"
-                type="textarea"
-                :rows="6"
-                placeholder="请输入题目内容"
-                maxlength="2000"
-                show-word-limit
+                :height="200"
+                placeholder="请输入题目内容，支持富文本编辑、数学公式、代码块等功能"
               />
             </div>
 
@@ -194,19 +191,17 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="解析">
-                <el-input
+                <EnhancedEditor
                   v-model="questionData.explanation"
-                  type="textarea"
-                  :rows="4"
-                  placeholder="题目解析"
+                  :height="150"
+                  placeholder="请输入题目解析，支持富文本编辑、数学公式、代码块等功能"
                 />
               </el-form-item>
               <el-form-item label="提示">
-                <el-input
+                <EnhancedEditor
                   v-model="questionData.hint"
-                  type="textarea"
-                  :rows="2"
-                  placeholder="解题提示"
+                  :height="100"
+                  placeholder="请输入解题提示，支持富文本编辑、数学公式、代码块等功能"
                 />
               </el-form-item>
             </el-form>
@@ -229,6 +224,7 @@
 import { ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Delete, Document, Setting, Edit } from '@element-plus/icons-vue'
+import EnhancedEditor from '@/components/QuestionBank/EnhancedEditor.vue'
 
 const props = defineProps({
   modelValue: {

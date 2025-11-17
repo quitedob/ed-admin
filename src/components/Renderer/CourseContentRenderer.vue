@@ -67,14 +67,17 @@
 
               <div class="section-meta">
                 <span v-if="section.duration" class="duration">
+                  <el-icon><Clock /></el-icon>
                   {{ formatDuration(section.duration) }}
                 </span>
                 <el-tag
                   v-if="section.practice?.questions"
                   size="small"
                   type="warning"
+                  effect="dark"
                 >
-                  {{ section.practice.questions }} 道练习题
+                  <el-icon><EditPen /></el-icon>
+                  {{ section.practice.questions }} 道练习
                 </el-tag>
               </div>
             </div>
@@ -154,7 +157,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { VideoPlay, Document, Picture } from '@element-plus/icons-vue'
+import { VideoPlay, Document, Picture, Clock, EditPen } from '@element-plus/icons-vue'
 
 const props = defineProps({
   courseData: {
@@ -338,8 +341,18 @@ const getLevelText = (level) => {
 }
 
 .duration {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   color: var(--color-text-tertiary);
   font-size: 13px;
+}
+
+.section-meta .el-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
 }
 
 .resource-viewer {
