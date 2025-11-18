@@ -1,9 +1,8 @@
 import request from '@/utils/request'
 import mockApi from './mockApi'
 
-// 开发环境检测
-const isDevelopment = process.env.NODE_ENV === 'development'
-const useMock = isDevelopment && localStorage.getItem('useMockApi') === 'true'
+// 全面使用Mock数据
+const useMock = true
 
 // 题库管理相关API接口
 

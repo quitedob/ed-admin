@@ -14,7 +14,7 @@ const request = axios.create({
   timeout: 60000 // request timeout
 })
 
-// Mock data responses (when backend is not available)
+// Mock data responses (全面使用Mock数据)
 const mockResponses = {
   '/system/api/sys/config/website': {
     code: 200,
@@ -31,23 +31,136 @@ const mockResponses = {
       verToken: 'mock-token-' + Date.now(),
       img: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjEwIiB5PSIyNSIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzQwOUVGRiI+MTIzNDwvdGV4dD48L3N2Zz4='
     }
+  },
+  // 用户相关API
+  '/api/user/info': {
+    code: 200,
+    data: {
+      id: 1,
+      username: 'admin',
+      nickname: '管理员',
+      email: 'admin@example.com',
+      avatar: '',
+      roles: ['admin'],
+      permissions: ['*']
+    }
+  },
+  '/api/user/list': {
+    code: 200,
+    data: {
+      items: [
+        { id: 1, username: 'admin', nickname: '管理员', status: 'active' },
+        { id: 2, username: 'teacher1', nickname: '张老师', status: 'active' },
+        { id: 3, username: 'student1', nickname: '张三', status: 'active' }
+      ],
+      total: 3,
+      page: 1,
+      limit: 20
+    }
+  },
+  // 班级相关API
+  '/api/class/list': {
+    code: 200,
+    data: {
+      items: [
+        { id: 1, name: '班级A', teacher: '张老师', studentCount: 30 },
+        { id: 2, name: '班级B', teacher: '李老师', studentCount: 25 }
+      ],
+      total: 2,
+      page: 1,
+      limit: 20
+    }
+  },
+  // 作业相关API
+  '/api/homework/list': {
+    code: 200,
+    data: {
+      items: [
+        { id: 1, title: 'JavaScript基础练习', class: '班级A', deadline: '2024-12-31' },
+        { id: 2, title: 'React组件开发', class: '班级B', deadline: '2024-12-25' }
+      ],
+      total: 2,
+      page: 1,
+      limit: 20
+    }
+  },
+  // 考试相关API
+  '/api/exam/list': {
+    code: 200,
+    data: {
+      items: [
+        { id: 1, title: '期中考试', class: '班级A', startTime: '2024-12-20 09:00' },
+        { id: 2, title: '期末考试', class: '班级B', startTime: '2024-12-28 14:00' }
+      ],
+      total: 2,
+      page: 1,
+      limit: 20
+    }
+  },
+  // 课程相关API
+  '/api/course/list': {
+    code: 200,
+    data: {
+      items: [
+        { id: 1, name: 'JavaScript基础', description: '学习JavaScript基础知识' },
+        { id: 2, name: 'React开发', description: 'React框架开发课程' }
+      ],
+      total: 2,
+      page: 1,
+      limit: 20
+    }
+  },
+  // 题库相关API
+  '/api/question-bank/questions': {
+    code: 200,
+    data: {
+      items: [],
+      total: 0,
+      page: 1,
+      limit: 20
+    }
+  },
+  '/api/question-bank/tags': {
+    code: 200,
+    data: {
+      items: [
+        { id: 1, name: 'JavaScript', color: '#f7df1e' },
+        { id: 2, name: 'React', color: '#61dafb' }
+      ],
+      total: 2
+    }
+  },
+  // 分析相关API
+  '/api/analysis/dashboard': {
+    code: 200,
+    data: {
+      totalStudents: 100,
+      totalClasses: 5,
+      totalHomeworks: 20,
+      totalExams: 10
+    }
   }
 }
 
 // request interceptor
 request.interceptors.request.use(
   (config) => {
-    // Check if we should use mock data
+    // 强制使用Mock数据 - 拦截所有请求并返回mock响应
     const mockData = mockResponses[config.url]
-    if (mockData) {
-      // Return mock response immediately
+    if (mockData || process.env.NODE_ENV === 'development') {
+      // 如果有特定mock数据就用，否则返回通用mock响应
+      const response = mockData || {
+        code: 200,
+        data: {},
+        message: 'Mock data response'
+      }
       return Promise.reject({
         config,
-        response: { data: mockData },
+        response: { data: response },
         __isMock: true
       })
     }
-    
+
     removePending(config, true) // 在一个ajax发送前执行一下取消操作
     const token = getToken()
     if (token) {

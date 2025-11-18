@@ -7,6 +7,7 @@ import router, { createNewRouter } from '@/router/index.js'
 import store from '@/store/index.js'
 // 移除不再需要的导入
 import { useUserStore } from '@/store/modules/user.js'
+import { useMockStore } from '@/stores/mockStore.js'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'virtual:svg-icons-register'
 import Icon from '@/components/Icon/index.vue'
@@ -43,6 +44,8 @@ async function setupInit() {
     }
   })
 
+  // 初始化Mock Store
+  useMockStore().initialize()
   // 统一使用模拟数据，避免调用真实API导致500错误
   useUserStore().mockLogin()
   // 创建模拟路由

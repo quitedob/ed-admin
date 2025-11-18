@@ -56,7 +56,26 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="questionText" label="题目内容" min-width="300" show-overflow-tooltip />
+          <el-table-column prop="questionText" label="题目内容" min-width="250" show-overflow-tooltip />
+          <el-table-column label="题目标签" prop="tags" width="200">
+            <template #default="{ row }">
+              <div class="tag-container">
+                <el-tag
+                  v-for="tag in (row.tags || [])"
+                  :key="tag"
+                  size="small"
+                  type="primary"
+                  effect="light"
+                  style="margin: 2px;"
+                >
+                  {{ tag }}
+                </el-tag>
+                <span v-if="!row.tags || row.tags.length === 0" class="no-tags">
+                  暂无标签
+                </span>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column prop="difficulty" label="难度" width="100">
             <template #default="{ row }">
               <el-tag :type="getDifficultyTagType(row.difficulty)" size="small">
@@ -136,6 +155,7 @@ const initMockData = () => {
       questionText: '以下哪个不是面向对象编程的特性？',
       difficulty: 'easy',
       score: 2,
+      tags: ['面向对象', '基础概念', 'Java'],
       options: [
         { value: 'A', text: '封装', isCorrect: false },
         { value: 'B', text: '继承', isCorrect: false },
@@ -151,6 +171,7 @@ const initMockData = () => {
       questionText: '以下哪些是Java的基本数据类型？',
       difficulty: 'easy',
       score: 3,
+      tags: ['Java基础', '数据类型'],
       options: [
         { value: 'A', text: 'int', isCorrect: true },
         { value: 'B', text: 'String', isCorrect: false },
@@ -166,6 +187,7 @@ const initMockData = () => {
       questionText: 'Java中，___是所有类的父类，___方法用于比较两个对象是否相等。',
       difficulty: 'medium',
       score: 4,
+      tags: ['Java基础', '面向对象', '填空题'],
       fillBlanks: [
         { answers: ['Object'] },
         { answers: ['equals'] }
@@ -178,6 +200,7 @@ const initMockData = () => {
       questionText: 'Java中，接口可以包含方法的实现。',
       difficulty: 'medium',
       score: 2,
+      tags: ['Java', '接口', '判断题'],
       correctAnswer: true,
       explanation: 'Java 8之后，接口可以包含默认方法和静态方法的实现'
     },
@@ -187,6 +210,7 @@ const initMockData = () => {
       questionText: '实现一个函数，判断一个字符串是否为回文串',
       difficulty: 'medium',
       score: 10,
+      tags: ['算法', '字符串', '双指针', '编程题'],
       hojProblemId: '1001',
       timeLimit: 1000,
       memoryLimit: 256,
@@ -200,6 +224,7 @@ const initMockData = () => {
       questionText: '请简述MVC设计模式的核心思想及其优点。',
       difficulty: 'hard',
       score: 10,
+      tags: ['设计模式', '架构', '简答题'],
       referenceAnswer: 'MVC将应用分为Model（模型）、View（视图）、Controller（控制器）三层。优点包括：1.分离关注点 2.提高代码复用性 3.便于维护和测试',
       gradingCriteria: '需要说明三层的作用，至少列举两个优点',
       aiGrading: false,
@@ -434,5 +459,21 @@ onMounted(() => {
 .question-list {
   flex: 1;
   overflow-y: auto;
+}
+
+/* 题目标签相关样式 */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 24px;
+}
+
+.no-tags {
+  color: #909399;
+  font-size: 12px;
+  font-style: italic;
 }
 </style>

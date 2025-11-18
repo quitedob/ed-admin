@@ -7,14 +7,12 @@
         <mains />
       </el-container>
     </el-scrollbar>
-    <DevModeToggle />
   </el-container>
 </template>
 <script setup>
   import Navbar from './components/Navbar/index.vue'
   import Sidebar from './components/Sidebar/index.vue'
   import Mains from './components/Mains.vue'
-  import DevModeToggle from '@/components/DevModeToggle.vue'
   import { useWebsiteStore } from '@/store/modules/website.js'
   import { onMounted } from 'vue'
 

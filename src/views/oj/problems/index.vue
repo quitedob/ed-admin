@@ -105,16 +105,23 @@
             <el-tag type="info">{{ getCategoryLabel(scope.row.category) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="标签" align="center" prop="tags" width="150">
+        <el-table-column label="题目标签" align="center" prop="tags" width="200">
           <template #default="scope">
-            <el-tag
-              v-for="tag in scope.row.tags"
-              :key="tag"
-              size="small"
-              style="margin: 2px;"
-            >
-              {{ tag }}
-            </el-tag>
+            <div class="tag-container">
+              <el-tag
+                v-for="tag in (scope.row.tags || [])"
+                :key="tag"
+                size="small"
+                type="primary"
+                effect="light"
+                style="margin: 2px;"
+              >
+                {{ tag }}
+              </el-tag>
+              <span v-if="!scope.row.tags || scope.row.tags.length === 0" class="no-tags">
+                暂无标签
+              </span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="通过数" align="center" prop="acceptedCount" width="80" />
@@ -394,8 +401,16 @@
           </el-form-item>
         </template>
 
-        <el-form-item label="标签" prop="tags">
-          <el-select v-model="form.tags" multiple placeholder="请选择标签" style="width: 100%">
+        <el-form-item label="题目标签" prop="tags">
+          <el-select
+            v-model="form.tags"
+            multiple
+            filterable
+            allow-create
+            default-first-option
+            placeholder="请选择或输入题目标签"
+            style="width: 100%"
+          >
             <el-option
               v-for="tag in tagList"
               :key="tag"
@@ -403,6 +418,9 @@
               :value="tag"
             />
           </el-select>
+          <div class="tag-help">
+            <small>可选择现有标签或输入新标签创建自定义标签</small>
+          </div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -561,8 +579,26 @@ const categoryList = ref([
 
 // 标签列表
 const tagList = ref([
+  // 算法类别
   '排序', '搜索', '哈希表', '二分查找', '双指针', '递归', '分治', '数学',
-  '位运算', '栈', '队列', '堆', '字典树', '并查集', '滑动窗口', '单调栈'
+  '位运算', '贪心', '动态规划', '回溯', '穷举', '模拟',
+
+  // 数据结构
+  '数组', '字符串', '链表', '栈', '队列', '堆', '字典树', '并查集',
+  '树', '二叉树', '平衡树', '红黑树', '图', '有向图', '无向图',
+
+  // 技巧和模式
+  '滑动窗口', '单调栈', '前缀和', '差分数组', '倍增', 'LCA', '拓扑排序',
+  '最短路', '最小生成树', '网络流', '字符串匹配', 'KMP', 'Trie',
+
+  // 难度标签
+  '入门', '简单', '中等', '困难', '挑战',
+
+  // 来源标签
+  'LeetCode', 'Codeforces', 'AtCoder', 'HDU', 'POJ', 'UVA', 'SPOJ',
+
+  // 课程标签
+  '算法基础', '数据结构', '图论', '数论', '组合数学', '计算几何'
 ])
 
 // 课程列表
@@ -580,8 +616,8 @@ const courseList = ref([
     // 使用统一的模拟数据
     import('@/utils/mockData').then(({ mockApi }) => {
       mockApi.getOJProblems(queryParams.value).then(result => {
-        problemList.value = result.records
-        total.value = result.total
+        problemList.value = result.data.records
+        total.value = result.data.total
         loading.value = false
       })
     })
@@ -704,8 +740,8 @@ const handleEdit = (row) => {
   reset()
   const _id = row.id || ids.value
   // 使用模拟数据获取题目详情
-  import('@/utils/mockData').then(({ mockData }) => {
-    const problem = mockData.ojProblems.find(p => p.id === _id)
+  import('@/utils/mockData').then(({ ojProblems }) => {
+    const problem = ojProblems.find(p => p.id === _id)
     if (problem) {
       form.value = { ...problem }
       open.value = true
@@ -740,10 +776,10 @@ const handleDelete = (row) => {
   const _ids = row.id || ids.value
   ElMessageBox.confirm('是否确认删除题目编号为"' + _ids + '"的数据项？').then(() => {
     // 使用模拟数据进行删除
-    import('@/utils/mockData').then(({ mockData }) => {
-      const index = mockData.ojProblems.findIndex(p => p.id === _ids)
+    import('@/utils/mockData').then(({ ojProblems }) => {
+      const index = ojProblems.findIndex(p => p.id === _ids)
       if (index !== -1) {
-        mockData.ojProblems.splice(index, 1)
+        ojProblems.splice(index, 1)
         getList()
         ElMessage.success('删除成功')
       } else {
@@ -758,18 +794,18 @@ const handleBatchCopy = () => {
   const _ids = ids.value
   ElMessageBox.confirm('是否确认复制选中的题目？').then(() => {
     // 使用模拟数据进行批量复制
-    import('@/utils/mockData').then(({ mockData }) => {
+    import('@/utils/mockData').then(({ ojProblems }) => {
       const copiedProblems = []
       _ids.forEach(id => {
-        const originalProblem = mockData.ojProblems.find(p => p.id === id)
+        const originalProblem = ojProblems.find(p => p.id === id)
         if (originalProblem) {
           const copiedProblem = {
             ...originalProblem,
-            id: Math.max(...mockData.ojProblems.map(p => p.id)) + 1,
+            id: Math.max(...ojProblems.map(p => p.id)) + 1,
             title: `${originalProblem.title} (副本)`,
             createTime: new Date().toISOString()
           }
-          mockData.ojProblems.push(copiedProblem)
+          ojProblems.push(copiedProblem)
           copiedProblems.push(copiedProblem)
         }
       })
@@ -789,12 +825,12 @@ const handleBatchDelete = () => {
   const _ids = ids.value
   ElMessageBox.confirm('是否确认删除选中的题目？').then(() => {
     // 使用模拟数据进行批量删除
-    import('@/utils/mockData').then(({ mockData }) => {
+    import('@/utils/mockData').then(({ ojProblems }) => {
       let deletedCount = 0
       _ids.forEach(id => {
-        const index = mockData.ojProblems.findIndex(p => p.id === id)
+        const index = ojProblems.findIndex(p => p.id === id)
         if (index !== -1) {
-          mockData.ojProblems.splice(index, 1)
+          ojProblems.splice(index, 1)
           deletedCount++
         }
       })
@@ -870,12 +906,12 @@ const submitForm = () => {
   proxy.$refs.problemRef.validate(valid => {
     if (valid) {
       // 使用模拟数据进行保存和编辑
-      import('@/utils/mockData').then(({ mockData }) => {
+      import('@/utils/mockData').then(({ ojProblems }) => {
         if (form.value.id != undefined) {
           // 编辑现有题目
-          const index = mockData.ojProblems.findIndex(p => p.id === form.value.id)
+          const index = ojProblems.findIndex(p => p.id === form.value.id)
           if (index !== -1) {
-            mockData.ojProblems[index] = { ...form.value }
+            ojProblems[index] = { ...form.value }
             ElMessage.success('修改成功')
             open.value = false
             getList()
@@ -884,7 +920,7 @@ const submitForm = () => {
           }
         } else {
           // 新增题目
-          const newId = Math.max(...mockData.ojProblems.map(p => p.id), 0) + 1
+          const newId = Math.max(...ojProblems.map(p => p.id), 0) + 1
           const newProblem = {
             ...form.value,
             id: newId,
@@ -893,7 +929,7 @@ const submitForm = () => {
             submissionCount: 0,
             acceptanceRate: 0
           }
-          mockData.ojProblems.push(newProblem)
+          ojProblems.push(newProblem)
           ElMessage.success('新增成功')
           open.value = false
           getList()
@@ -1059,5 +1095,39 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* 题目标签相关样式 */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+  min-height: 24px;
+}
+
+.no-tags {
+  color: #909399;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.tag-help {
+  margin-top: 5px;
+  color: #909399;
+}
+
+/* 表格操作按钮样式 */
+.table-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.table-actions .el-button {
+  padding: 4px 8px;
+  font-size: 12px;
 }
 </style>

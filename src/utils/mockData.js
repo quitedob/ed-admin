@@ -466,5 +466,139 @@ export const mockApi = {
         }
       ]
     })
+  },
+
+  // 获取OJ问题列表
+  getOJProblems(params) {
+    return Promise.resolve({
+      code: 200,
+      message: 'success',
+      data: {
+        records: generateMockOJProblems(),
+        total: 5,
+        size: parseInt(params.pageSize) || 10,
+        current: parseInt(params.page) || 1,
+        pages: 1
+      }
+    })
   }
+}
+
+// 导出ojProblems数据供页面使用
+export const ojProblems = generateMockOJProblems()
+
+// 生成模拟OJ问题数据
+function generateMockOJProblems() {
+  return [
+    {
+      id: 1,
+      title: "两数之和",
+      questionType: "oj",
+      difficulty: "easy",
+      category: "array",
+      tags: ["数组", "哈希表", "LeetCode", "简单"],
+      courseId: 2,
+      questionText: "给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出和为目标值 target 的那两个整数，并返回它们的数组下标。",
+      timeLimit: 1000,
+      memoryLimit: 256,
+      inputFormat: "第一行包含整数n和target，表示数组长度和目标值。\n第二行包含n个整数，表示数组元素。",
+      outputFormat: "输出两个整数，表示满足条件的数组下标。",
+      sampleInput: "4 9\n2 7 11 15",
+      sampleOutput: "0 1",
+      hint: "可以使用哈希表来优化时间复杂度。",
+      acceptedCount: 1250,
+      submissionCount: 2340,
+      acceptanceRate: 53.4,
+      createTime: "2024-12-01T10:00:00Z",
+      courseName: "算法与数据结构"
+    },
+    {
+      id: 2,
+      title: "反转链表",
+      questionType: "oj",
+      difficulty: "medium",
+      category: "linked-list",
+      tags: ["链表", "递归", "LeetCode", "中等"],
+      courseId: 2,
+      questionText: "给你单链表的头节点 head ，请你反转链表，并返回反转后的链表。",
+      timeLimit: 1000,
+      memoryLimit: 256,
+      inputFormat: "第一行包含整数n，表示链表长度。\n第二行包含n个整数，表示链表节点的值。",
+      outputFormat: "输出一行，包含n个整数，表示反转后的链表。",
+      sampleInput: "5\n1 2 3 4 5",
+      sampleOutput: "5 4 3 2 1",
+      hint: "可以使用迭代或递归的方式解决。",
+      acceptedCount: 890,
+      submissionCount: 1560,
+      acceptanceRate: 57.1,
+      createTime: "2024-12-02T14:30:00Z",
+      courseName: "算法与数据结构"
+    },
+    {
+      id: 3,
+      title: "二叉树的最大深度",
+      questionType: "oj",
+      difficulty: "easy",
+      category: "tree",
+      tags: ["树", "二叉树", "递归", "LeetCode", "简单"],
+      courseId: 2,
+      questionText: "给定一个二叉树，找出其最大深度。",
+      timeLimit: 1000,
+      memoryLimit: 256,
+      inputFormat: "第一行包含整数n，表示节点个数。\n接下来n行，每行包含两个整数，表示节点的左右子节点。",
+      outputFormat: "输出一个整数，表示二叉树的最大深度。",
+      sampleInput: "7\n1 2 3\n2 4 5\n3 6 7\n4 0 0\n5 0 0\n6 0 0\n7 0 0",
+      sampleOutput: "3",
+      hint: "可以使用深度优先搜索(DFS)或广度优先搜索(BFS)。",
+      acceptedCount: 780,
+      submissionCount: 1250,
+      acceptanceRate: 62.4,
+      createTime: "2024-12-03T09:15:00Z",
+      courseName: "算法与数据结构"
+    },
+    {
+      id: 4,
+      title: "最长递增子序列",
+      questionType: "oj",
+      difficulty: "hard",
+      category: "dp",
+      tags: ["动态规划", "数组", "LeetCode", "困难"],
+      courseId: 2,
+      questionText: "给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。",
+      timeLimit: 2000,
+      memoryLimit: 512,
+      inputFormat: "第一行包含整数n，表示数组长度。\n第二行包含n个整数，表示数组元素。",
+      outputFormat: "输出一个整数，表示最长严格递增子序列的长度。",
+      sampleInput: "8\n10 9 2 5 3 7 101 18",
+      sampleOutput: "4",
+      hint: "可以使用动态规划或二分查找优化。",
+      acceptedCount: 320,
+      submissionCount: 890,
+      acceptanceRate: 36.0,
+      createTime: "2024-12-04T16:45:00Z",
+      courseName: "算法与数据结构"
+    },
+    {
+      id: 5,
+      title: "实现最小栈",
+      questionType: "oj",
+      difficulty: "medium",
+      category: "stack",
+      tags: ["栈", "设计", "LeetCode", "中等"],
+      courseId: 2,
+      questionText: "设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。",
+      timeLimit: 1000,
+      memoryLimit: 256,
+      inputFormat: "第一行包含整数q，表示操作次数。\n接下来q行，每行表示一个操作。",
+      outputFormat: "对于每个top和getMin操作，输出相应的结果。",
+      sampleInput: "6\npush 1\npush 2\ngetMin\ntop\npop\ngetMin",
+      sampleOutput: "1\n2\n1",
+      hint: "可以使用辅助栈来记录最小值。",
+      acceptedCount: 560,
+      submissionCount: 980,
+      acceptanceRate: 57.1,
+      createTime: "2024-12-05T11:20:00Z",
+      courseName: "算法与数据结构"
+    }
+  ]
 }

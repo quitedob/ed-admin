@@ -65,6 +65,27 @@
                   placeholder="题目分值"
                 />
               </el-form-item>
+              <el-form-item label="题目标签">
+                <el-select
+                  v-model="questionData.tags"
+                  multiple
+                  filterable
+                  allow-create
+                  default-first-option
+                  placeholder="请选择或输入题目标签"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="tag in availableTags"
+                    :key="tag"
+                    :label="tag"
+                    :value="tag"
+                  />
+                </el-select>
+                <div class="tag-help">
+                  <small>可选择现有标签或输入新标签创建自定义标签</small>
+                </div>
+              </el-form-item>
             </el-form>
           </section>
 
@@ -286,13 +307,37 @@ const questionTypes = [
   { label: '填空题', value: 'fill' },
   { label: '判断题', value: 'judge' },
   { label: '编程题', value: 'programming' },
-  { label: '简答题', value: 'essay' }
 ]
 
-// 可用标签
+// 可用标签列表
 const availableTags = [
-  '基础概念', '算法', '数据结构', '网络编程', '数据库',
-  '前端开发', '后端开发', '系统设计', '安全', '测试'
+  // 算法类别
+  '排序', '搜索', '哈希表', '二分查找', '双指针', '递归', '分治', '数学',
+  '位运算', '贪心', '动态规划', '回溯', '穷举', '模拟',
+
+  // 数据结构
+  '数组', '字符串', '链表', '栈', '队列', '堆', '字典树', '并查集',
+  '树', '二叉树', '平衡树', '红黑树', '图', '有向图', '无向图',
+
+  // 技巧和模式
+  '滑动窗口', '单调栈', '前缀和', '差分数组', '倍增', 'LCA', '拓扑排序',
+  '最短路', '最小生成树', '网络流', '字符串匹配', 'KMP', 'Trie',
+
+  // 难度标签
+  '入门', '简单', '中等', '困难', '挑战',
+
+  // 来源标签
+  'LeetCode', 'Codeforces', 'AtCoder', 'HDU', 'POJ', 'UVA', 'SPOJ',
+
+  // 课程标签
+  '算法基础', '数据结构', '图论', '数论', '组合数学', '计算几何',
+
+  // 编程语言
+  'Java', 'Python', 'C++', 'JavaScript', 'C', 'Go', 'Rust',
+
+  // 概念标签
+  '面向对象', '基础概念', 'Java基础', '数据类型', '接口', '设计模式', '架构',
+  '填空题', '判断题', '简答题', '编程题'
 ]
 
 // 监听传入数据变化
@@ -491,5 +536,11 @@ const handleClose = () => {
 
 .dialog-footer {
   text-align: right;
+}
+
+/* 题目标签相关样式 */
+.tag-help {
+  margin-top: 5px;
+  color: #909399;
 }
 </style>
