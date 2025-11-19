@@ -74,5 +74,28 @@ export const usersApi = {
   },
   orderInfoStat: (data) => {
     return getRequest('/user/admin/order/info/stat?userId=' + data.userId)
+  },
+
+  // 素材管理
+  materialPage: (params, pageCurrent = 1, pageSize = 20) => {
+    return postRequest('/material/admin/material/page', { pageCurrent, pageSize, ...params })
+  },
+  materialView: (data) => {
+    return getRequest('/material/admin/material/view?id=' + data.id)
+  },
+  materialSave: (data) => {
+    return postRequest('/material/admin/material/save', data)
+  },
+  materialEdit: (data) => {
+    return putRequest('/material/admin/material/edit', data)
+  },
+  materialDelete: (data) => {
+    return deleteRequest('/material/admin/material/delete?id=' + data.id)
+  },
+  materialUpload: (data) => {
+    return postRequest('/material/admin/material/upload', data)
+  },
+  materialBatchDelete: (data) => {
+    return postRequest('/material/admin/material/batch/delete', data)
   }
 }

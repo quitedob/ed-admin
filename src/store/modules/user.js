@@ -68,7 +68,8 @@ export const useUserStore = defineStore({
 
         { id: 10, path: '/aigc/works', menuName: 'AIGC作品', component: '/aigc/works/index.vue' },
         { id: 11, path: '/aigc/gallery', menuName: '作品墙', component: '/aigc/gallery/index.vue' },
-        { id: 12, path: '/oj/problems', menuName: '题库管理', component: '/assignments/index.vue' },
+        { id: 12, path: '/material', menuName: '素材管理', component: '/material/index.vue' },
+        { id: 13, path: '/assignments', menuName: '题库管理', component: '/assignments/index.vue' },
         { id: 13, path: '/oj/submission', menuName: '提交记录', component: '/oj/submission/index.vue' },
         { id: 15, path: '/homework/list', menuName: '作业列表', component: '/homework/list/index.vue' },
         { id: 16, path: '/homework/review', menuName: '作业批改', component: '/homework/review/index.vue' },
@@ -127,13 +128,21 @@ export const useUserStore = defineStore({
           ]
         },
         {
+          id: 10,
+          menuName: '素材管理',
+          path: '/material',
+          menuIcon: 'folder',
+          parentId: 0,
+          children: []
+        },
+        {
           id: 5,
           menuName: '题库管理',
-          path: '/oj',
+          path: '/assignments',
           menuIcon: 'document',
           parentId: 0,
           children: [
-            { id: 51, menuName: '题库管理', path: '/oj/problems', parentId: 5 },
+            { id: 51, menuName: '题库管理', path: '/assignments', parentId: 5 },
             { id: 52, menuName: '提交记录', path: '/oj/submission', parentId: 5 }
           ]
         },
@@ -215,6 +224,9 @@ export const useUserStore = defineStore({
         // AIGC管理权限
         'aigc:works:view', 'aigc:works:add', 'aigc:works:edit', 'aigc:works:delete', 'aigc:works:audit',
         'aigc:gallery:view',
+
+        // 素材管理权限
+        'material:view', 'material:add', 'material:edit', 'material:delete', 'material:upload', 'material:batch',
 
         // OJ系统权限
         'oj:problem:view', 'oj:problem:add', 'oj:problem:edit', 'oj:problem:delete', 'oj:problem:copy',

@@ -5,7 +5,8 @@
       "WebSearch",
       "mcp__web-search-prime__webSearchPrime",
       "Bash(find:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []

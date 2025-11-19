@@ -81,6 +81,32 @@ const constantRoutes = [
         meta: { title: '自定义生成' }
       }
     ]
+  },
+  {
+    path: '/material',
+    component: Layout,
+    redirect: '/material/index',
+    children: [
+      {
+        path: 'index',
+        name: 'MaterialManagement',
+        component: () => import('@/views/material/index.vue'),
+        meta: { title: '素材管理' }
+      }
+    ]
+  },
+  {
+    path: '/assignments',
+    component: Layout,
+    redirect: '/assignments/index',
+    children: [
+      {
+        path: 'index',
+        name: 'Assignments',
+        component: () => import('@/views/assignments/index.vue'),
+        meta: { title: '题库管理' }
+      }
+    ]
   }
 ]
 
@@ -381,25 +407,6 @@ export function createNewRouter(data) {
           name: 'V2AssignmentList',
           component: () => import('@/views/assignments/v2-list.vue'),
           meta: { title: '作业管理' }
-        }
-      ]
-    },
-    {
-      path: '/question-bank',
-      component: Layout,
-      redirect: '/question-bank',
-      children: [
-        {
-          path: '',
-          name: 'QuestionBank',
-          component: () => import('@/views/question-bank/index.vue'),
-          meta: { title: '题库管理' }
-        },
-        {
-          path: 'analytics',
-          name: 'QuestionBankAnalytics',
-          component: () => import('@/views/question-bank/analytics.vue'),
-          meta: { title: '题库分析' }
         }
       ]
     }
