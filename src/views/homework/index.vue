@@ -110,6 +110,9 @@
                 <el-button link type="primary" size="small" @click="handleEdit(homework)">
                   编辑
                 </el-button>
+                <el-button link type="primary" size="small" @click="handleAddQuestions(homework)">
+                  添加题目
+                </el-button>
                 <el-button link type="primary" size="small" @click="handleSubmissions(homework)">
                   答题情况
                 </el-button>
@@ -151,6 +154,13 @@
       v-model="submissionsDialogVisible"
       :homework="currentHomework"
     />
+
+    <!-- 题目管理抽屉 -->
+    <QuestionManagementDrawer
+      v-model="questionDrawerVisible"
+      :homework-id="currentHomework?.id"
+      @save="handleAddQuestionsToHomework"
+    />
   </div>
 </template>
 
@@ -160,6 +170,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Upload, Download, Search } from '@element-plus/icons-vue'
 import HomeworkDialog from './components/HomeworkDialog.vue'
 import SubmissionsDialog from './components/SubmissionsDialog.vue'
+import QuestionManagementDrawer from './components/QuestionManagementDrawer.vue'
 
 const searchText = ref('')
 const filterClass = ref('')
@@ -168,6 +179,7 @@ const currentPage = ref(1)
 const pageSize = ref(9)
 const homeworkDialogVisible = ref(false)
 const submissionsDialogVisible = ref(false)
+const questionDrawerVisible = ref(false)
 const currentHomework = ref(null)
 
 const classes = ref([
@@ -278,6 +290,20 @@ const handleSubmissions = (homework) => {
   submissionsDialogVisible.value = true
 }
 
+const handleAddQuestions = (homework) => {
+  currentHomework.value = homework
+  questionDrawerVisible.value = true
+}
+
+const handleAddQuestionsToHomework = (questions) => {
+  if (currentHomework.value && questions && questions.length > 0) {
+    const totalScore = questions.reduce((sum, q) => sum + q.score, 0)
+    currentHomework.value.questionCount = (currentHomework.value.questionCount || 0) + questions.length
+    ElMessage.success(`已添加 ${questions.length} 道题目，总分值 ${totalScore} 分`)
+  }
+  questionDrawerVisible.value = false
+}
+
 const handleCopy = (homework) => {
   const newHomework = {
     ...homework,
@@ -325,6 +351,15 @@ const handleSaveHomework = (data) => {
     ElMessage.success('作业已创建')
   }
   homeworkDialogVisible.value = false
+}
+
+const handleAddQuestionsToHomework = (questions) => {
+  if (currentHomework.value) {
+    const totalScore = questions.reduce((sum, q) => sum + q.score, 0)
+    currentHomework.value.questionCount = (currentHomework.value.questionCount || 0) + questions.length
+    ElMessage.success(`已添加 ${questions.length} 道题目，总分值 ${totalScore} 分`)
+  }
+  questionDrawerVisible.value = false
 }
 
 const handleImport = () => {

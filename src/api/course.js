@@ -77,8 +77,33 @@ export const courseApi = {
   },
 
   // 资源分页
-  resourcePage: (params, pageCurrent = 1, pageSize = 20) => {
-    return postRequest('/course/admin/resource/page', { pageCurrent, pageSize, ...params })
+  resourcePage: (params = {}, pageCurrent = 1, pageSize = 20) => {
+    return postRequest('/course/admin/resource/page', { ...params, pageCurrent, pageSize })
+  },
+
+  // 资源分组分页
+  resourceGroupPage: (params = {}, pageCurrent = 1, pageSize = 20) => {
+    return postRequest('/course/admin/resource/group/page', { ...params, pageCurrent, pageSize })
+  },
+
+  // 资源分组列表
+  resourceGroupList: (data = {}) => {
+    return postRequest('/course/admin/resource/group/list', data)
+  },
+
+  // 资源分组保存
+  resourceGroupSave: (data) => {
+    return postRequest('/course/admin/resource/group/save', data)
+  },
+
+  // 资源分组编辑
+  resourceGroupEdit: (data) => {
+    return putRequest('/course/admin/resource/group/edit', data)
+  },
+
+  // 资源分组删除
+  resourceGroupDelete: (data) => {
+    return deleteRequest('/course/admin/resource/group/delete?id=' + data.id)
   },
 
   // 资源修改

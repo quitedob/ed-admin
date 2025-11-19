@@ -1,4 +1,4 @@
-<template>
+  <template>
   <div class="question-bank-container">
     <!-- 面包屑导航 -->
     <el-breadcrumb separator="/" class="breadcrumb">
@@ -29,19 +29,45 @@
               导入题目
             </el-button>
           </el-upload>
+          <el-button @click="tagManagerDrawerVisible = true">
+            <el-icon><Setting /></el-icon>
+            标签管理
+          </el-button>
         </div>
       </div>
 
-      <!-- 题型分类标签 -->
-      <div class="type-tabs">
-        <div
-          v-for="type in questionTypes"
-          :key="type.value"
-          :class="['type-tab', { active: selectedType === type.value }]"
-          @click="selectedType = type.value"
-        >
-          <span class="type-label">{{ type.label }}</span>
-          <span class="type-count">{{ getTypeCount(type.value) }}</span>
+      <!-- 筛选区域 -->
+      <div class="filter-area">
+        <!-- 题型分类标签 -->
+        <div class="type-tabs">
+          <div
+            v-for="type in questionTypes"
+            :key="type.value"
+            :class="['type-tab', { active: selectedType === type.value }]"
+            @click="selectedType = type.value"
+          >
+            <span class="type-label">{{ type.label }}</span>
+            <span class="type-count">{{ getTypeCount(type.value) }}</span>
+          </div>
+        </div>
+
+        <!-- 标签筛选 -->
+        <div class="tag-filter">
+          <span class="filter-label">标签筛选:</span>
+          <el-select
+            v-model="selectedTags"
+            placeholder="选择标签"
+            multiple
+            clearable
+            style="width: 300px"
+          >
+            <el-option
+              v-for="tag in allTags"
+              :key="tag.id"
+              :label="tag.name"
+              :value="tag.id"
+            />
+          </el-select>
         </div>
       </div>
 
@@ -104,14 +130,28 @@
       :question-data="currentQuestion"
       @save="handleSaveQuestion"
     />
+
+    <!-- 题目管理抽屉 -->
+    <QuestionManagementDrawer
+      v-model="questionDrawerVisible"
+      :bank-id="questionBank.id"
+      @save="handleAddQuestions"
+    />
+
+    <!-- 标签管理抽屉 -->
+    <TagManagerDrawer
+      v-model="tagManagerDrawerVisible"
+    />
   </div>
 </template>
 
 <script setup name="QuestionBank">
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Upload } from '@element-plus/icons-vue'
+import { Plus, Upload, Setting } from '@element-plus/icons-vue'
 import V2QuestionEditDialog from '@/components/V2QuestionEditDialog.vue'
+import QuestionManagementDrawer from './components/QuestionManagementDrawer.vue'
+import TagManagerDrawer from './components/TagManagerDrawer.vue'
 
 // 题型定义
 const questionTypes = [
@@ -126,9 +166,21 @@ const questionTypes = [
 
 // 响应式数据
 const selectedType = ref('all')
+const selectedTags = ref([])
 const questionDialogVisible = ref(false)
+const questionDrawerVisible = ref(false)
+const tagManagerDrawerVisible = ref(false)
 const currentQuestion = ref(null)
 const uploadRef = ref()
+
+// 标签数据
+const allTags = ref([
+  { id: 'tag_1', name: '面向对象', categoryId: 'cat_1', usageCount: 15 },
+  { id: 'tag_2', name: 'Java基础', categoryId: 'cat_1', usageCount: 8 },
+  { id: 'tag_3', name: '数据结构', categoryId: 'cat_2', usageCount: 0 },
+  { id: 'tag_4', name: '算法', categoryId: 'cat_2', usageCount: 5 },
+  { id: 'tag_5', name: '基础概念', categoryId: 'cat_3', usageCount: 12 }
+])
 
 // 题库数据
 const questionBank = ref({
@@ -140,10 +192,25 @@ const questionBank = ref({
 
 // 计算属性
 const filteredQuestions = computed(() => {
-  if (selectedType.value === 'all') {
-    return questionBank.value.questions
+  let result = questionBank.value.questions
+
+  // 按题型过滤
+  if (selectedType.value !== 'all') {
+    result = result.filter(q => q.type === selectedType.value)
   }
-  return questionBank.value.questions.filter(q => q.type === selectedType.value)
+
+  // 按标签过滤
+  if (selectedTags.value.length > 0) {
+    result = result.filter(q => {
+      if (!q.tags) return false
+      return selectedTags.value.some(tagId => {
+        const tag = allTags.value.find(t => t.id === tagId)
+        return tag && q.tags.includes(tag.name)
+      })
+    })
+  }
+
+  return result
 })
 
 // 初始化模拟数据
@@ -243,8 +310,22 @@ const getTypeCount = (type) => {
 }
 
 const handleAddQuestion = () => {
-  currentQuestion.value = null
-  questionDialogVisible.value = true
+  questionDrawerVisible.value = true
+}
+
+const handleAddQuestions = (questions) => {
+  if (questions && questions.length > 0) {
+    questions.forEach(q => {
+      const newQuestion = {
+        ...q,
+        id: `q_${Date.now()}_${Math.random()}`
+      }
+      questionBank.value.questions.push(newQuestion)
+    })
+    questionBank.value.totalQuestions = questionBank.value.questions.length
+    ElMessage.success(`成功添加 ${questions.length} 道题目`)
+  }
+  questionDrawerVisible.value = false
 }
 
 const handleEditQuestion = (question) => {
@@ -411,10 +492,14 @@ onMounted(() => {
   }
 }
 
+.filter-area {
+  margin-bottom: 20px;
+}
+
 .type-tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 
   .type-tab {
@@ -453,6 +538,18 @@ onMounted(() => {
       font-size: 12px;
       font-weight: 500;
     }
+  }
+}
+
+.tag-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .filter-label {
+    font-size: 14px;
+    color: #606266;
+    font-weight: 500;
   }
 }
 
