@@ -1,13 +1,13 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" id="course-analytics-container">
     <!-- 返回按钮 -->
-    <div class="back-button">
-      <el-button @click="goBack" :icon="ArrowLeft">返回课程列表</el-button>
+    <div class="back-button" id="back-button">
+      <el-button @click="goBack" :icon="ArrowLeft" id="return-course-btn">返回课程列表</el-button>
     </div>
 
     <!-- 课程信息头部 -->
-    <div class="course-header">
-      <div class="course-info">
+    <div class="course-header" id="course-header">
+      <div class="course-info" id="course-info-section">
         <img :src="courseInfo.courseLogo" :alt="courseInfo.courseName" class="course-logo" />
         <div class="course-details">
           <h1>{{ courseInfo.courseName }}</h1>
@@ -17,7 +17,7 @@
           </div>
         </div>
       </div>
-      <div class="time-filter">
+      <div class="time-filter" id="time-filter">
         <el-date-picker
           v-model="timeRange"
           type="daterange"
@@ -27,15 +27,16 @@
           format="YYYY-MM-DD"
           value-format="YYYY-MM-DD"
           @change="handleTimeChange"
+          id="time-range-picker"
         />
       </div>
     </div>
 
     <!-- 核心指标 -->
-    <div class="metrics-section">
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <el-card class="metric-card">
+    <div class="metrics-section" id="metrics-section">
+      <el-row :gutter="20" id="metrics-row">
+        <el-col :span="6" id="total-students-col">
+          <el-card class="metric-card" id="total-students-card">
             <div class="metric-item">
               <div class="metric-icon">
                 <el-icon :size="32"><User /></el-icon>

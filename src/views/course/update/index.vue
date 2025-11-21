@@ -1,9 +1,9 @@
 <template>
-  <div class="form-container">
-    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="80px" style="max-width: 980px" @submit.prevent>
-      <div class="form-main">
+  <div class="form-container" id="course-update-container">
+    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="80px" style="max-width: 980px" @submit.prevent id="course-update-form">
+      <div class="form-main" id="basic-info-section">
         <div class="form-main-title">基础信息</div>
-        <div class="form-main-content">
+        <div class="form-main-content" id="basic-info-content">
           <el-form-item label="分类" prop="categoryId">
             <cascader-course v-model="formModel.categoryId"></cascader-course>
           </el-form-item>
@@ -22,9 +22,9 @@
           </el-form-item>
         </div>
       </div>
-      <div class="form-main">
+      <div class="form-main" id="course-settings-section">
         <div class="form-main-title">课程设置</div>
-        <div class="form-main-content">
+        <div class="form-main-content" id="course-settings-content">
           <el-form-item class="form-group" label="倍速播放" prop="speedDouble">
             <enum-radio v-model="formModel.speedDouble" :enum-name="'SpeedDoubleEnum'" />
             <span class="tooltip">开启后，用户可在播放页面选择播放速度，默认为1倍速播放。 </span>
@@ -45,9 +45,9 @@
         </div>
       </div>
     </el-form>
-    <div class="form-footer">
-      <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" @click="onSubmit()">确定</el-button>
+    <div class="form-footer" id="form-footer">
+      <el-button @click="handleClose" id="cancel-button">取消</el-button>
+      <el-button type="primary" @click="onSubmit()" id="submit-button">确定</el-button>
     </div>
   </div>
   <select-lecturer v-if="lecturer.visible" @close="handleLecturer" />

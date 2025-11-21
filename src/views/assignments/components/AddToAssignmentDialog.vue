@@ -1,16 +1,17 @@
 <template>
   <el-dialog
-    title="添加到作业"
-    v-model="visible"
-    width="600px"
-    append-to-body
+      id="add-to-assignment-dialog"
+      title="添加到作业"
+      v-model="visible"
+      width="600px"
+      append-to-body
   >
-    <div class="add-to-assignment-content">
+    <div id="add-to-assignment-content" class="add-to-assignment-content">
       <p>已选择 {{ questions.length }} 道题目</p>
 
-      <el-form :model="form" label-width="100px">
+      <el-form id="assignment-form" :model="form" label-width="100px">
         <el-form-item label="选择作业">
-          <el-select v-model="form.assignmentId" placeholder="请选择要添加到的作业" style="width: 100%">
+          <el-select id="assignment-select" v-model="form.assignmentId" placeholder="请选择要添加到的作业" style="width: 100%">
             <el-option
               v-for="assignment in assignmentList"
               :key="assignment.id"
@@ -21,14 +22,14 @@
         </el-form-item>
 
         <el-form-item label="或创建新作业">
-          <el-input v-model="form.newAssignmentTitle" placeholder="输入新作业标题" />
+          <el-input id="new-assignment-title" v-model="form.newAssignmentTitle" placeholder="输入新作业标题" />
         </el-form-item>
       </el-form>
 
-      <div class="selected-questions">
+      <div id="selected-questions" class="selected-questions">
         <h4>选中的题目：</h4>
         <ul>
-          <li v-for="question in questions" :key="question.id">
+          <li v-for="(question, index) in questions" :key="question.id" :id="`selected-question-${index}`">
             {{ question.title }} ({{ getQuestionTypeLabel(question.type) }})
           </li>
         </ul>
@@ -36,9 +37,9 @@
     </div>
 
     <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleAdd">添加</el-button>
+      <div id="add-assignment-dialog-footer" class="dialog-footer">
+        <el-button id="cancel-add-btn" @click="handleClose">取消</el-button>
+        <el-button id="confirm-add-btn" type="primary" @click="handleAdd">添加</el-button>
       </div>
     </template>
   </el-dialog>

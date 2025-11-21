@@ -5,10 +5,11 @@
     width="80%"
     top="5vh"
     @close="handleClose"
+    id="question-detail-dialog"
   >
-    <div v-if="question" class="question-detail-content">
+    <div v-if="question" class="question-detail-content" id="question-detail-content">
       <!-- 题目信息 -->
-      <el-card class="question-info-card" shadow="never">
+      <el-card class="question-info-card" shadow="never" id="question-info-card">
         <div class="question-header">
           <div class="question-meta">
             <el-tag :type="getTypeTagType(question.type)">
@@ -21,9 +22,9 @@
       </el-card>
 
       <!-- 统计指标 -->
-      <el-row :gutter="20" class="metrics-row">
-        <el-col :span="6">
-          <div class="metric-card">
+      <el-row :gutter="20" class="metrics-row" id="metrics-row">
+        <el-col :span="6" id="correct-rate-col">
+          <div class="metric-card" id="correct-rate-card">
             <div class="metric-label">正确率</div>
             <div class="metric-value" :style="{ color: getCorrectRateColor(question.correctRate) }">
               {{ question.correctRate }}%

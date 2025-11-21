@@ -1,23 +1,23 @@
 <template>
-  <div class="exam-create-container">
+  <div id="exam-create-container" class="exam-create-container">
     <!-- 顶部导航 -->
-    <div class="top-bar">
-      <div class="title-section">
+    <div id="exam-top-bar" class="top-bar">
+      <div id="exam-title-section" class="title-section">
         <el-button link @click="handleBack">
           <el-icon><ArrowLeft /></el-icon>
           返回
         </el-button>
         <span class="page-title">{{ isEdit ? '编辑考试' : '创建考试' }}</span>
       </div>
-      <div class="action-buttons">
+      <div id="exam-action-buttons" class="action-buttons">
         <el-button @click="handleSaveDraft">保存草稿</el-button>
         <el-button type="primary" @click="handlePublish">发布考试</el-button>
       </div>
     </div>
 
     <!-- 步骤条 -->
-    <div class="steps-container">
-      <el-steps :active="currentStep" align-center finish-status="success">
+    <div id="exam-steps-container" class="steps-container">
+      <el-steps :active="currentStep" align-center finish-status="success" id="exam-steps">
         <el-step title="基本信息" />
         <el-step title="时间安排" />
         <el-step title="组建试卷" />
@@ -27,11 +27,11 @@
     </div>
 
     <!-- 主内容区 -->
-    <div class="main-content">
-      <el-form ref="formRef" :model="examForm" :rules="rules" label-width="120px">
+    <div id="exam-main-content" class="main-content">
+      <el-form ref="formRef" :model="examForm" :rules="rules" label-width="120px" id="exam-form">
         <!-- 第一步：基本信息 -->
-        <div v-show="currentStep === 0" class="step-content">
-          <el-card shadow="never">
+        <div v-show="currentStep === 0" id="step-basic-info" class="step-content">
+          <el-card shadow="never" id="basic-info-card">
             <template #header>
               <span class="step-title">基本信息</span>
             </template>
@@ -89,8 +89,8 @@
         </div>
 
         <!-- 第二步：时间安排 -->
-        <div v-show="currentStep === 1" class="step-content">
-          <el-card shadow="never">
+        <div v-show="currentStep === 1" id="step-time-schedule" class="step-content">
+          <el-card shadow="never" id="time-schedule-card">
             <template #header>
               <span class="step-title">时间安排</span>
             </template>
@@ -141,17 +141,18 @@
         </div>
 
         <!-- 第三步：组建试卷 -->
-        <div v-show="currentStep === 2" class="step-content">
+        <div v-show="currentStep === 2" id="step-paper-builder" class="step-content">
           <PaperBuilder
             v-model:question-banks="examForm.questionBanks"
             v-model:total-score="examForm.totalScore"
             v-model:passing-score="examForm.passingScore"
+            id="paper-builder"
           />
         </div>
 
         <!-- 第四步：阅卷设置 -->
-        <div v-show="currentStep === 3" class="step-content">
-          <el-card shadow="never">
+        <div v-show="currentStep === 3" id="step-grading-settings" class="step-content">
+          <el-card shadow="never" id="grading-settings-card">
             <template #header>
               <span class="step-title">阅卷设置</span>
             </template>
@@ -166,7 +167,7 @@
               <div class="form-tip">启用AI辅助批改问答题和编程题</div>
             </el-form-item>
 
-            <div v-if="examForm.grading.aiGrade" class="ai-config-section">
+            <div v-if="examForm.grading.aiGrade" id="ai-config-section" class="ai-config-section">
               <el-form-item label="AI模型">
                 <el-select v-model="examForm.grading.aiModel">
                   <el-option label="GPT-4" value="gpt-4" />
@@ -221,14 +222,14 @@
         </div>
 
         <!-- 第五步：考试设置 -->
-        <div v-show="currentStep === 4" class="step-content">
-          <el-card shadow="never">
+        <div v-show="currentStep === 4" id="step-exam-settings" class="step-content">
+          <el-card shadow="never" id="exam-settings-card">
             <template #header>
               <span class="step-title">考试设置</span>
             </template>
 
             <el-form-item label="显示成绩">
-              <el-radio-group v-model="examForm.settings.showScoreMode">
+              <el-radio-group v-model="examForm.settings.showScoreMode" id="score-display-mode">
                 <el-radio label="immediate">考完立即显示</el-radio>
                 <el-radio label="scheduled">指定时间显示</el-radio>
                 <el-radio label="manual">手动发布</el-radio>
@@ -273,7 +274,7 @@
             <el-divider />
 
             <el-form-item label="监考设置">
-              <el-radio-group v-model="examForm.settings.proctorMode">
+              <el-radio-group v-model="examForm.settings.proctorMode" id="proctor-mode">
                 <el-radio label="none">不需要监考</el-radio>
                 <el-radio label="camera">摄像头监考</el-radio>
                 <el-radio label="screen">屏幕录制</el-radio>
@@ -311,7 +312,7 @@
     </div>
 
     <!-- 底部操作栏 -->
-    <div class="bottom-bar">
+    <div id="exam-bottom-bar" class="bottom-bar">
       <el-button v-if="currentStep > 0" @click="handlePrevStep">上一步</el-button>
       <el-button v-if="currentStep < 4" type="primary" @click="handleNextStep">
         下一步

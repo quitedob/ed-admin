@@ -1,26 +1,26 @@
 
 <template>
-  <div class="class-management-container">
-    <div class="main-content">
+  <div class="class-management-container" id="class-management-container">
+    <div class="main-content" id="main-content">
       <!-- 左侧工具栏 -->
-      <div class="left-sidebar">
+      <div class="left-sidebar" id="left-sidebar">
         <!-- 操作按钮 -->
-        <div class="action-buttons">
-          <el-button type="primary" class="new-class-btn" @click="handleCreateClass">
+        <div class="action-buttons" id="action-buttons">
+          <el-button type="primary" class="new-class-btn" @click="handleCreateClass" id="new-class-btn">
             <el-icon><Plus /></el-icon>
             新建班级
           </el-button>
-          <el-button class="import-btn" @click="handleBatchImport">
+          <el-button class="import-btn" @click="handleBatchImport" id="import-btn">
             <el-icon><Upload /></el-icon>
             批量导入
           </el-button>
         </div>
 
         <!-- 筛选器 -->
-        <div class="filters">
-          <div class="filter-section">
+        <div class="filters" id="filters">
+          <div class="filter-section" id="grade-filter-section">
             <div class="filter-label">年级</div>
-            <el-select v-model="filterGrade" placeholder="全部年级" clearable>
+            <el-select v-model="filterGrade" placeholder="全部年级" clearable id="grade-select">
               <el-option label="全部年级" value="" />
               <el-option label="一年级" value="grade1" />
               <el-option label="二年级" value="grade2" />
@@ -38,11 +38,12 @@
         </div>
 
         <!-- 搜索框 -->
-        <div class="search-section">
+        <div class="search-section" id="search-section">
           <el-input
             v-model="searchText"
             placeholder="搜索班级..."
             clearable
+            id="class-search-input"
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
@@ -52,25 +53,25 @@
       </div>
 
       <!-- 右侧班级卡片网格 -->
-      <div class="right-content">
-        <div class="content-header">
+      <div class="right-content" id="right-content">
+        <div class="content-header" id="content-header">
           <h2>班级管理</h2>
-          <div class="stats">
+          <div class="stats" id="stats">
             <span>共 {{ filteredClasses.length }} 个班级</span>
             <span>总学生数: {{ totalStudents }}</span>
           </div>
         </div>
 
-        <div class="class-grid">
+        <div class="class-grid" id="class-grid">
           <el-row :gutter="20">
             <el-col
               v-for="classItem in paginatedClasses"
               :key="classItem.id"
               :span="8"
             >
-              <el-card class="class-card" shadow="hover">
-                <div class="card-header">
-                  <div class="class-info">
+              <el-card class="class-card" shadow="hover" :id="`class-card-${classItem.id}`">
+                <div class="card-header" :id="`card-header-${classItem.id}`">
+                  <div class="class-info" :id="`class-info-${classItem.id}`">
                     <h3 class="class-name">{{ classItem.name }}</h3>
                     <el-tag :type="getStatusTagType(classItem.status)" size="small">
                       {{ getStatusLabel(classItem.status) }}
@@ -79,43 +80,41 @@
                   <el-tag type="info">{{ getGradeLabel(classItem.grade) }}</el-tag>
                 </div>
 
-                <div class="card-description">
+                <div class="card-description" :id="`card-description-${classItem.id}`">
                   {{ classItem.description || '暂无描述' }}
                 </div>
 
-                <div class="card-stats">
-                  <div class="stat-item">
+                <div class="card-stats" :id="`card-stats-${classItem.id}`">
+                  <div class="stat-item" :id="`stat-students-${classItem.id}`">
                     <el-icon><User /></el-icon>
                     <span>{{ classItem.studentCount }}名学生</span>
                   </div>
-                  <div class="stat-item">
+                  <div class="stat-item" :id="`stat-teachers-${classItem.id}`">
                     <el-icon><UserFilled /></el-icon>
                     <span>{{ classItem.teacherCount }}名老师</span>
                   </div>
-                  <div class="stat-item">
+                  <div class="stat-item" :id="`stat-courses-${classItem.id}`">
                     <el-icon><Reading /></el-icon>
                     <span>课程: {{ classItem.courseCount }}门</span>
                   </div>
-                  <div class="stat-item class-code-item">
+                  <div class="stat-item class-code-item" :id="`stat-class-code-${classItem.id}`">
                     <span class="code-label">班级码:</span>
                     <el-input
                       v-model="classItem.code"
                       size="small"
                       class="code-input"
                       readonly
+                      disabled
                     />
-                    <el-button
-                      type="primary"
-                      size="small"
-                      text
-                      @click="editClassCode(classItem)"
-                    >
-                      编辑
-                    </el-button>
+                    <el-tooltip content="班级码由系统自动生成，不可修改" placement="top">
+                      <el-icon style="color: #909399; cursor: help">
+                        <QuestionFilled />
+                      </el-icon>
+                    </el-tooltip>
                   </div>
                 </div>
 
-                <div class="card-head-teachers">
+                <div class="card-head-teachers" :id="`card-head-teachers-${classItem.id}`">
                   <span class="label">班主任：</span>
                   <el-tag
                     v-for="teacher in classItem.headTeachers"
@@ -127,9 +126,9 @@
                   </el-tag>
                 </div>
 
-                <div class="card-actions">
+                <div class="card-actions" :id="`card-actions-${classItem.id}`">
                   <el-button link type="primary" size="small" @click="handleEdit(classItem)">
-                    编辑班级信息
+                    编辑信息
                   </el-button>
                   <el-button link type="primary" size="small" @click="handleManageStudents(classItem)">
                     管理学生
@@ -137,14 +136,8 @@
                   <el-button link type="primary" size="small" @click="handleManageTeachers(classItem)">
                     管理老师
                   </el-button>
-                  <el-button link type="primary" size="small" @click="handleAuthorizeCourses(classItem)">
-                    授权课程
-                  </el-button>
-                  <el-button link type="primary" size="small" @click="handleAuthorizeHomeworks(classItem)">
-                    授权作业
-                  </el-button>
-                  <el-button link type="primary" size="small" @click="handleAuthorizeExams(classItem)">
-                    授权考试
+                  <el-button link type="primary" size="small" @click="handleManageCourses(classItem)">
+                    管理课程
                   </el-button>
                 </div>
               </el-card>
@@ -188,12 +181,19 @@
       @save="handleTeachersSave"
     />
 
-    <!-- 授权对话框 -->
-    <AuthorizationDialog
-      v-model="authorizationDialogVisible"
+    <!-- 课程管理对话框 -->
+    <CourseManagementDialog
+      v-model="courseManagementVisible"
       :class-data="currentClass"
-      :auth-type="currentAuthType"
-      @save="handleAuthorizationSave"
+      @save="handleCoursesSave"
+    />
+
+    <!-- 课次开放设置对话框 -->
+    <CourseAccessDialog
+      v-model="courseAccessDialogVisible"
+      :class-id="currentClass?.id"
+      :course-id="selectedCourseId"
+      @save="handleCourseAccessSave"
     />
   </div>
 </template>
@@ -212,12 +212,14 @@ import {
   Calendar,
   View,
   Edit,
-  Delete
+  Delete,
+  QuestionFilled
 } from '@element-plus/icons-vue'
 import ClassDialog from './components/ClassDialog.vue'
 import StudentManagementDrawer from './components/StudentManagementDrawer.vue'
 import TeacherManagementDrawer from './components/TeacherManagementDrawer.vue'
-import AuthorizationDialog from './components/AuthorizationDialog.vue'
+import CourseManagementDialog from './components/CourseManagementDialog.vue'
+import CourseAccessDialog from './components/CourseAccessDialog.vue'
 
 const router = useRouter()
 
@@ -232,8 +234,9 @@ const classDialogVisible = ref(false)
 const currentClass = ref(null)
 const studentDrawerVisible = ref(false)
 const teacherDrawerVisible = ref(false)
-const authorizationDialogVisible = ref(false)
-const currentAuthType = ref('course')
+const courseManagementVisible = ref(false)
+const courseAccessDialogVisible = ref(false)
+const selectedCourseId = ref('')
 
 const classes = ref([])
 
@@ -280,6 +283,7 @@ const initMockData = () => {
     {
       id: 'class_001',
       name: '一年级一班',
+      code: 'CLS001',
       description: '小学一年级基础班',
       headTeachers: [
         { id: 'teacher_001', name: '王老师' },
@@ -290,11 +294,17 @@ const initMockData = () => {
       teacherCount: 3,
       courseCount: 3,
       status: 'active',
-      createdAt: '2024-09-01T10:00:00Z'
+      createdAt: '2024-09-01T10:00:00Z',
+      authorizedResources: {
+        courses: [],
+        assignments: [],
+        exams: []
+      }
     },
     {
       id: 'class_002',
       name: '五年级二班',
+      code: 'CLS002',
       description: '小学五年级进阶班',
       headTeachers: [
         { id: 'teacher_002', name: '李老师' }
@@ -304,11 +314,17 @@ const initMockData = () => {
       teacherCount: 2,
       courseCount: 2,
       status: 'active',
-      createdAt: '2024-09-01T10:00:00Z'
+      createdAt: '2024-09-01T10:00:00Z',
+      authorizedResources: {
+        courses: [],
+        assignments: [],
+        exams: []
+      }
     },
     {
       id: 'class_003',
       name: '初二一班',
+      code: 'CLS003',
       description: '初中二年级班',
       headTeachers: [
         { id: 'teacher_003', name: '张老师' }
@@ -318,11 +334,17 @@ const initMockData = () => {
       teacherCount: 2,
       courseCount: 4,
       status: 'active',
-      createdAt: '2024-03-01T10:00:00Z'
+      createdAt: '2024-03-01T10:00:00Z',
+      authorizedResources: {
+        courses: [],
+        assignments: [],
+        exams: []
+      }
     },
     {
       id: 'class_004',
       name: '高三三班',
+      code: 'CLS004',
       description: '高中三年级毕业班',
       headTeachers: [
         { id: 'teacher_004', name: '赵老师' },
@@ -333,7 +355,12 @@ const initMockData = () => {
       teacherCount: 3,
       courseCount: 3,
       status: 'active',
-      createdAt: '2024-09-01T10:00:00Z'
+      createdAt: '2024-09-01T10:00:00Z',
+      authorizedResources: {
+        courses: [],
+        assignments: [],
+        exams: []
+      }
     }
   ]
 }
@@ -359,38 +386,33 @@ const handleManageTeachers = (classItem) => {
   teacherDrawerVisible.value = true
 }
 
-const handleAuthorizeCourses = (classItem) => {
+const handleManageCourses = (classItem) => {
   currentClass.value = classItem
-  currentAuthType.value = 'course'
-  authorizationDialogVisible.value = true
+  courseManagementVisible.value = true
 }
 
-const handleAuthorizeHomeworks = (classItem) => {
-  currentClass.value = classItem
-  currentAuthType.value = 'homework'
-  authorizationDialogVisible.value = true
-}
-
-const handleAuthorizeExams = (classItem) => {
-  currentClass.value = classItem
-  currentAuthType.value = 'exam'
-  authorizationDialogVisible.value = true
-}
-
-const editClassCode = (classItem) => {
-  ElMessageBox.prompt('请输入新的班级码', '编辑班级码', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    inputValue: classItem.code
-  }).then(({ value }) => {
-    if (value) {
-      classItem.code = value
-      ElMessage.success('班级码已更新')
+const handleCoursesSave = (data) => {
+  if (currentClass.value) {
+    const index = classes.value.findIndex(c => c.id === currentClass.value.id)
+    if (index > -1) {
+      classes.value[index].courseCount = data.courses.length
+      ElMessage.success('课程列表已更新')
     }
-  }).catch(() => {
-    ElMessage.info('已取消编辑')
-  })
+  }
+  courseManagementVisible.value = false
 }
+
+const handleCourseAccessSave = (accessData) => {
+  ElMessage.success('课次开放设置已保存')
+  courseAccessDialogVisible.value = false
+}
+
+const openCourseAccessDialog = (courseId) => {
+  selectedCourseId.value = courseId
+  courseAccessDialogVisible.value = true
+}
+
+// 移除 editClassCode 方法，班级码不可编辑
 
 const handleStudentsSave = (data) => {
   ElMessage.success('学生列表已更新')
@@ -408,9 +430,7 @@ const handleTeachersSave = (data) => {
   ElMessage.success('老师列表已更新')
 }
 
-const handleAuthorizationSave = (data) => {
-  ElMessage.success(`${data.authType === 'course' ? '课程' : data.authType === 'homework' ? '作业' : '考试'}授权已更新`)
-}
+
 
 const handleBatchImport = () => {
   ElMessage.info('批量导入功能开发中...')

@@ -1,12 +1,12 @@
 <template>
-  <div class="course-detail-container">
+  <div id="course-detail-container" class="course-detail-container">
     <!-- 左侧固定导航栏 -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
+    <aside id="sidebar" class="sidebar">
+      <div id="sidebar-header" class="sidebar-header">
         <img src="@/assets/images/logo.png" alt="Logo" class="sidebar-logo" />
       </div>
 
-      <nav class="sidebar-nav">
+      <nav id="sidebar-nav" class="sidebar-nav">
         <router-link
           v-for="item in navItems"
           :key="item.id"
@@ -23,9 +23,9 @@
     </aside>
 
     <!-- 右侧主内容区 -->
-    <main class="main-content">
+    <main id="main-content" class="main-content">
       <!-- 面包屑导航 -->
-      <nav class="breadcrumb">
+      <nav id="breadcrumb" class="breadcrumb">
         <router-link to="/course" class="breadcrumb-link">系列课</router-link>
         <span class="breadcrumb-separator">></span>
         <router-link to="/course" class="breadcrumb-link">课程</router-link>
@@ -34,24 +34,24 @@
       </nav>
 
       <!-- 课程信息头 -->
-      <header class="course-header">
-        <div class="course-info">
-          <div class="course-thumbnail">
+      <header id="course-header" class="course-header">
+        <div id="course-info" class="course-info">
+          <div id="course-thumbnail" class="course-thumbnail">
             <img :src="courseInfo.courseLogo" :alt="courseInfo.courseName" />
           </div>
 
-          <div class="course-details">
+          <div id="course-details" class="course-details">
             <h2 class="course-title">{{ courseInfo.courseName }}</h2>
 
-            <div class="course-stats">
+            <div id="course-stats" class="course-stats">
               <span class="stat-item">小节数: {{ courseInfo.chapterCount || 0 }}</span>
               <span class="stat-item">累计带货数: {{ courseInfo.salesCount || 8 }}</span>
             </div>
           </div>
         </div>
 
-        <div class="course-actions">
-          <div class="status-price">
+        <div id="course-actions" class="course-actions">
+          <div id="status-price" class="status-price">
             <span class="status-indicator" :class="getStatusClass(courseInfo.statusId)">
               ● {{ getStatusText(courseInfo.statusId) }}
             </span>
@@ -60,7 +60,7 @@
             </span>
           </div>
 
-          <div class="action-buttons">
+          <div id="action-buttons" class="action-buttons">
             <el-button type="primary" @click="showImportDialog">
               从已有课程导入
             </el-button>
@@ -72,10 +72,10 @@
       </header>
 
       <!-- 课程目录内容区 -->
-      <section class="course-content">
-        <div class="content-header">
+      <section id="course-content" class="course-content">
+        <div id="content-header" class="content-header">
           <h3 class="content-title">课程目录</h3>
-          <div class="content-actions">
+          <div id="content-actions" class="content-actions">
             <el-dropdown @command="handleAddChapter" trigger="click">
               <el-button type="primary" class="split-button">
                 <span>添加小节</span>
@@ -102,19 +102,19 @@
         </div>
 
         <!-- 空状态 -->
-        <div v-if="!hasChapters" class="empty-state">
-          <div class="empty-illustration">
+        <div v-if="!hasChapters" id="empty-state" class="empty-state">
+          <div id="empty-illustration" class="empty-illustration">
             <el-icon size="120" color="#d0d0d0">
               <Document />
             </el-icon>
           </div>
 
-          <p class="empty-text">
+          <p id="empty-text" class="empty-text">
             你还没有添加任何小节，<br />
             开始创建你的第一个小节吧
           </p>
 
-          <div class="empty-actions">
+          <div id="empty-actions" class="empty-actions">
             <el-dropdown @command="handleAddChapter" trigger="click">
               <el-button type="primary" size="large" class="split-button">
                 <span>添加小节</span>
@@ -141,7 +141,7 @@
         </div>
 
         <!-- 章节列表 -->
-        <div v-else class="chapter-list">
+        <div v-else id="chapter-list" class="chapter-list">
           <!-- 这里将来可以添加章节列表组件 -->
           <div v-for="chapter in chapters" :key="chapter.id" class="chapter-item">
             <div class="chapter-header">

@@ -122,13 +122,22 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" width="150" fixed="right">
+          <el-table-column label="操作" width="200" fixed="right">
             <template #default="{ row }">
               <el-button link type="primary" size="small" @click="handleViewQuestion(row)">
                 查看
               </el-button>
               <el-button link type="primary" size="small" @click="handleEditQuestion(row)">
                 编辑
+              </el-button>
+              <el-button 
+                v-if="row.type === 'programming'" 
+                link 
+                type="success" 
+                size="small" 
+                @click="handleImportTestCases(row)"
+              >
+                导入用例
               </el-button>
               <el-button link type="danger" size="small" @click="handleDeleteQuestion(row)">
                 删除
@@ -160,6 +169,12 @@
         </div>
       </div>
     </template>
+
+    <!-- OJ测试用例导入对话框 -->
+    <OJQuestionImportDialog
+      v-model="showImportDialog"
+      @import="handleTestCasesImported"
+    />
   </el-drawer>
 </template>
 
@@ -167,6 +182,7 @@
 import { ref, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Upload, Search } from '@element-plus/icons-vue'
+import OJQuestionImportDialog from './OJQuestionImportDialog.vue'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -188,6 +204,8 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const loading = ref(false)
 const selectedQuestions = ref([])
+const showImportDialog = ref(false)
+const currentEditingQuestion = ref(null)
 
 // 模拟题库数据
 const questions = ref([
@@ -254,6 +272,30 @@ const questions = ref([
     difficulty: 'easy',
     score: 3,
     tags: ['数论', '基础']
+  },
+  {
+    id: 'q_009',
+    questionText: '编程题：两数之和',
+    type: 'programming',
+    difficulty: 'easy',
+    score: 100,
+    tags: ['算法', '基础'],
+    testCases: [
+      {
+        id: 'tc001',
+        input: '1 2',
+        output: '3',
+        score: 10,
+        isSample: true
+      },
+      {
+        id: 'tc002',
+        input: '10 20',
+        output: '30',
+        score: 10,
+        isSample: false
+      }
+    ]
   }
 ])
 
@@ -353,6 +395,28 @@ const handleCreateQuestion = () => {
 
 const handleImportQuestions = () => {
   ElMessage.info('导入题目功能开发中...')
+}
+
+const handleImportTestCases = (question) => {
+  currentEditingQuestion.value = question
+  showImportDialog.value = true
+}
+
+const handleTestCasesImported = (data) => {
+  if (!currentEditingQuestion.value) return
+
+  const question = questions.value.find(q => q.id === currentEditingQuestion.value.id)
+  if (question) {
+    question.testCases = data.testCases
+    question.score = data.totalScore
+    
+    ElMessage.success({
+      message: `测试用例已更新，题目总分已调整为${data.totalScore}分`,
+      duration: 3000
+    })
+  }
+
+  currentEditingQuestion.value = null
 }
 
 const handleConfirm = () => {

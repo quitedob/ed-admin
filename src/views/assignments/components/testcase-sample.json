@@ -1,0 +1,74 @@
+{
+  "testCases": [
+    {
+      "id": "tc001",
+      "input": "1 2",
+      "output": "3",
+      "score": 5,
+      "isSample": true
+    },
+    {
+      "id": "tc002",
+      "input": "10 20",
+      "output": "30",
+      "score": 5,
+      "isSample": false
+    },
+    {
+      "id": "tc003",
+      "input": "100 200",
+      "output": "300",
+      "score": 5,
+      "isSample": false
+    },
+    {
+      "id": "tc004",
+      "input": "-5 10",
+      "output": "5",
+      "score": 5,
+      "isSample": false
+    },
+    {
+      "id": "tc005",
+      "input": "0 0",
+      "output": "0",
+      "score": 10,
+      "isSample": false
+    },
+    {
+      "id": "tc006",
+      "input": "999 1",
+      "output": "1000",
+      "score": 10,
+      "isSample": false
+    },
+    {
+      "id": "tc007",
+      "input": "-100 -200",
+      "output": "-300",
+      "score": 10,
+      "isSample": false
+    },
+    {
+      "id": "tc008",
+      "input": "12345 67890",
+      "output": "80235",
+      "score": 10,
+      "isSample": false
+    },
+    {
+      "id": "tc009",
+      "input": "1000000 2000000",
+      "output": "3000000",
+      "score": 15,
+      "isSample": false
+    },
+    {
+      "id": "tc010",
+      "input": "-999999 999999",
+      "output": "0",
+      "score": 15,
+      "isSample": false
+    }
+  ]
+}

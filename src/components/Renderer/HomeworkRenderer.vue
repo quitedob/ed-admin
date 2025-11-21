@@ -1,8 +1,8 @@
 <template>
-  <div class="homework-renderer">
-    <el-card class="homework-header-card" shadow="hover">
+  <div class="homework-renderer" id="homework-renderer">
+    <el-card class="homework-header-card" shadow="hover" id="homework-header-card">
       <template #header>
-        <div class="header-content">
+        <div class="header-content" id="header-content">
           <h2>{{ homeworkData.basicInfo?.title }}</h2>
           <el-tag :type="getDifficultyType(homeworkData.basicInfo?.difficulty)">
             {{ getDifficultyText(homeworkData.basicInfo?.difficulty) }}
@@ -10,33 +10,34 @@
         </div>
       </template>
 
-      <div class="homework-meta">
-        <div class="meta-item">
+      <div class="homework-meta" id="homework-meta">
+        <div class="meta-item" id="meta-due-date">
           <span class="label">截止时间：</span>
           <span>{{ formatDate(homeworkData.schedule?.dueDate) }}</span>
         </div>
-        <div class="meta-item">
+        <div class="meta-item" id="meta-question-count">
           <span class="label">题目数量：</span>
           <span>{{ homeworkData.questions?.length || 0 }} 题</span>
         </div>
-        <div class="meta-item">
+        <div class="meta-item" id="meta-total-score">
           <span class="label">总分：</span>
           <span class="score">{{ calculateTotalScore() }} 分</span>
         </div>
       </div>
 
-      <div class="homework-description">
+      <div class="homework-description" id="homework-description">
         {{ homeworkData.basicInfo?.description }}
       </div>
     </el-card>
 
-    <div class="questions-section">
+    <div class="questions-section" id="questions-section">
       <div
         v-for="(question, index) in homeworkData.questions"
         :key="question.id"
         class="question-card"
+        :id="`question-card-${index}`"
       >
-        <div class="question-header">
+        <div class="question-header" :id="`question-header-${index}`">
           <span class="question-number">{{ index + 1 }}.</span>
           <el-tag
             :type="getQuestionTypeColor(question.type)"
@@ -54,8 +55,8 @@
           </el-tag>
         </div>
 
-        <div class="question-content">
-          <div class="question-text" v-html="question.questionText"></div>
+        <div class="question-content" :id="`question-content-${index}`">
+          <div class="question-text" v-html="question.questionText" :id="`question-text-${index}`"></div>
 
           <!-- 单选题 -->
           <el-radio-group
@@ -130,18 +131,20 @@
       </div>
     </div>
 
-    <div class="submit-section">
+    <div class="submit-section" id="submit-section">
       <el-button
         type="primary"
         size="large"
         @click="handleSubmit"
         :loading="submitting"
+        id="submit-homework-btn"
       >
         提交作业
       </el-button>
       <el-button
         size="large"
         @click="handleSaveDraft"
+        id="save-draft-btn"
       >
         保存草稿
       </el-button>

@@ -1,10 +1,10 @@
 <template>
-  <div class="exam-renderer">
-    <el-card class="exam-header-card" shadow="hover">
+  <div id="exam-renderer" class="exam-renderer">
+    <el-card id="exam-header-card" class="exam-header-card" shadow="hover">
       <template #header>
-        <div class="header-content">
+        <div id="exam-header-content" class="header-content">
           <h2>{{ examData.basicInfo?.title }}</h2>
-          <div class="exam-status">
+          <div id="exam-status" class="exam-status">
             <el-tag :type="getDifficultyType(examData.basicInfo?.difficulty)">
               {{ getDifficultyText(examData.basicInfo?.difficulty) }}
             </el-tag>
@@ -13,52 +13,40 @@
         </div>
       </template>
 
-      <div class="exam-meta">
-        <div class="meta-item">
-          <span class="label">考试时间：</span>
-          <span>{{ formatDateTime(examData.schedule?.startTime) }} - {{ formatDateTime(examData.schedule?.endTime) }}</span>
-        </div>
-        <div class="meta-item">
-          <span class="label">考试时长：</span>
-          <span>{{ examData.schedule?.duration }} 分钟</span>
-        </div>
-        <div class="meta-item">
-          <span class="label">总分：</span>
-          <span class="score">{{ examData.settings?.totalScore || 100 }} 分</span>
-        </div>
-        <div class="meta-item">
-          <span class="label">及格分：</span>
-          <span>{{ examData.settings?.passingScore || 60 }} 分</span>
+      <div id="exam-meta" class="exam-meta">
+        <div v-for="(item, index) in examMetaItems" :key="index" class="meta-item">
+          <span class="label">{{ item.label }}：</span>
+          <span>{{ item.value }}</span>
         </div>
       </div>
 
       <!-- 考试倒计时 -->
-      <div v-if="showTimer" class="exam-timer">
-        <div class="timer-display">
+      <div v-if="showTimer" id="exam-timer" class="exam-timer">
+        <div id="timer-display" class="timer-display">
           <el-icon><Timer /></el-icon>
           <span class="timer-text">剩余时间：{{ formatTime(remainingTime) }}</span>
         </div>
-        <div class="timer-progress">
+        <div id="timer-progress" class="timer-progress">
           <el-progress :percentage="timeProgress" :color="getTimerColor()" />
         </div>
       </div>
 
-      <div class="exam-description">
+      <div id="exam-description" class="exam-description">
         {{ examData.basicInfo?.description }}
       </div>
     </el-card>
 
     <!-- 题目区域 -->
-    <div class="questions-section">
-      <div class="section-header">
+    <div id="questions-section" class="questions-section">
+      <div id="questions-header" class="section-header">
         <h3>考试题目</h3>
-        <div class="navigation-info">
+        <div id="navigation-info" class="navigation-info">
           <span>当前题目：{{ currentQuestionIndex + 1 }} / {{ totalQuestions }}</span>
           <el-button-group>
-            <el-button size="small" @click="prevQuestion" :disabled="currentQuestionIndex === 0">
+            <el-button id="prev-question-btn" size="small" @click="prevQuestion" :disabled="currentQuestionIndex === 0">
               上一题
             </el-button>
-            <el-button size="small" @click="nextQuestion" :disabled="currentQuestionIndex === totalQuestions - 1">
+            <el-button id="next-question-btn" size="small" @click="nextQuestion" :disabled="currentQuestionIndex === totalQuestions - 1">
               下一题
             </el-button>
           </el-button-group>
@@ -66,8 +54,8 @@
       </div>
 
       <!-- 单题显示模式 -->
-      <div v-if="!showAllQuestions" class="question-card">
-        <div class="question-header">
+      <div v-if="!showAllQuestions" id="single-question" class="question-card">
+        <div id="current-question-header" class="question-header">
           <span class="question-number">{{ currentQuestionIndex + 1 }}.</span>
           <el-tag :type="getQuestionTypeColor(currentQuestion.type)" size="small">
             {{ getQuestionTypeLabel(currentQuestion.type) }}
@@ -78,7 +66,7 @@
           </el-tag>
         </div>
 
-        <div class="question-content">
+        <div id="current-question-content" class="question-content">
           <div class="question-text" v-html="currentQuestion.questionText"></div>
 
           <!-- 题目选项根据类型动态渲染 -->
@@ -92,10 +80,11 @@
       </div>
 
       <!-- 全部题目显示模式 -->
-      <div v-else class="all-questions">
+      <div v-else id="all-questions" class="all-questions">
         <div
           v-for="(question, index) in allQuestions"
           :key="question.id"
+          :id="`question-${index}`"
           class="question-card"
         >
           <div class="question-header">
@@ -123,12 +112,13 @@
       </div>
 
       <!-- 题目导航面板 -->
-      <div class="question-navigation">
+      <div id="question-navigation" class="question-navigation">
         <h4>题目导航</h4>
-        <div class="nav-grid">
+        <div id="nav-grid" class="nav-grid">
           <div
             v-for="(question, index) in allQuestions"
             :key="question.id"
+            :id="`nav-item-${index}`"
             class="nav-item"
             :class="getNavClass(question, index)"
             @click="jumpToQuestion(index)"
@@ -136,7 +126,7 @@
             {{ index + 1 }}
           </div>
         </div>
-        <div class="view-toggle">
+        <div id="view-toggle" class="view-toggle">
           <el-switch
             v-model="showAllQuestions"
             active-text="显示全部题目"
@@ -147,8 +137,9 @@
     </div>
 
     <!-- 提交区域 -->
-    <div v-if="!examSubmitted" class="submit-section">
+    <div v-if="!examSubmitted" id="submit-section" class="submit-section">
       <el-button
+        id="submit-exam-btn"
         type="primary"
         size="large"
         @click="handleSubmit"
@@ -157,24 +148,24 @@
       >
         提交试卷
       </el-button>
-      <el-button size="large" @click="handleSaveProgress">
+      <el-button id="save-progress-btn" size="large" @click="handleSaveProgress">
         保存进度
       </el-button>
     </div>
 
     <!-- 考试结果 -->
-    <div v-else class="result-section">
-      <el-card class="result-card">
+    <div v-else id="result-section" class="result-section">
+      <el-card id="result-card" class="result-card">
         <template #header>
           <h3>考试结果</h3>
         </template>
-        <div class="result-content">
-          <div class="score-display">
-            <div class="total-score">
+        <div id="result-content" class="result-content">
+          <div id="score-display" class="score-display">
+            <div id="total-score" class="total-score">
               <span class="score-number">{{ examResult.totalScore }}</span>
               <span class="score-label">总分</span>
             </div>
-            <div class="score-details">
+            <div id="score-details" class="score-details">
               <div class="detail-item">
                 <span class="label">正确率：</span>
                 <span class="value">{{ examResult.accuracy }}%</span>
@@ -246,6 +237,40 @@ const totalQuestions = computed(() => allQuestions.value.length)
 const currentQuestion = computed(() => {
   return allQuestions.value[currentQuestionIndex.value]
 })
+
+const examMetaItems = computed(() => [
+  {
+    label: '考试时间',
+    value: `${formatDateTime(examData.schedule?.startTime)} - ${formatDateTime(examData.schedule?.endTime)}`
+  },
+  {
+    label: '考试时长',
+    value: `${examData.schedule?.duration} 分钟`
+  },
+  {
+    label: '总分',
+    value: `${examData.settings?.totalScore || 100} 分`
+  },
+  {
+    label: '及格分',
+    value: `${examData.settings?.passingScore || 60} 分`
+  }
+])
+
+const resultDetails = computed(() => [
+  {
+    label: '正确率',
+    value: `${examResult.accuracy}%`
+  },
+  {
+    label: '用时',
+    value: examResult.timeUsed
+  },
+  {
+    label: '结果',
+    value: examResult.passed ? '通过' : '未通过'
+  }
+])
 
 const timeProgress = computed(() => {
   const totalTime = props.examData.schedule?.duration * 60 || 3600

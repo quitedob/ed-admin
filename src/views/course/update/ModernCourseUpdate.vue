@@ -23,6 +23,17 @@
           <el-tag v-if="section.error" type="danger" size="small">!</el-tag>
         </div>
       </nav>
+
+      <!-- 班级权限导航项 -->
+      <div class="nav-divider"></div>
+      <div
+        class="nav-item"
+        :class="{ active: currentSection === 'class-permission' }"
+        @click="currentSection = 'class-permission'"
+      >
+        <el-icon><Setting /></el-icon>
+        <span>班级权限</span>
+      </div>
     </aside>
 
     <!-- 右侧详情区 -->
@@ -926,10 +937,33 @@
         </el-card>
       </section>
 
-  
+      <!-- 班级授权 -->
+      <section v-if="currentSection === 'authorization'" class="edit-section">
+        <ClassAuthorizationPanel
+          :course-id="courseData.id"
+          :chapters="courseData.chapters"
+        />
+      </section>
   
   <!-- 操作按钮 -->
       <div class="action-buttons">
+        <!-- 班级授权部分 -->
+        <section v-if="currentSection === 'authorization'" class="edit-section">
+          <el-card>
+            <template #header>
+              <div class="section-header">
+                <h3>班级权限管理</h3>
+                <span class="section-subtitle">为不同班级设置课程章节/课次的开放权限</span>
+              </div>
+            </template>
+
+            <ClassChapterPeriodControl
+              :course-id="courseData.id"
+              :chapters="courseData.chapters"
+            />
+          </el-card>
+        </section>
+
         <el-button size="large" @click="handleCancel">取消</el-button>
         <el-button type="primary" size="large" @click="handleSave" :loading="saving">
           保存课程
@@ -968,11 +1002,14 @@ import {
   FolderOpened,
   ArrowUp,
   ArrowDown,
-  Setting
+  Setting,
+  UserFilled
 } from '@element-plus/icons-vue'
 import SelectorImage from '@/components/Selector/Image/index.vue'
 import SelectLecturer from '@/components/Selector/Lecturer/index.vue'
 import QuestionBankManager from '@/components/QuestionBankManager/index.vue'
+import ClassAuthorizationPanel from './components/ClassAuthorizationPanel.vue'
+import ClassChapterPeriodControl from './components/ClassChapterPeriodControl.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -983,7 +1020,8 @@ const currentSection = ref('basic')
 // 导航sections
 const navigationSections = ref([
   { id: 'basic', title: '基础信息', icon: Document },
-  { id: 'chapters', title: '章节内容', icon: FolderOpened }
+  { id: 'chapters', title: '章节内容', icon: FolderOpened },
+  { id: 'authorization', title: '班级授权', icon: UserFilled }
 ])
 
 // 课程数据 - 符合 rule.txt JSON 格式，时间安排合并在基础信息中
@@ -1952,6 +1990,12 @@ if (route.query.courseId) {
   border-left: 3px solid var(--color-primary-500);
 }
 
+.nav-divider {
+  height: 1px;
+  background-color: var(--color-border-light);
+  margin: var(--spacing-sm) 0;
+}
+
 /* 右侧详情区 */
 .main-content {
   flex: 1;
@@ -2682,5 +2726,26 @@ if (route.query.courseId) {
   background-color: var(--color-bg-secondary);
   border-radius: var(--radius-small);
   border: 1px solid var(--color-border-light);
+}
+
+/* 班级权限相关样式 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.section-subtitle {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-left: auto;
 }
 </style>

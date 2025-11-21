@@ -1,6 +1,7 @@
 <template>
-  <div class="question-bank-list">
+  <div id="question-bank-list" class="question-bank-list">
     <el-table
+      id="question-bank-table"
       v-loading="loading"
       :data="questions"
       @selection-change="handleSelectionChange"
@@ -9,18 +10,18 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="题目ID" align="center" prop="id" width="120">
         <template #default="scope">
-          <span class="question-id">{{ scope.row.id }}</span>
+          <span :id="`question-id-${scope.$index}`" class="question-id">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column label="题目标题" align="left" prop="title" min-width="250" show-overflow-tooltip>
         <template #default="scope">
-          <div class="question-title">
-            <div class="title-text">{{ scope.row.title }}</div>
-            <div class="question-meta">
-              <el-tag size="small" :type="getDifficultyTagType(scope.row.difficulty)">
+          <div :id="`question-title-${scope.$index}`" class="question-title">
+            <div :id="`title-text-${scope.$index}`" class="title-text">{{ scope.row.title }}</div>
+            <div :id="`question-meta-${scope.$index}`" class="question-meta">
+              <el-tag :id="`difficulty-tag-${scope.$index}`" size="small" :type="getDifficultyTagType(scope.row.difficulty)">
                 {{ getDifficultyLabel(scope.row.difficulty) }}
               </el-tag>
-              <el-tag size="small" type="info">
+              <el-tag :id="`type-tag-${scope.$index}`" size="small" type="info">
                 {{ getQuestionTypeLabel(scope.row.type) }}
               </el-tag>
             </div>
@@ -29,30 +30,31 @@
       </el-table-column>
       <el-table-column label="题目内容" align="left" min-width="300" show-overflow-tooltip>
         <template #default="scope">
-          <div class="question-content">
+          <div :id="`question-content-${scope.$index}`" class="question-content">
             {{ stripHtml(scope.row.questionText) }}
           </div>
         </template>
       </el-table-column>
       <el-table-column label="分类" align="center" width="120">
         <template #default="scope">
-          <el-tag type="info" size="small">
+          <el-tag :id="`category-tag-${scope.$index}`" type="info" size="small">
             {{ getCategoryLabel(scope.row.metadata?.category) }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="标签" align="center" width="200">
         <template #default="scope">
-          <div class="tags-container">
+          <div :id="`tags-container-${scope.$index}`" class="tags-container">
             <el-tag
-              v-for="tag in (scope.row.metadata?.tags || scope.row.tags || []).slice(0, 3)"
+              v-for="(tag, tagIndex) in (scope.row.metadata?.tags || scope.row.tags || []).slice(0, 3)"
+              :id="`tag-${scope.$index}-${tagIndex}`"
               :key="tag"
               size="small"
               style="margin: 2px;"
             >
               {{ tag }}
             </el-tag>
-            <span v-if="(scope.row.metadata?.tags || scope.row.tags || []).length > 3" class="more-tags">
+            <span v-if="(scope.row.metadata?.tags || scope.row.tags || []).length > 3" :id="`more-tags-${scope.$index}`" class="more-tags">
               +{{ (scope.row.metadata?.tags || scope.row.tags || []).length - 3 }}
             </span>
           </div>
@@ -60,18 +62,18 @@
       </el-table-column>
       <el-table-column label="最后使用" align="center" width="120">
         <template #default="scope">
-          <span>{{ formatLastUsed(scope.row.lastUsed) }}</span>
+          <span :id="`last-used-${scope.$index}`">{{ formatLastUsed(scope.row.lastUsed) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="180" fixed="right">
         <template #default="scope">
-          <el-button link type="success" size="small" @click="$emit('add-to-assignment', scope.row)">
+          <el-button :id="`add-to-assignment-btn-${scope.$index}`" link type="success" size="small" @click="$emit('add-to-assignment', scope.row)">
             添加到作业
           </el-button>
-          <el-button link type="primary" size="small" @click="$emit('edit', scope.row)">
+          <el-button :id="`edit-btn-${scope.$index}`" link type="primary" size="small" @click="$emit('edit', scope.row)">
             编辑
           </el-button>
-          <el-button link type="danger" size="small" @click="$emit('delete', scope.row)">
+          <el-button :id="`delete-btn-${scope.$index}`" link type="danger" size="small" @click="$emit('delete', scope.row)">
             删除
           </el-button>
         </template>
@@ -80,16 +82,18 @@
 
     <!-- 题目预览对话框 -->
     <el-dialog
+      id="question-preview-dialog"
       v-model="previewVisible"
       :title="`题目预览 - ${currentQuestion?.title || '未知题目'}`"
       width="80%"
       append-to-body
       @closed="handlePreviewClose"
     >
-      <div v-if="currentQuestion" class="question-preview">
+      <div v-if="currentQuestion" id="question-preview" class="question-preview">
         <!-- 单选题预览 -->
         <SingleChoice
           v-if="currentQuestion.type === 'single'"
+          :id="`single-choice-preview-${currentQuestion.id}`"
           :key="`single-${currentQuestion.id}`"
           :question="currentQuestion"
           :show-answer="true"
@@ -99,6 +103,7 @@
         <!-- 多选题预览 -->
         <MultipleChoice
           v-else-if="currentQuestion.type === 'multiple'"
+          :id="`multiple-choice-preview-${currentQuestion.id}`"
           :key="`multiple-${currentQuestion.id}`"
           :question="currentQuestion"
           :show-answer="true"
@@ -108,6 +113,7 @@
         <!-- 填空题预览 -->
         <FillBlank
           v-else-if="currentQuestion.type === 'fill'"
+          :id="`fill-blank-preview-${currentQuestion.id}`"
           :key="`fill-${currentQuestion.id}`"
           :question="currentQuestion"
           :show-answer="true"
@@ -117,6 +123,7 @@
         <!-- 应用题预览 -->
         <EssayQuestion
           v-else-if="currentQuestion.type === 'essay'"
+          :id="`essay-question-preview-${currentQuestion.id}`"
           :key="`essay-${currentQuestion.id}`"
           :question="currentQuestion"
           :show-answer="true"
@@ -126,6 +133,7 @@
         <!-- OJ题预览 -->
         <OJQuestion
           v-else-if="currentQuestion.type === 'oj'"
+          :id="`oj-question-preview-${currentQuestion.id}`"
           :key="`oj-${currentQuestion.id}`"
           :question="currentQuestion"
           :show-answer="false"
@@ -135,7 +143,7 @@
         />
 
         <!-- 默认显示 -->
-        <div v-else :key="`default-${currentQuestion.id}`" class="question-preview-placeholder">
+        <div v-else :id="`default-preview-${currentQuestion.id}`" :key="`default-${currentQuestion.id}`" class="question-preview-placeholder">
           <p>该题目类型暂不支持预览</p>
           <pre>{{ JSON.stringify(currentQuestion, null, 2) }}</pre>
         </div>

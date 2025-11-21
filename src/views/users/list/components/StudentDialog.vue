@@ -41,28 +41,58 @@
         </el-col>
       </el-row>
 
-      <el-form-item label="班级" prop="classIds">
-        <el-select
-          v-model="formData.classIds"
-          placeholder="请选择班级"
-          multiple
-          style="width: 100%"
-        >
-          <el-option
-            v-for="cls in classOptions"
+      <!-- 班级信息只读显示，不允许在此处编辑 -->
+      <el-form-item label="所属班级">
+        <div class="class-display">
+          <el-tag
+            v-for="cls in displayClasses"
             :key="cls.id"
-            :label="cls.name"
-            :value="cls.id"
-          />
+            size="small"
+            type="info"
+            style="margin-right: 8px"
+          >
+            {{ cls.name }}
+          </el-tag>
+          <span v-if="displayClasses.length === 0" style="color: #909399; font-size: 14px">
+            暂无班级（请在班级管理页面添加学生到班级）
+          </span>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="学生状态" prop="status">
+        <el-select v-model="formData.status" placeholder="请选择学生状态" style="width: 100%">
+          <el-option label="新生" value="new">
+            <span style="color: #606266">新生</span>
+          </el-option>
+          <el-option label="在读" value="studying">
+            <span style="color: #67c23a; font-weight: 500">在读</span>
+          </el-option>
+          <el-option label="停课" value="suspended">
+            <span style="color: #e6a23c; font-weight: 500">停课</span>
+          </el-option>
+          <el-option label="封存" value="archived">
+            <span style="color: #909399">封存</span>
+          </el-option>
+          <el-option label="结课" value="finished">
+            <span style="color: #e6a23c; font-weight: 500">结课</span>
+          </el-option>
+          <el-option label="退费" value="refunded">
+            <span style="color: #f56c6c; font-weight: 500">退费</span>
+          </el-option>
         </el-select>
       </el-form-item>
 
-      <el-form-item label="状态" prop="status">
-        <el-radio-group v-model="formData.status">
-          <el-radio label="active">在读</el-radio>
-          <el-radio label="inactive">休学</el-radio>
-          <el-radio label="graduated">已毕业</el-radio>
-        </el-radio-group>
+      <el-form-item label="账号状态" prop="isDisabled">
+        <el-switch
+          v-model="formData.isDisabled"
+          :active-value="false"
+          :inactive-value="true"
+          active-text="启用"
+          inactive-text="禁用"
+        />
+        <span style="margin-left: 12px; font-size: 12px; color: #909399">
+          禁用后学生将无法登录系统
+        </span>
       </el-form-item>
     </el-form>
 
@@ -102,16 +132,14 @@ const formData = ref({
   name: '',
   phone: '',
   email: '',
-  classIds: [],
-  status: 'active'
+  status: 'new',
+  isDisabled: false
 })
 
-// 班级选项
-const classOptions = ref([
-  { id: 'class_001', name: '前端开发一班' },
-  { id: 'class_002', name: '前端开发二班' },
-  { id: 'class_003', name: '数据科学班' }
-])
+// 显示学生当前所属班级（只读）
+const displayClasses = computed(() => {
+  return props.studentData?.classes || []
+})
 
 // 表单验证规则
 const rules = {
@@ -128,9 +156,6 @@ const rules = {
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
-  ],
-  classIds: [
-    { required: true, message: '请选择至少一个班级', trigger: 'change' }
   ],
   status: [
     { required: true, message: '请选择状态', trigger: 'change' }
@@ -152,8 +177,8 @@ const initFormData = () => {
       name: props.studentData.name || '',
       phone: props.studentData.phone || '',
       email: props.studentData.email || '',
-      classIds: props.studentData.classes ? props.studentData.classes.map(c => c.id) : [],
-      status: props.studentData.status || 'active'
+      status: props.studentData.status || 'new',
+      isDisabled: props.studentData.isDisabled ?? false
     }
   } else {
     resetForm()
@@ -167,8 +192,8 @@ const resetForm = () => {
     name: '',
     phone: '',
     email: '',
-    classIds: [],
-    status: 'active'
+    status: 'new',
+    isDisabled: false
   }
 }
 
@@ -182,21 +207,14 @@ const handleSave = async () => {
 
     saving.value = true
 
-    // 构建保存数据
+    // 构建保存数据（不包含班级信息，班级关系在班级管理页面维护）
     const saveData = {
       studentId: formData.value.studentId,
       name: formData.value.name,
       phone: formData.value.phone,
       email: formData.value.email,
-      classes: formData.value.classIds.map(id => {
-        const cls = classOptions.value.find(c => c.id === id)
-        return {
-          id,
-          name: cls ? cls.name : '',
-          joinTime: new Date().toISOString()
-        }
-      }),
-      status: formData.value.status
+      status: formData.value.status,
+      isDisabled: formData.value.isDisabled
     }
 
     emit('save', saveData)
@@ -220,5 +238,13 @@ initFormData()
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+.class-display {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
 }
 </style>

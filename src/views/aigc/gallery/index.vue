@@ -1,10 +1,10 @@
 <template>
-  <div class="app-container">
-    <el-card class="box-card">
+  <div id="aigc-gallery" class="app-container">
+    <el-card id="gallery-card" class="box-card">
       <template #header>
-        <div class="card-header">
+        <div id="gallery-header" class="card-header">
           <span>AIGC作品墙</span>
-          <div class="header-controls">
+          <div id="header-controls" class="header-controls">
             <el-select v-model="currentCourseId" placeholder="选择课程" @change="handleCourseChange" style="margin-right: 10px;">
               <el-option
                 v-for="course in courseList"
@@ -21,13 +21,13 @@
       </template>
 
       <!-- 统计信息 -->
-      <div class="stats-section" v-if="statsData">
+      <div id="stats-section" class="stats-section" v-if="statsData">
         <el-row :gutter="20">
           <el-col :span="6">
-            <el-statistic title="作品总数" :value="statsData.total" />
+            <el-statistic id="stat-total" title="作品总数" :value="statsData.total" />
           </el-col>
           <el-col :span="6">
-            <el-statistic title="图片作品" :value="statsData.imageCount" />
+            <el-statistic id="stat-images" title="图片作品" :value="statsData.imageCount" />
           </el-col>
           <el-col :span="6">
             <el-statistic title="视频作品" :value="statsData.videoCount" />
@@ -39,7 +39,7 @@
       </div>
 
       <!-- 筛选条件 -->
-      <div class="filter-section">
+      <div id="filter-section" class="filter-section">
         <el-form :model="filterParams" :inline="true">
           <el-form-item label="作品类型">
             <el-select v-model="filterParams.type" placeholder="全部类型" clearable @change="handleFilter">
@@ -59,20 +59,21 @@
       </div>
 
       <!-- 作品展示区域 -->
-      <div class="gallery-container" v-loading="loading">
+      <div id="gallery-container" class="gallery-container" v-loading="loading">
         <!-- 网格视图 -->
-        <div v-if="viewType === 'grid'" class="grid-view">
+        <div v-if="viewType === 'grid'" id="grid-view" class="grid-view">
           <el-row :gutter="20">
             <el-col
               v-for="work in filteredWorks"
               :key="work.id"
+              :id="`work-col-${work.id}`"
               :xs="24"
               :sm="12"
               :md="8"
               :lg="6"
               class="work-item-col"
             >
-              <el-card class="work-card" :body-style="{ padding: '0px' }" @click="handlePreview(work)">
+              <el-card :id="`work-card-${work.id}`" class="work-card" :body-style="{ padding: '0px' }" @click="handlePreview(work)">
                 <div class="work-preview">
                   <div v-if="work.type === 'image'" class="image-preview">
                     <el-image
@@ -128,8 +129,8 @@
         </div>
 
         <!-- 列表视图 -->
-        <div v-else class="list-view">
-          <el-table :data="filteredWorks" stripe>
+        <div v-else id="list-view" class="list-view">
+          <el-table id="works-table" :data="filteredWorks" stripe>
             <el-table-column label="预览" width="120">
               <template #default="scope">
                 <div class="list-preview">
@@ -185,6 +186,7 @@
 
     <!-- 作品预览对话框 -->
     <el-dialog
+      id="preview-dialog"
       :title="previewWork?.title"
       v-model="previewOpen"
       width="80%"

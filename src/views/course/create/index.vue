@@ -1,15 +1,15 @@
 <template>
-  <div class="form-container">
-    <div class="form-header">
+  <div class="form-container" id="course-create-container">
+    <div class="form-header" id="form-header">
       <h2>{{ isCopyMode ? '复制课程' : '创建课程' }}</h2>
       <el-button @click="goBack">返回</el-button>
     </div>
 
-    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="120px" style="max-width: 980px" @submit.prevent>
+    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="120px" style="max-width: 980px" @submit.prevent id="course-create-form">
       <!-- 元数据信息 -->
-      <div class="form-main">
+      <div class="form-main" id="metadata-section">
         <div class="form-main-title">元数据信息</div>
-        <div class="form-main-content">
+        <div class="form-main-content" id="metadata-content">
           <el-form-item label="课程ID" prop="id">
             <el-input v-model="formModel.id" placeholder="系统自动生成" disabled></el-input>
           </el-form-item>
@@ -23,9 +23,9 @@
       </div>
 
       <!-- 基础信息 -->
-      <div class="form-main">
+      <div class="form-main" id="basic-info-section">
         <div class="form-main-title">基础信息</div>
-        <div class="form-main-content">
+        <div class="form-main-content" id="basic-info-content">
           <el-form-item label="课程标题" prop="title">
             <el-input
               v-model="formModel.basicInfo.title"
@@ -63,7 +63,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="讲师信息" prop="teacher">
-            <div class="teacher-info">
+            <div class="teacher-info" id="teacher-info">
               <el-input v-model="formModel.basicInfo.teacher.name" disabled style="width: 260px; margin-right: 20px"></el-input>
               <el-button type="primary" @click="lecturerSelect">选择讲师</el-button>
             </div>
@@ -89,9 +89,9 @@
       </div>
 
       <!-- 课程安排 -->
-      <div class="form-main">
+      <div class="form-main" id="schedule-section">
         <div class="form-main-title">课程安排</div>
-        <div class="form-main-content">
+        <div class="form-main-content" id="schedule-content">
           <el-form-item label="开始日期" prop="startDate">
             <el-date-picker
               v-model="formModel.schedule.startDate"
@@ -121,9 +121,9 @@
       </div>
 
       <!-- 复制选项 -->
-      <div v-if="isCopyMode" class="form-main">
+      <div v-if="isCopyMode" class="form-main" id="copy-options-section">
         <div class="form-main-title">复制选项</div>
-        <div class="form-main-content">
+        <div class="form-main-content" id="copy-options-content">
           <el-form-item label="复制内容">
             <el-checkbox-group v-model="copyOptions">
               <el-checkbox value="basic">基础信息</el-checkbox>
@@ -145,9 +145,9 @@
       </div>
     </el-form>
 
-    <div class="form-footer">
+    <div class="form-footer" id="form-footer">
       <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" @click="onSubmit()" :loading="loading">
+      <el-button type="primary" @click="onSubmit()" :loading="loading" id="submit-button">
         {{ isCopyMode ? '创建副本' : '创建课程' }}
       </el-button>
     </div>

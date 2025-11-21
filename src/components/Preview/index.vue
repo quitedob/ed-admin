@@ -1,9 +1,9 @@
 <template>
-  <el-dialog :append-to-body="true" :model-value="visible" :title="props.resourceName" width="600px" center align-center :destroy-on-close="true" @close="onClose">
-    <div id="player"></div>
+  <el-dialog id="preview-dialog" :append-to-body="true" :model-value="visible" :title="props.resourceName" width="600px" center align-center :destroy-on-close="true" @close="onClose">
+    <div id="media-player" class="player"></div>
     <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="onClose()">取消</el-button>
+      <span id="preview-dialog-footer" class="dialog-footer">
+        <el-button id="close-preview-btn" @click="onClose()">取消</el-button>
       </span>
     </template>
   </el-dialog>
@@ -70,7 +70,7 @@
 
   function simplePlay(params) {
     window.polyvPlayer({
-      wrap: '#player',
+      wrap: '#media-player',
       autoplay: true,
       hideSwitchPlayer: true,
       showLine: 'off',
@@ -81,7 +81,7 @@
 
   const polyvPlay = (params) => {
     window.polyvPlayer({
-      wrap: '#player',
+      wrap: '#media-player',
       autoplay: true,
       hideSwitchPlayer: true,
       showLine: 'off',

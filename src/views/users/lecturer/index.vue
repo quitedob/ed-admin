@@ -1,8 +1,8 @@
 <!-- 文件路径: views/users/lecturer/index.vue -->
 <template>
-  <div class="app-container">
-    <div class="page_head">
-      <div class="search_bar clearfix">
+  <div class="app-container" id="lecturer-management-container">
+    <div class="page_head" id="lecturer-page-header">
+      <div class="search_bar clearfix" id="lecturer-search-bar">
         <el-form :model="query" inline label-width="80px">
           <el-form-item>
             <el-input v-model="query.lecturerName" placeholder="请输入讲师名称" prefix-icon="Search" clearable />
@@ -13,11 +13,11 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="button_bar">
+      <div class="button_bar" id="lecturer-button-bar">
         <el-button v-permission="'lecturer:save'" type="primary" @click="openFormModal()">添加讲师</el-button>
       </div>
     </div>
-    <el-table v-loading="page.loading" :data="page.list" row-key="id" class="drag-table">
+    <el-table v-loading="page.loading" :data="page.list" row-key="id" class="drag-table" id="lecturer-data-table">
       <el-table-column label="讲师信息">
         <template #default="scope">
           <img :alt="scope.row.lecturerName" :src="scope.row.lecturerHead" style="height: 40px; width: auto; border-radius: 50%; vertical-align: middle" />

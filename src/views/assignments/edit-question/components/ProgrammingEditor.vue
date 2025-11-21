@@ -1,14 +1,15 @@
 <template>
-  <div class="programming-editor">
-    <el-form label-width="120px">
-      <el-form-item label="绑定HOJ题目">
+  <div id="programming-editor" class="programming-editor">
+    <el-form id="programming-form" label-width="120px">
+      <el-form-item id="hoj-problem-item" label="绑定HOJ题目">
         <el-input
+          id="hoj-problem-input"
           v-model="localValue.hojProblemId"
           placeholder="如: CF-1001, LC-001"
           @blur="handleSearchProblem"
         >
           <template #append>
-            <el-button @click="handleSearchProblem" :loading="searching">
+            <el-button id="search-hoj-btn" @click="handleSearchProblem" :loading="searching">
               <el-icon><Search /></el-icon>
               搜索HOJ题库
             </el-button>
@@ -17,56 +18,51 @@
       </el-form-item>
 
       <template v-if="problemInfo">
-        <el-divider content-position="left">题目信息(自动获取)</el-divider>
+        <el-divider id="problem-info-divider" content-position="left">题目信息(自动获取)</el-divider>
 
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="题目名称">
+        <el-descriptions id="problem-info-descriptions" :column="2" border>
+          <el-descriptions-item id="problem-name-item" label="题目名称">
             {{ problemInfo.name }}
           </el-descriptions-item>
-          <el-descriptions-item label="题目来源">
+          <el-descriptions-item id="problem-source-item" label="题目来源">
             {{ problemInfo.source }}
           </el-descriptions-item>
-          <el-descriptions-item label="时间限制">
+          <el-descriptions-item id="time-limit-item" label="时间限制">
             {{ problemInfo.timeLimit }}ms
           </el-descriptions-item>
-          <el-descriptions-item label="内存限制">
+          <el-descriptions-item id="memory-limit-item" label="内存限制">
             {{ problemInfo.memoryLimit }}MB
           </el-descriptions-item>
-          <el-descriptions-item label="难度">
-            <el-rate 
-              v-model="problemInfo.difficulty" 
-              disabled 
+          <el-descriptions-item id="difficulty-item" label="难度">
+            <el-rate
+              id="difficulty-rate"
+              v-model="problemInfo.difficulty"
+              disabled
               :max="5"
               show-score
               text-color="#ff9900"
             />
           </el-descriptions-item>
-          <el-descriptions-item label="通过率">
-            <el-progress 
-              :percentage="problemInfo.acceptRate" 
+          <el-descriptions-item id="accept-rate-item" label="通过率">
+            <el-progress
+              id="accept-rate-progress"
+              :percentage="problemInfo.acceptRate"
               :color="getAcceptRateColor(problemInfo.acceptRate)"
             />
           </el-descriptions-item>
         </el-descriptions>
       </template>
 
-      <el-divider content-position="left">本题设置</el-divider>
+      <el-divider id="settings-divider" content-position="left">本题设置</el-divider>
 
-      <el-row :gutter="20">
+      <el-row id="first-settings-row" :gutter="20">
         <el-col :span="12">
-          <el-form-item label="分值">
-            <el-input-number 
-              v-model="localValue.score" 
-              :min="1" 
-              :max="100"
-              style="width: 100%"
-            />
-            <span style="margin-left: 8px">分</span>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="必做">
-            <el-switch 
+          <el-form-item id="required-item" label="必做">
+            <el-switch
+              id="required-switch"
               v-model="localValue.required"
               active-text="是"
               inactive-text="否"
@@ -75,55 +71,59 @@
         </el-col>
       </el-row>
 
-      <el-row :gutter="20">
+      <el-row id="second-settings-row" :gutter="20">
         <el-col :span="12">
-          <el-form-item label="允许多次提交">
-            <el-switch 
+          <el-form-item id="multiple-submit-item" label="允许多次提交">
+            <el-switch
+              id="multiple-submit-switch"
               v-model="localValue.multipleSubmit"
               active-text="允许"
               inactive-text="不允许"
             />
-            <div style="color: #909399; font-size: 12px; margin-top: 4px">
+            <div id="multiple-submit-hint" style="color: #909399; font-size: 12px; margin-top: 4px">
               允许学生多次提交，取最高分
             </div>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="显示测试用例">
-            <el-switch 
+          <el-form-item id="show-test-cases-item" label="显示测试用例">
+            <el-switch
+              id="show-test-cases-switch"
               v-model="localValue.showTestCases"
               active-text="显示"
               inactive-text="隐藏"
             />
-            <div style="color: #909399; font-size: 12px; margin-top: 4px">
+            <div id="show-test-cases-hint" style="color: #909399; font-size: 12px; margin-top: 4px">
               是否向学生显示测试用例
             </div>
           </el-form-item>
         </el-col>
       </el-row>
 
-      <el-form-item label="提交次数限制">
-        <el-input-number 
-          v-model="localValue.submitLimit" 
-          :min="0" 
+      <el-form-item id="submit-limit-item" label="提交次数限制">
+        <el-input-number
+          id="submit-limit-input"
+          v-model="localValue.submitLimit"
+          :min="0"
           :max="100"
           :disabled="!localValue.multipleSubmit"
         />
-        <span style="margin-left: 8px">次 (0表示不限制)</span>
+        <span id="submit-limit-unit" style="margin-left: 8px">次 (0表示不限制)</span>
       </el-form-item>
 
-      <el-form-item label="语言限制">
-        <el-checkbox-group v-model="localValue.allowedLanguages">
-          <el-checkbox label="C++">C++</el-checkbox>
-          <el-checkbox label="Java">Java</el-checkbox>
-          <el-checkbox label="Python">Python</el-checkbox>
-          <el-checkbox label="JavaScript">JavaScript</el-checkbox>
-          <el-checkbox label="Go">Go</el-checkbox>
+      <el-form-item id="allowed-languages-item" label="语言限制">
+        <el-checkbox-group id="allowed-languages-group" v-model="localValue.allowedLanguages">
+          <el-checkbox id="lang-cpp" label="C++">C++</el-checkbox>
+          <el-checkbox id="lang-java" label="Java">Java</el-checkbox>
+          <el-checkbox id="lang-python" label="Python">Python</el-checkbox>
+          <el-checkbox id="lang-javascript" label="JavaScript">JavaScript</el-checkbox>
+          <el-checkbox id="lang-go" label="Go">Go</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
 
-      <el-form-item label="题目解析">
+      <el-form-item id="explanation-item" label="题目解析">
         <el-input
+          id="explanation-input"
           v-model="localValue.explanation"
           type="textarea"
           :rows="4"
@@ -150,7 +150,6 @@ const emit = defineEmits(['update:modelValue'])
 
 const localValue = ref({
   ...props.modelValue,
-  score: props.modelValue.score || 10,
   submitLimit: props.modelValue.submitLimit || 0,
   allowedLanguages: props.modelValue.allowedLanguages || ['C++', 'Java', 'Python']
 })
@@ -161,7 +160,6 @@ const problemInfo = ref(null)
 watch(() => props.modelValue, (newVal) => {
   localValue.value = {
     ...newVal,
-    score: newVal.score || 10,
     submitLimit: newVal.submitLimit || 0,
     allowedLanguages: newVal.allowedLanguages || ['C++', 'Java', 'Python']
   }

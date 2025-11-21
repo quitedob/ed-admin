@@ -4,23 +4,24 @@
     v-model="visible"
     width="800px"
     append-to-body
+    id="import-from-bank-dialog"
   >
-    <div class="import-bank-content">
-      <p>从题库导入功能 - 支持按类型、难度、分类等条件筛选题目并导入到作业中</p>
-      <p>此功能将允许您：</p>
-      <ul>
-        <li>按题型筛选题目（单选题、多选题、填空题、应用题、OJ题）</li>
-        <li>按难度筛选题目（简单、中等、困难）</li>
-        <li>按分类和标签筛选题目</li>
-        <li>预览题目内容</li>
-        <li>批量选择并导入题目</li>
+    <div id="import-bank-content" class="import-bank-content">
+      <p id="import-description">从题库导入功能 - 支持按类型、难度、分类等条件筛选题目并导入到作业中</p>
+      <p id="features-title">此功能将允许您：</p>
+      <ul id="features-list">
+        <li id="feature-1">按题型筛选题目（单选题、多选题、填空题、应用题、OJ题）</li>
+        <li id="feature-2">按难度筛选题目（简单、中等、困难）</li>
+        <li id="feature-3">按分类和标签筛选题目</li>
+        <li id="feature-4">预览题目内容</li>
+        <li id="feature-5">批量选择并导入题目</li>
       </ul>
     </div>
 
     <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleImport">确定导入</el-button>
+      <div id="import-dialog-footer" class="dialog-footer">
+        <el-button @click="handleClose" id="import-cancel-btn">取消</el-button>
+        <el-button type="primary" @click="handleImport" id="import-confirm-btn">确定导入</el-button>
       </div>
     </template>
   </el-dialog>

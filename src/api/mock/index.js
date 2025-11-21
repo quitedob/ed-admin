@@ -34,7 +34,12 @@ export const mockQuestionBankApi = {
     await sleep(500)
     const mockStore = useMockStore()
     
-    let result = mockStore.questionBanks
+    // Ensure store is initialized
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    let result = mockStore.questionBanks || []
     
     // 搜索过滤
     if (params.keyword) {
@@ -53,7 +58,12 @@ export const mockQuestionBankApi = {
   async getQuestionBankDetail(id) {
     await sleep(300)
     const mockStore = useMockStore()
-    const bank = mockStore.questionBanks.find(qb => qb.id === id)
+    
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    const bank = (mockStore.questionBanks || []).find(qb => qb && qb.id === id)
     
     if (!bank) {
       return errorResponse('题库不存在')
@@ -110,7 +120,11 @@ export const mockClassApi = {
     await sleep(500)
     const mockStore = useMockStore()
     
-    let result = mockStore.classes
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    let result = mockStore.classes || []
     
     // 筛选
     if (params.grade) {
@@ -129,14 +143,19 @@ export const mockClassApi = {
   async getClassDetail(id) {
     await sleep(300)
     const mockStore = useMockStore()
-    const classData = mockStore.classes.find(c => c.id === id)
+    
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    const classData = (mockStore.classes || []).find(c => c && c.id === id)
     
     if (!classData) {
       return errorResponse('班级不存在')
     }
     
     // 获取班级学生
-    const students = mockStore.getStudentsByClass(id)
+    const students = mockStore.getStudentsByClass(id) || []
     
     return successResponse({
       ...classData,
@@ -183,7 +202,11 @@ export const mockStudentApi = {
     await sleep(500)
     const mockStore = useMockStore()
     
-    let result = mockStore.students
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    let result = mockStore.students || []
     
     // 搜索
     if (params.keyword) {
@@ -210,7 +233,12 @@ export const mockStudentApi = {
   async getStudentDetail(id) {
     await sleep(300)
     const mockStore = useMockStore()
-    const student = mockStore.students.find(s => s.id === id)
+    
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    const student = (mockStore.students || []).find(s => s && s.id === id)
     
     if (!student) {
       return errorResponse('学生不存在')
@@ -264,7 +292,11 @@ export const mockHomeworkApi = {
     await sleep(500)
     const mockStore = useMockStore()
     
-    let result = mockStore.homeworks
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    let result = mockStore.homeworks || []
     
     if (params.classId) {
       result = result.filter(hw => hw.classId === params.classId)
@@ -279,13 +311,18 @@ export const mockHomeworkApi = {
   async getHomeworkDetail(id) {
     await sleep(300)
     const mockStore = useMockStore()
-    const homework = mockStore.homeworks.find(hw => hw.id === id)
+    
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    const homework = (mockStore.homeworks || []).find(hw => hw && hw.id === id)
     
     if (!homework) {
       return errorResponse('作业不存在')
     }
     
-    const submissions = mockStore.getSubmissionsByHomework(id)
+    const submissions = mockStore.getSubmissionsByHomework(id) || []
     
     return successResponse({
       ...homework,
@@ -335,7 +372,11 @@ export const mockExamApi = {
     await sleep(500)
     const mockStore = useMockStore()
     
-    let result = mockStore.exams
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    let result = mockStore.exams || []
     
     if (params.classId) {
       result = result.filter(exam => exam.classId === params.classId)
@@ -350,7 +391,12 @@ export const mockExamApi = {
   async getExamDetail(id) {
     await sleep(300)
     const mockStore = useMockStore()
-    const exam = mockStore.exams.find(e => e.id === id)
+    
+    if (!mockStore.initialized) {
+      mockStore.initialize()
+    }
+    
+    const exam = (mockStore.exams || []).find(e => e && e.id === id)
     
     if (!exam) {
       return errorResponse('考试不存在')

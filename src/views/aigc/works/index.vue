@@ -1,14 +1,14 @@
 <template>
-  <div class="aigc-works-container">
-    <div class="page-header">
+  <div id="aigc-works" class="aigc-works-container">
+    <div id="page-header" class="page-header">
       <h2>AIGC作品提交</h2>
       <p>展示你的AI创作才华，按顺序上传你的作品</p>
     </div>
 
     <!-- 作品提交表单 -->
-    <el-card class="submit-card">
+    <el-card id="submit-card" class="submit-card">
       <template #header>
-        <div class="card-header">
+        <div id="submit-header" class="card-header">
           <span>上传新作品</span>
           <el-button type="primary" @click="showSubmitForm = !showSubmitForm">
             {{ showSubmitForm ? '收起' : '展开' }}

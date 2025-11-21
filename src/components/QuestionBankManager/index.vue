@@ -6,29 +6,29 @@
     :before-close="handleClose"
     destroy-on-close
   >
-    <div class="question-bank-manager">
+    <div class="question-bank-manager" id="question-bank-manager">
       <!-- 题库选择器 -->
-      <div class="bank-selector">
-        <el-tabs v-model="activeBankType" @tab-change="handleBankTypeChange">
+      <div class="bank-selector" id="bank-selector">
+        <el-tabs v-model="activeBankType" @tab-change="handleBankTypeChange" id="bank-tabs">
           <el-tab-pane
             v-for="bank in questionBanks"
             :key="bank.id"
             :label="bank.name"
             :name="bank.type"
           >
-            <div class="bank-header">
-              <div class="bank-info">
+            <div class="bank-header" :id="`bank-header-${bank.type}`">
+              <div class="bank-info" :id="`bank-info-${bank.type}`">
                 <span class="bank-title">{{ bank.name }}</span>
                 <el-tag type="info">{{ bank.questionCount }} 题</el-tag>
                 <el-tag type="success">每题 {{ bank.scorePerQuestion }} 分</el-tag>
                 <span class="bank-description">考试抽取 {{ bank.totalQuestionsNeeded }} 题</span>
               </div>
-              <div class="bank-actions">
-                <el-button size="small" @click="importQuestions(bank.type)">
+              <div class="bank-actions" :id="`bank-actions-${bank.type}`">
+                <el-button size="small" @click="importQuestions(bank.type)" :id="`import-btn-${bank.type}`">
                   <el-icon><Upload /></el-icon>
                   导入题目
                 </el-button>
-                <el-button size="small" @click="addQuestion(bank.type)">
+                <el-button size="small" @click="addQuestion(bank.type)" :id="`add-btn-${bank.type}`">
                   <el-icon><Plus /></el-icon>
                   添加题目
                 </el-button>
@@ -36,39 +36,42 @@
             </div>
 
             <!-- 题目列表 -->
-            <div class="questions-container">
-              <div class="questions-header">
+            <div class="questions-container" :id="`questions-container-${bank.type}`">
+              <div class="questions-header" :id="`questions-header-${bank.type}`">
                 <el-input
                   v-model="searchText"
                   placeholder="搜索题目内容..."
                   class="search-input"
                   clearable
                   @input="handleSearch"
+                  :id="`search-input-${bank.type}`"
                 >
                   <template #prefix>
                     <el-icon><Search /></el-icon>
                   </template>
                 </el-input>
-                <el-select v-model="difficultyFilter" placeholder="难度筛选" clearable @change="handleSearch">
+                <el-select v-model="difficultyFilter" placeholder="难度筛选" clearable @change="handleSearch" :id="`difficulty-filter-${bank.type}`">
                   <el-option label="简单" value="easy" />
                   <el-option label="中等" value="medium" />
                   <el-option label="困难" value="hard" />
                 </el-select>
               </div>
 
-              <div class="questions-list">
+              <div class="questions-list" :id="`questions-list-${bank.type}`">
                 <div
                   v-for="(question, index) in filteredQuestions"
                   :key="question.id"
                   class="question-item"
                   :class="{ 'question-selected': selectedQuestions.includes(question.id) }"
+                  :id="`question-item-${question.id}`"
                 >
-                  <div class="question-header">
-                    <div class="question-meta">
+                  <div class="question-header" :id="`question-header-${question.id}`">
+                    <div class="question-meta" :id="`question-meta-${question.id}`">
                       <el-checkbox
                         v-model="selectedQuestions"
                         :label="question.id"
                         @change="handleQuestionSelect(question.id)"
+                        :id="`question-checkbox-${question.id}`"
                       />
                       <span class="question-number">题目 {{ index + 1 }}</span>
                       <el-tag :type="getDifficultyType(question.difficulty)" size="small">
@@ -76,11 +79,11 @@
                       </el-tag>
                       <el-tag type="info" size="small">{{ question.score }}分</el-tag>
                     </div>
-                    <div class="question-actions">
-                      <el-button size="small" @click="editQuestion(question)">
+                    <div class="question-actions" :id="`question-actions-${question.id}`">
+                      <el-button size="small" @click="editQuestion(question)" :id="`edit-question-btn-${question.id}`">
                         <el-icon><Edit /></el-icon>
                       </el-button>
-                      <el-button size="small" type="danger" @click="deleteQuestion(question.id)">
+                      <el-button size="small" type="danger" @click="deleteQuestion(question.id)" :id="`delete-question-btn-${question.id}`">
                         <el-icon><Delete /></el-icon>
                       </el-button>
                     </div>

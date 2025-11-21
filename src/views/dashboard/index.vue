@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div id="dashboard-container" class="dashboard-container">
     <el-row :gutter="20">
       <el-col v-if="hasPermission('stat:data')" :span="12">
         <stat-data />
@@ -7,15 +7,15 @@
       <el-col :span="12">
         <el-card class="info">
           <template #header>芝麻编程的管理系统介绍</template>
-          <div class="info-body">
-            <div class="info-content">
+          <div id="info-body" class="info-body">
+            <div id="info-content" class="info-content">
               <div>1. <strong>课程管理</strong>：支持视频、文档、图片等多种内容形式</div>
               <div>2. <strong>学员跟踪</strong>：实时监控学习进度和成绩表现</div>
               <div>3. <strong>智能评测</strong>：AI驱动的作业和考试自动批改系统</div>
               <div>4. <strong>班级管理</strong>：灵活的班级组织和授权管理功能</div>
               <div>5. <strong>数据分析</strong>：全面的学习报告和能力评估分析</div>
             </div>
-            <div class="system-features">
+            <div id="system-features" class="system-features">
               <el-icon><Platform /></el-icon>
               <span>一站式编程教育管理平台</span>
             </div>
@@ -24,10 +24,10 @@
       </el-col>
     </el-row>
 
-    <div v-if="hasPermission('stat:login')">
+    <div v-if="hasPermission('stat:login')" id="stat-login-section">
       <stat-login />
     </div>
-    <div v-if="hasPermission('stat:vod')">
+    <div v-if="hasPermission('stat:vod')" id="stat-vod-section">
       <stat-vod />
     </div>
   </div>

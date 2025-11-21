@@ -26,6 +26,7 @@ export const useMockStore = defineStore('mock', {
     
     // 元数据
     version: '1.0.0',
+// 班级课程进度配置    classCourseConfigs: [],    // 课程数据    courses: [],
     generatedAt: null
   }),
 
@@ -33,8 +34,14 @@ export const useMockStore = defineStore('mock', {
     // 获取指定班级的学生
     getStudentsByClass: (state) => (classId) => {
       return state.students.filter(s => 
-        s.classes.some(c => c.id === classId)
+        s.classes && s.classes.some(c => c.id === classId)
       )
+    },
+
+    // 根据学生ID获取班级列表（单向引用）
+    getClassesByStudentId: (state) => (studentId) => {
+      const student = state.students.find(s => s.id === studentId)
+      return student && student.classes ? student.classes : []
     },
 
     // 获取指定班级的作业
@@ -101,6 +108,33 @@ export const useMockStore = defineStore('mock', {
           ? (gradedSubmissions.length / submissions.length * 100)
           : 0
       }
+    },
+
+    // 获取课程信息
+    getCourseById: (state) => (courseId) => {
+      return state.courses.find(c => c.id === courseId)
+    },
+
+    // 获取班级课程配置
+    getClassCourseConfig: (state) => (classId, courseId) => {
+      return state.classCourseConfigs.find(
+        config => config.classId === classId && config.courseId === courseId
+      )
+    },
+
+    // 获取班级在某个课程中已解锁的节点ID列表
+    getUnlockedNodeIds: (state) => (classId, courseId) => {
+      const config = state.classCourseConfigs.find(
+        config => config.classId === classId && config.courseId === courseId
+      )
+      return config ? config.unlockedIds : []
+    },
+
+    // 检查特定节点是否对班级开放
+    isNodeUnlocked: (state) => (classId, courseId, nodeId) => {
+      const unlockedIds = state.classCourseConfigs
+        .find(config => config.classId === classId && config.courseId === courseId)?.unlockedIds || []
+      return unlockedIds.includes(nodeId)
     }
   },
 
@@ -303,6 +337,55 @@ export const useMockStore = defineStore('mock', {
       const index = this.submissions.findIndex(sub => sub.id === id)
       if (index > -1) {
         this.submissions.splice(index, 1)
+        this.save()
+      }
+    },
+
+    // ========== 课程操作 ==========
+    
+    addCourse(course) {
+      this.courses.push(course)
+      this.save()
+    },
+
+    updateCourse(id, updates) {
+      const index = this.courses.findIndex(c => c.id === id)
+      if (index > -1) {
+        this.courses[index] = { ...this.courses[index], ...updates }
+        this.save()
+      }
+    },
+
+    deleteCourse(id) {
+      const index = this.courses.findIndex(c => c.id === id)
+      if (index > -1) {
+        this.courses.splice(index, 1)
+        // 同时删除相关配置
+        this.classCourseConfigs = this.classCourseConfigs.filter(config => config.courseId !== id)
+        this.save()
+      }
+    },
+
+    // ========== 班级课程配置操作 ==========
+    
+    updateClassCourseConfig(config) {
+      const index = this.classCourseConfigs.findIndex(
+        c => c.classId === config.classId && c.courseId === config.courseId
+      )
+      if (index > -1) {
+        this.classCourseConfigs[index] = config
+      } else {
+        this.classCourseConfigs.push(config)
+      }
+      this.save()
+    },
+
+    removeClassCourseConfig(classId, courseId) {
+      const index = this.classCourseConfigs.findIndex(
+        c => c.classId === classId && c.courseId === courseId
+      )
+      if (index > -1) {
+        this.classCourseConfigs.splice(index, 1)
         this.save()
       }
     }

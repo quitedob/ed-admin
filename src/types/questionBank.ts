@@ -349,3 +349,52 @@ export interface UserPreferences {
   keyboardNavigation: boolean
   theme: 'light' | 'dark' | 'auto'
 }
+
+// 学生侧题库练习记录结构
+export interface PracticeRecord {
+  id: string              // 记录ID
+  questionId: string      // 题目ID
+  questionTitle: string   // 题目标题（冗余方便前端）
+  type: QuestionType      // 题型
+  source: 'bank' | 'assignment' | 'exam'  // 来源
+  sourceId?: string       // 来源ID（作业ID或考试ID）
+  sourceTitle?: string    // 来源名称（作业名称或考试名称）
+  submitTime: string      // 提交时间
+  correct: boolean        // 是否正确
+  timeSpent?: number      // 耗时（秒）
+  studentAnswer?: string | string[]  // 学生答案
+  difficulty?: Difficulty // 题目难度
+}
+
+// 作业记录结构（移除分数，改为完成度）
+export interface HomeworkRecord {
+  id: string
+  title: string
+  courseId: string
+  courseName: string
+  classId: string
+  className: string
+  dueDate: string
+  submitTime?: string
+  completionRate: number    // 完成度 0~100
+  finishedCount: number     // 已完成题目数
+  totalCount: number        // 总题目数
+  studyDuration?: number    // 学习时长（分钟）
+  status: 'submitted' | 'notSubmitted' | 'graded' | 'overdue'
+}
+
+// 考试记录结构（保留分数）
+export interface ExamRecord {
+  id: string
+  title: string
+  type: 'midterm' | 'final' | 'quiz' | 'mock'
+  courseId: string
+  courseName: string
+  classId: string
+  className: string
+  startTime: string
+  duration: number          // 考试时长（分钟）
+  score: number | null      // 得分
+  maxScore: number          // 满分
+  status: 'notStarted' | 'completed' | 'graded'
+}

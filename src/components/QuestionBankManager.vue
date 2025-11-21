@@ -1,13 +1,14 @@
 <template>
-  <div class="question-bank-manager">
+  <div id="question-bank-manager" class="question-bank-manager">
     <!-- 三级标签筛选器 -->
-    <div class="filter-bar">
+    <div id="filter-bar" class="filter-bar">
       <el-select
         v-model="filter.level1"
         placeholder="一级标签(课程/考点)"
         clearable
         class="filter-select"
         @change="applyFilter"
+        id="level1-filter"
       >
         <el-option
           v-for="tag in level1Tags"
@@ -23,6 +24,7 @@
         clearable
         class="filter-select"
         @change="applyFilter"
+        id="level2-filter"
       >
         <el-option
           v-for="tag in level2Tags"
@@ -38,6 +40,7 @@
         clearable
         class="filter-select"
         @change="applyFilter"
+        id="level3-filter"
       >
         <el-option
           v-for="tag in level3Tags"
@@ -47,32 +50,33 @@
         />
       </el-select>
 
-      <el-button type="primary" @click="applyFilter">筛选</el-button>
-      <el-button @click="clearFilter">清空</el-button>
+      <el-button type="primary" @click="applyFilter" id="apply-filter-btn">筛选</el-button>
+      <el-button @click="clearFilter" id="clear-filter-btn">清空</el-button>
     </div>
 
     <!-- 筛选结果统计 -->
-    <div class="filter-stats">
+    <div id="filter-stats" class="filter-stats">
       <span>共筛选出 <strong>{{ filteredQuestions.length }}</strong> 道题目</span>
     </div>
 
     <!-- 题目列表 -->
-    <div class="question-list">
+    <div id="question-list" class="question-list">
       <div
         v-for="(question, index) in filteredQuestions"
         :key="question.id"
         class="question-card"
+        :id="`question-card-${index}`"
       >
-        <div class="question-header">
-          <span class="question-index">{{ index + 1 }}.</span>
-          <span class="question-content">{{ truncateText(question.content, 100) }}</span>
+        <div class="question-header" :id="`question-header-${index}`">
+          <span class="question-index" :id="`question-index-${index}`">{{ index + 1 }}.</span>
+          <span class="question-content" :id="`question-content-${index}`">{{ truncateText(question.content, 100) }}</span>
         </div>
 
-        <div class="question-tags">
-          <el-tag type="info" size="small" class="tag-item">
+        <div class="question-tags" :id="`question-tags-${index}`">
+          <el-tag type="info" size="small" class="tag-item" :id="`type-tag-${index}`">
             {{ question.type }}
           </el-tag>
-          <el-tag type="warning" size="small" class="tag-item">
+          <el-tag type="warning" size="small" class="tag-item" :id="`difficulty-tag-${index}`">
             {{ question.difficulty }}
           </el-tag>
           <el-tag
@@ -80,28 +84,29 @@
             :key="idx"
             size="small"
             class="tag-item"
+            :id="`knowledge-tag-${index}-${idx}`"
           >
             {{ point }}
           </el-tag>
-          <el-tag v-if="question.knowledgePoints.length > 3" size="small" class="tag-item">
+          <el-tag v-if="question.knowledgePoints.length > 3" size="small" class="tag-item" :id="`more-tags-${index}`">
             +{{ question.knowledgePoints.length - 3 }}
           </el-tag>
         </div>
 
-        <div class="question-actions">
-          <el-button text type="primary" size="small" @click="viewDetail(question)">
+        <div class="question-actions" :id="`question-actions-${index}`">
+          <el-button text type="primary" size="small" @click="viewDetail(question)" :id="`view-detail-btn-${index}`">
             查看详情
           </el-button>
-          <el-button text type="success" size="small" @click="addToHomework(question)">
+          <el-button text type="success" size="small" @click="addToHomework(question)" :id="`add-to-homework-btn-${index}`">
             添加到作业
           </el-button>
-          <el-button text type="warning" size="small" @click="addToExam(question)">
+          <el-button text type="warning" size="small" @click="addToExam(question)" :id="`add-to-exam-btn-${index}`">
             添加到考试
           </el-button>
         </div>
       </div>
 
-      <el-empty v-if="filteredQuestions.length === 0" description="暂无题目" />
+      <el-empty v-if="filteredQuestions.length === 0" description="暂无题目" id="empty-questions" />
     </div>
 
     <!-- 题目详情对话框 -->
@@ -110,16 +115,17 @@
       title="题目详情"
       width="80%"
       append-to-body
+      id="question-detail-dialog"
     >
-      <div v-if="selectedQuestion" class="question-detail">
-        <div class="detail-section">
+      <div v-if="selectedQuestion" id="question-detail" class="question-detail">
+        <div id="content-section" class="detail-section">
           <h4>题目内容</h4>
-          <p>{{ selectedQuestion.content }}</p>
+          <p id="question-content-detail">{{ selectedQuestion.content }}</p>
         </div>
 
-        <div class="detail-section">
+        <div id="info-section" class="detail-section">
           <h4>题目信息</h4>
-          <el-descriptions :column="2" border size="small">
+          <el-descriptions :column="2" border size="small" id="question-info-descriptions">
             <el-descriptions-item label="题型">{{ selectedQuestion.type }}</el-descriptions-item>
             <el-descriptions-item label="难度">{{ selectedQuestion.difficulty }}</el-descriptions-item>
             <el-descriptions-item label="分值">{{ selectedQuestion.score }}分</el-descriptions-item>
@@ -129,6 +135,7 @@
                 :key="point"
                 size="small"
                 style="margin-right: 5px;"
+                :id="`detail-knowledge-tag-${point}`"
               >
                 {{ point }}
               </el-tag>
@@ -136,14 +143,14 @@
           </el-descriptions>
         </div>
 
-        <div v-if="selectedQuestion.answer" class="detail-section">
+        <div v-if="selectedQuestion.answer" id="answer-section" class="detail-section">
           <h4>参考答案</h4>
-          <p>{{ selectedQuestion.answer }}</p>
+          <p id="reference-answer">{{ selectedQuestion.answer }}</p>
         </div>
 
-        <div v-if="selectedQuestion.explanation" class="detail-section">
+        <div v-if="selectedQuestion.explanation" id="explanation-section" class="detail-section">
           <h4>题目解析</h4>
-          <p>{{ selectedQuestion.explanation }}</p>
+          <p id="question-explanation">{{ selectedQuestion.explanation }}</p>
         </div>
       </div>
     </el-dialog>

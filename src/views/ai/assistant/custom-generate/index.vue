@@ -1,6 +1,6 @@
 <template>
-  <div class="custom-generate-container">
-    <div class="page-header">
+  <div id="custom-generate-container" class="custom-generate-container">
+    <div id="page-header" class="page-header">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/ai/assistant' }">智能作业生成</el-breadcrumb-item>
         <el-breadcrumb-item>自定义生成</el-breadcrumb-item>
@@ -9,14 +9,14 @@
       <p>根据您的具体要求，自定义题目类型、数量、难度等参数生成试卷</p>
     </div>
 
-    <div class="content-wrapper">
+    <div id="content-wrapper" class="content-wrapper">
       <el-row :gutter="20">
         <!-- 左侧配置区域 -->
         <el-col :span="16">
           <!-- 基础信息 -->
-          <el-card class="config-card">
+          <el-card id="basic-info-card" class="config-card">
             <template #header>
-              <div class="card-header">
+              <div id="basic-info-header" class="card-header">
                 <span>基础信息</span>
                 <el-button type="primary" size="small" @click="useTemplate">
                   <el-icon><DocumentCopy /></el-icon>
@@ -116,11 +116,11 @@
           </el-card>
 
           <!-- 题目配置 -->
-          <el-card class="config-card">
+          <el-card id="question-config-card" class="config-card">
             <template #header>
-              <div class="card-header">
+              <div id="question-config-header" class="card-header">
                 <span>题目配置</span>
-                <div class="header-actions">
+                <div id="question-config-actions" class="header-actions">
                   <el-button type="text" size="small" @click="autoBalance">自动平衡</el-button>
                   <el-button type="text" size="small" @click="resetQuestions">重置</el-button>
                 </div>
@@ -162,15 +162,16 @@
           </el-card>
 
           <!-- 知识点配置 -->
-          <el-card class="config-card">
+          <el-card id="knowledge-config-card" class="config-card">
             <template #header>
               <span>知识点权重配置</span>
             </template>
 
-            <div class="knowledge-points">
+            <div id="knowledge-points" class="knowledge-points">
               <div
                 v-for="point in knowledgePoints"
                 :key="point.id"
+                :id="`point-item-${point.id}`"
                 class="point-item"
               >
                 <span class="point-name">{{ point.name }}</span>
@@ -187,7 +188,7 @@
           </el-card>
 
           <!-- 高级选项 -->
-          <el-card class="config-card">
+          <el-card id="advanced-options-card" class="config-card">
             <template #header>
               <span>高级选项</span>
             </template>
@@ -195,7 +196,7 @@
             <el-form :model="config" label-width="100px">
               <el-form-item label="选项">
                 <el-checkbox-group v-model="config.options">
-                  <div v-for="option in advancedOptions" :key="option.value" class="option-item">
+                  <div v-for="option in advancedOptions" :key="option.value" :id="`option-item-${option.value}`" class="option-item">
                     <el-checkbox :label="option.value">
                       {{ option.label }}
                     </el-checkbox>
@@ -214,7 +215,7 @@
           </el-card>
 
           <!-- 操作按钮 -->
-          <div class="action-buttons">
+          <div id="action-buttons" class="action-buttons">
             <el-button @click="resetAll">重置全部</el-button>
             <el-button @click="previewConfig">预览配置</el-button>
             <el-button type="primary" @click="generatePaper" :loading="generating">
@@ -226,12 +227,12 @@
 
         <!-- 右侧预览区域 -->
         <el-col :span="8">
-          <el-card class="preview-card">
+          <el-card id="preview-card" class="preview-card">
             <template #header>
               <span>配置预览</span>
             </template>
 
-            <div class="preview-content">
+            <div id="preview-content" class="preview-content">
               <div class="preview-item">
                 <span class="label">标题:</span>
                 <span class="value">{{ config.title || '未设置' }}</span>
@@ -285,12 +286,12 @@
           </el-card>
 
           <!-- 生成结果 -->
-          <el-card v-if="generatedPaper" class="result-card">
+          <el-card v-if="generatedPaper" id="result-card" class="result-card">
             <template #header>
               <span>生成结果</span>
             </template>
 
-            <div class="result-content">
+            <div id="result-content" class="result-content">
               <el-alert
                 title="生成成功"
                 type="success"
@@ -316,7 +317,7 @@
     </div>
 
     <!-- 预览对话框 -->
-    <el-dialog v-model="previewDialogVisible" title="配置预览" width="600px">
+    <el-dialog id="preview-dialog" v-model="previewDialogVisible" title="配置预览" width="600px">
       <JsonPreview :data="config" />
       <template #footer>
         <el-button @click="previewDialogVisible = false">关闭</el-button>

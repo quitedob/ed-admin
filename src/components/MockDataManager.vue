@@ -1,17 +1,17 @@
 <template>
-  <div class="mock-data-manager">
-    <el-card>
+  <div class="mock-data-manager" id="mock-data-manager">
+    <el-card id="mock-data-card">
       <template #header>
-        <div class="card-header">
+        <div class="card-header" id="mock-data-header">
           <span>模拟数据管理</span>
-          <el-tag :type="initialized ? 'success' : 'info'">
+          <el-tag :type="initialized ? 'success' : 'info'" id="init-status-tag">
             {{ initialized ? '已初始化' : '未初始化' }}
           </el-tag>
         </div>
       </template>
 
       <!-- 统计信息 -->
-      <el-descriptions :column="3" border>
+      <el-descriptions :column="3" border id="statistics-descriptions">
         <el-descriptions-item label="题库数量">
           {{ statistics.totalQuestionBanks }}
         </el-descriptions-item>
@@ -34,8 +34,8 @@
 
       <!-- 存储信息 -->
       <el-divider />
-      <div v-if="storageInfo" class="storage-info">
-        <el-descriptions :column="2" border>
+      <div v-if="storageInfo" class="storage-info" id="storage-info">
+        <el-descriptions :column="2" border id="storage-descriptions">
           <el-descriptions-item label="存储状态">
             <el-tag :type="storageInfo.exists ? 'success' : 'warning'">
               {{ storageInfo.exists ? '已存储' : '未存储' }}

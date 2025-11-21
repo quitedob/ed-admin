@@ -51,23 +51,51 @@
           </div>
         </div>
 
-        <!-- 标签筛选 -->
-        <div class="tag-filter">
-          <span class="filter-label">标签筛选:</span>
-          <el-select
-            v-model="selectedTags"
-            placeholder="选择标签"
-            multiple
+        <!-- 搜索和标签筛选 -->
+        <div class="search-filter-section">
+          <!-- 搜索框 -->
+          <el-input
+            v-model="searchText"
+            placeholder="搜索题目内容、解析或标签..."
             clearable
             style="width: 300px"
           >
-            <el-option
-              v-for="tag in allTags"
-              :key="tag.id"
-              :label="tag.name"
-              :value="tag.id"
-            />
-          </el-select>
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+
+          <!-- 标签筛选 -->
+          <div class="tag-filter-wrapper">
+            <div class="filter-label">标签筛选：</div>
+            <el-select
+              v-model="selectedTags"
+              multiple
+              filterable
+              allow-create
+              default-first-option
+              placeholder="选择或创建标签（最多5个）"
+              style="width: 400px"
+              :max-collapse-tags="3"
+              collapse-tags
+              collapse-tags-tooltip
+              clearable
+              @change="handleTagChange"
+            >
+              <el-option
+                v-for="tag in availableTags"
+                :key="tag.name"
+                :label="tag.name"
+                :value="tag.name"
+                :disabled="selectedTags.length >= 5 && !selectedTags.includes(tag.name)"
+              >
+                <span :style="{ color: tag.color, fontWeight: 500 }">{{ tag.name }}</span>
+              </el-option>
+            </el-select>
+            <span v-if="selectedTags.length > 0" class="tag-count-hint">
+              已选 {{ selectedTags.length }}/5
+            </span>
+          </div>
         </div>
       </div>
 
@@ -88,13 +116,13 @@
               <div class="tag-container">
                 <el-tag
                   v-for="tag in (row.tags || [])"
-                  :key="tag"
+                  :key="typeof tag === 'string' ? tag : tag.name"
                   size="small"
-                  type="primary"
+                  :color="getTagColor(typeof tag === 'string' ? tag : tag.name)"
                   effect="light"
-                  style="margin: 2px;"
+                  style="margin: 2px; border: none; color: white;"
                 >
-                  {{ tag }}
+                  {{ typeof tag === 'string' ? tag : tag.name }}
                 </el-tag>
                 <span v-if="!row.tags || row.tags.length === 0" class="no-tags">
                   暂无标签
@@ -109,7 +137,6 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="score" label="分值" width="80" />
           <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
               <el-button link type="primary" size="small" @click="handleEditQuestion(row)">
@@ -146,13 +173,12 @@
 </template>
 
 <script setup name="QuestionBank">
-import { ref, computed, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Upload, Setting } from '@element-plus/icons-vue'
-import V2QuestionEditDialog from '@/components/V2QuestionEditDialog.vue'
-import QuestionManagementDrawer from './components/QuestionManagementDrawer.vue'
-import TagManagerDrawer from './components/TagManagerDrawer.vue'
-
+import { ref, computed, onMounted } from "vue"
+import { ElMessage, ElMessageBox } from "element-plus"
+import { Plus, Upload, Setting, Search } from "@element-plus/icons-vue"
+import V2QuestionEditDialog from "@/components/V2QuestionEditDialog.vue"
+import QuestionManagementDrawer from "./components/QuestionManagementDrawer.vue"
+import TagManagerDrawer from "./components/TagManagerDrawer.vue"
 // 题型定义
 const questionTypes = [
   { label: '全部', value: 'all' },
@@ -167,20 +193,76 @@ const questionTypes = [
 // 响应式数据
 const selectedType = ref('all')
 const selectedTags = ref([])
+const searchText = ref('')
 const questionDialogVisible = ref(false)
 const questionDrawerVisible = ref(false)
 const tagManagerDrawerVisible = ref(false)
 const currentQuestion = ref(null)
 const uploadRef = ref()
 
-// 标签数据
-const allTags = ref([
-  { id: 'tag_1', name: '面向对象', categoryId: 'cat_1', usageCount: 15 },
-  { id: 'tag_2', name: 'Java基础', categoryId: 'cat_1', usageCount: 8 },
-  { id: 'tag_3', name: '数据结构', categoryId: 'cat_2', usageCount: 0 },
-  { id: 'tag_4', name: '算法', categoryId: 'cat_2', usageCount: 5 },
-  { id: 'tag_5', name: '基础概念', categoryId: 'cat_3', usageCount: 12 }
+// 标签颜色池
+const tagColors = [
+  '#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399',
+  '#00d2d3', '#fa6400', '#722ed1', '#eb2f96', '#52c41a',
+  '#1890ff', '#faad14', '#f5222d', '#13c2c2', '#2f54eb'
+]
+
+// 可用标签列表（扁平结构，每个标签只有名称和颜色）
+const availableTags = ref([
+  { name: '面向对象', color: '#409eff' },
+  { name: '封装继承多态', color: '#67c23a' },
+  { name: 'Java集合', color: '#e6a23c' },
+  { name: '异常处理', color: '#f56c6c' },
+  { name: '数组操作', color: '#909399' },
+  { name: '二分查找', color: '#00d2d3' },
+  { name: '单例模式', color: '#fa6400' },
+  { name: '矩阵运算', color: '#722ed1' },
+  { name: '概率计算', color: '#eb2f96' },
+  { name: '词汇辨析', color: '#52c41a' },
+  { name: '时态用法', color: '#1890ff' },
+  { name: '二叉树遍历', color: '#faad14' },
+  { name: '快速排序', color: '#f5222d' },
+  { name: '动态规划', color: '#13c2c2' },
+  { name: '贪心算法', color: '#2f54eb' },
+  { name: '图论', color: '#409eff' },
+  { name: '字符串处理', color: '#67c23a' },
+  { name: '递归', color: '#e6a23c' },
+  { name: '栈和队列', color: '#f56c6c' },
+  { name: '哈希表', color: '#909399' }
 ])
+
+// 自动分配标签颜色
+const getAutoTagColor = () => {
+  const usedColors = availableTags.value.map(t => t.color)
+  const availableColors = tagColors.filter(c => !usedColors.includes(c))
+  if (availableColors.length > 0) {
+    return availableColors[0]
+  }
+  // 如果所有颜色都用完了，随机返回一个
+  return tagColors[Math.floor(Math.random() * tagColors.length)]
+}
+
+// 添加或获取标签（自动查重）
+const addOrGetTag = (tagName) => {
+  if (!tagName || !tagName.trim()) return null
+  
+  const trimmedName = tagName.trim()
+  
+  // 查找是否已存在
+  const existingTag = availableTags.value.find(t => t.name === trimmedName)
+  if (existingTag) {
+    return existingTag.name
+  }
+  
+  // 不存在则新建
+  const newTag = {
+    name: trimmedName,
+    color: getAutoTagColor()
+  }
+  availableTags.value.push(newTag)
+  ElMessage.success(`已创建新标签: ${trimmedName}`)
+  return newTag.name
+}
 
 // 题库数据
 const questionBank = ref({
@@ -202,11 +284,24 @@ const filteredQuestions = computed(() => {
   // 按标签过滤
   if (selectedTags.value.length > 0) {
     result = result.filter(q => {
-      if (!q.tags) return false
-      return selectedTags.value.some(tagId => {
-        const tag = allTags.value.find(t => t.id === tagId)
-        return tag && q.tags.includes(tag.name)
+      if (!q.tags || !Array.isArray(q.tags)) return false
+      return selectedTags.value.some(selectedTag => {
+        return q.tags.some(qTag => {
+          // 兼容字符串和对象格式
+          const tagName = typeof qTag === 'string' ? qTag : qTag.name
+          return tagName === selectedTag
+        })
       })
+    })
+  }
+
+  // 按搜索文本过滤
+  if (searchText.value.trim()) {
+    const keyword = searchText.value.toLowerCase()
+    result = result.filter(q => {
+      return q.questionText?.toLowerCase().includes(keyword) ||
+             q.explanation?.toLowerCase().includes(keyword) ||
+             q.tags?.some(tag => tag.toLowerCase().includes(keyword))
     })
   }
 
@@ -221,8 +316,7 @@ const initMockData = () => {
       type: 'single',
       questionText: '以下哪个不是面向对象编程的特性？',
       difficulty: 'easy',
-      score: 2,
-      tags: ['面向对象', '基础概念', 'Java'],
+      tags: ['面向对象', '封装继承多态'],
       options: [
         { value: 'A', text: '封装', isCorrect: false },
         { value: 'B', text: '继承', isCorrect: false },
@@ -237,8 +331,7 @@ const initMockData = () => {
       type: 'multiple',
       questionText: '以下哪些是Java的基本数据类型？',
       difficulty: 'easy',
-      score: 3,
-      tags: ['Java基础', '数据类型'],
+      tags: ['Java集合', '异常处理'],
       options: [
         { value: 'A', text: 'int', isCorrect: true },
         { value: 'B', text: 'String', isCorrect: false },
@@ -253,8 +346,7 @@ const initMockData = () => {
       type: 'fill',
       questionText: 'Java中，___是所有类的父类，___方法用于比较两个对象是否相等。',
       difficulty: 'medium',
-      score: 4,
-      tags: ['Java基础', '面向对象', '填空题'],
+      tags: ['Java集合', '面向对象'],
       fillBlanks: [
         { answers: ['Object'] },
         { answers: ['equals'] }
@@ -266,8 +358,7 @@ const initMockData = () => {
       type: 'judge',
       questionText: 'Java中，接口可以包含方法的实现。',
       difficulty: 'medium',
-      score: 2,
-      tags: ['Java', '接口', '判断题'],
+      tags: ['Java集合', '异常处理'],
       correctAnswer: true,
       explanation: 'Java 8之后，接口可以包含默认方法和静态方法的实现'
     },
@@ -276,8 +367,7 @@ const initMockData = () => {
       type: 'programming',
       questionText: '实现一个函数，判断一个字符串是否为回文串',
       difficulty: 'medium',
-      score: 10,
-      tags: ['算法', '字符串', '双指针', '编程题'],
+      tags: ['数组操作', '二分查找'],
       hojProblemId: '1001',
       timeLimit: 1000,
       memoryLimit: 256,
@@ -290,12 +380,95 @@ const initMockData = () => {
       type: 'essay',
       questionText: '请简述MVC设计模式的核心思想及其优点。',
       difficulty: 'hard',
-      score: 10,
-      tags: ['设计模式', '架构', '简答题'],
+      tags: ['单例模式'],
       referenceAnswer: 'MVC将应用分为Model（模型）、View（视图）、Controller（控制器）三层。优点包括：1.分离关注点 2.提高代码复用性 3.便于维护和测试',
       gradingCriteria: '需要说明三层的作用，至少列举两个优点',
       aiGrading: false,
       explanation: 'MVC是一种经典的软件架构模式'
+    },
+    {
+      id: 'q_007',
+      type: 'single',
+      questionText: '下列哪个矩阵是可逆的？',
+      difficulty: 'medium',
+      score: 3,
+      tags: ['矩阵运算'],
+      options: [
+        { value: 'A', text: '[1 2; 2 4]', isCorrect: false },
+        { value: 'B', text: '[1 0; 0 1]', isCorrect: true },
+        { value: 'C', text: '[0 0; 0 0]', isCorrect: false },
+        { value: 'D', text: '[1 1; 1 1]', isCorrect: false }
+      ],
+      correctAnswer: 'B',
+      explanation: '单位矩阵总是可逆的，其逆矩阵就是它本身'
+    },
+    {
+      id: 'q_008',
+      type: 'fill',
+      questionText: '设随机变量X服从正态分布N(2, 9)，则P(X≤5) = ___（保留三位小数）',
+      difficulty: 'hard',
+      score: 5,
+      tags: ['概率计算'],
+      fillBlanks: [
+        { answers: ['0.841', '0.8413'] }
+      ],
+      explanation: '标准化：Z = (5-2)/3 = 1，查标准正态分布表得P(Z≤1) ≈ 0.8413'
+    },
+    {
+      id: 'q_009',
+      type: 'multiple',
+      questionText: '下列哪些单词的过去式与原形相同？',
+      difficulty: 'easy',
+      score: 2,
+      tags: ['词汇辨析'],
+      options: [
+        { value: 'A', text: 'put', isCorrect: true },
+        { value: 'B', text: 'go', isCorrect: false },
+        { value: 'C', text: 'cut', isCorrect: true },
+        { value: 'D', text: 'run', isCorrect: false }
+      ],
+      correctAnswer: ['A', 'C'],
+      explanation: 'put-put-put, cut-cut-cut 是不规则动词，过去式与原形相同'
+    },
+    {
+      id: 'q_010',
+      type: 'judge',
+      questionText: '现在完成时可以表示从过去开始持续到现在的动作。',
+      difficulty: 'medium',
+      score: 2,
+      tags: ['时态用法'],
+      correctAnswer: true,
+      explanation: '现在完成时的主要用法之一就是表示从过去开始持续到现在的动作或状态'
+    },
+    {
+      id: 'q_011',
+      type: 'programming',
+      questionText: '实现二叉树的中序遍历',
+      difficulty: 'medium',
+      score: 8,
+      tags: ['二叉树遍历'],
+      hojProblemId: '1002',
+      timeLimit: 1000,
+      memoryLimit: 256,
+      required: true,
+      multipleSubmit: true,
+      explanation: '中序遍历按照左子树-根节点-右子树的顺序遍历二叉树'
+    },
+    {
+      id: 'q_012',
+      type: 'single',
+      questionText: '快速排序的平均时间复杂度是？',
+      difficulty: 'easy',
+      score: 2,
+      tags: ['快速排序'],
+      options: [
+        { value: 'A', text: 'O(n)', isCorrect: false },
+        { value: 'B', text: 'O(n log n)', isCorrect: true },
+        { value: 'C', text: 'O(n²)', isCorrect: false },
+        { value: 'D', text: 'O(log n)', isCorrect: false }
+      ],
+      correctAnswer: 'B',
+      explanation: '快速排序的平均时间复杂度是O(n log n)，最坏情况下是O(n²)'
     }
   ]
   questionBank.value.totalQuestions = questionBank.value.questions.length
@@ -436,6 +609,29 @@ const getDifficultyTagType = (difficulty) => {
   return map[difficulty] || ''
 }
 
+
+
+// 处理标签变化（自动创建新标签）
+const handleTagChange = (values) => {
+  // 处理新创建的标签
+  const processedTags = values.map(value => {
+    const existingTag = availableTags.value.find(t => t.name === value)
+    if (!existingTag) {
+      // 新标签，自动创建
+      return addOrGetTag(value)
+    }
+    return value
+  }).filter(Boolean)
+  
+  selectedTags.value = processedTags
+}
+
+// 获取标签颜色
+const getTagColor = (tagName) => {
+  const tag = availableTags.value.find(t => t.name === tagName)
+  return tag ? tag.color : '#909399'
+}
+
 onMounted(() => {
   initMockData()
 })
@@ -541,15 +737,32 @@ onMounted(() => {
   }
 }
 
-.tag-filter {
+.search-filter-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 4px;
 
-  .filter-label {
-    font-size: 14px;
-    color: #606266;
-    font-weight: 500;
+  .tag-filter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+
+    .filter-label {
+      font-size: 14px;
+      color: #606266;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .tag-count-hint {
+      font-size: 12px;
+      color: #909399;
+      white-space: nowrap;
+    }
   }
 }
 

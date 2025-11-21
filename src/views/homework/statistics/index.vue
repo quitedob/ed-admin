@@ -1,20 +1,20 @@
 <template>
-  <div class="homework-statistics-container">
+  <div class="homework-statistics-container" id="homework-statistics-container">
     <!-- 顶部导航 -->
-    <div class="top-bar">
-      <div class="title-section">
-        <el-button link @click="handleBack">
+    <div class="top-bar" id="top-bar">
+      <div class="title-section" id="title-section">
+        <el-button link @click="handleBack" id="back-btn">
           <el-icon><ArrowLeft /></el-icon>
           返回
         </el-button>
-        <span class="page-title">作业分析 > {{ homework?.title }}</span>
+        <span class="page-title" id="page-title">作业分析 > {{ homework?.title }}</span>
       </div>
-      <div class="action-buttons">
-        <el-button @click="handleExport">
+      <div class="action-buttons" id="action-buttons">
+        <el-button @click="handleExport" id="export-btn">
           <el-icon><Download /></el-icon>
           导出报告
         </el-button>
-        <el-button type="primary" @click="handleRefresh">
+        <el-button type="primary" @click="handleRefresh" id="refresh-btn">
           <el-icon><Refresh /></el-icon>
           刷新数据
         </el-button>
@@ -22,11 +22,11 @@
     </div>
 
     <!-- 主内容区 -->
-    <div class="main-content">
+    <div class="main-content" id="main-content">
       <!-- 总体统计卡片 -->
-      <el-row :gutter="20" class="stats-cards">
-        <el-col :span="6">
-          <div class="stat-card">
+      <el-row :gutter="20" class="stats-cards" id="stats-cards-row">
+        <el-col :span="6" id="total-students-card-col">
+          <div class="stat-card" id="total-students-card">
             <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
               <el-icon><User /></el-icon>
             </div>

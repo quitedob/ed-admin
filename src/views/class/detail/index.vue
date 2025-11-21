@@ -1,15 +1,15 @@
 <template>
-  <div class="class-detail-container">
+  <div id="class-detail-container" class="class-detail-container">
     <!-- 顶部导航 -->
-    <div class="top-bar">
-      <div class="title-section">
+    <div id="top-bar" class="top-bar">
+      <div id="title-section" class="title-section">
         <el-button link @click="handleBack">
           <el-icon><ArrowLeft /></el-icon>
           返回
         </el-button>
         <span class="page-title">班级详情 > {{ classInfo?.name }}</span>
       </div>
-      <div class="action-buttons">
+      <div id="action-buttons" class="action-buttons">
         <el-button @click="handleEdit">
           <el-icon><Edit /></el-icon>
           编辑班级
@@ -18,12 +18,12 @@
     </div>
 
     <!-- 标签页 -->
-    <div class="main-content">
-      <el-tabs v-model="activeTab" class="detail-tabs">
+    <div id="main-content" class="main-content">
+      <el-tabs v-model="activeTab" id="detail-tabs" class="detail-tabs">
         <!-- 基本信息标签页 -->
         <el-tab-pane label="基本信息" name="info">
-          <el-card shadow="never">
-            <el-descriptions :column="2" border>
+          <el-card shadow="never" id="basic-info-card">
+            <el-descriptions :column="2" border id="basic-info-descriptions">
               <el-descriptions-item label="班级名称">
                 {{ classInfo?.name }}
               </el-descriptions-item>
@@ -62,10 +62,10 @@
 
         <!-- 学生管理标签页 -->
         <el-tab-pane label="学生管理" name="students">
-          <el-card shadow="never">
+          <el-card shadow="never" id="student-management-card">
             <!-- 工具栏 -->
-            <div class="toolbar">
-              <div class="toolbar-left">
+            <div id="student-toolbar" class="toolbar">
+              <div id="student-toolbar-left" class="toolbar-left">
                 <el-button type="primary" @click="handleAddStudent">
                   <el-icon><Plus /></el-icon>
                   添加学生
@@ -87,7 +87,7 @@
                   批量删除
                 </el-button>
               </div>
-              <div class="toolbar-right">
+              <div id="student-toolbar-right" class="toolbar-right">
                 <el-input
                   v-model="studentSearch"
                   placeholder="搜索学生..."
@@ -114,6 +114,7 @@
               style="margin-top: 16px"
               stripe
               :empty-text="filteredStudents.length === 0 ? '暂无学生数据' : '暂无数据'"
+              id="student-table"
             >
               <el-table-column type="selection" width="55" />
               <el-table-column type="index" label="序号" width="60" :index="getTableIndex" />
@@ -129,7 +130,7 @@
                   </el-link>
                 </template>
               </el-table-column>
-              <el-table-column prop="phone" label="手机号" width="150" />
+              <el-table-column prop="phone" label="手机号" width="220" />
               <el-table-column prop="email" label="邮箱" min-width="180" show-overflow-tooltip />
               <el-table-column label="加入时间" width="180">
                 <template #default="{ row }">
@@ -148,6 +149,7 @@
                   <el-button link type="primary" size="small" @click="handleViewStudent(row)">
                     <el-icon><View /></el-icon>
                     查看
+<el-button link type="success" size="small" @click="handleManagePacing(row)">                    进度管理                  </el-button>
                   </el-button>
                   <el-button link type="primary" size="small" @click="handleEditStudent(row)">
                     <el-icon><Edit /></el-icon>
@@ -162,7 +164,7 @@
             </el-table>
 
             <!-- 分页 -->
-            <div class="pagination">
+            <div id="student-pagination" class="pagination">
               <el-pagination
                 v-model:current-page="studentPage"
                 v-model:page-size="studentPageSize"
@@ -176,9 +178,9 @@
 
         <!-- 课程绑定标签页 -->
         <el-tab-pane label="课程绑定" name="courses">
-          <el-card shadow="never">
+          <el-card shadow="never" id="course-binding-card">
             <!-- 工具栏 -->
-            <div class="toolbar">
+            <div id="course-toolbar" class="toolbar">
               <el-button type="primary" @click="handleAddCourse">
                 <el-icon><Plus /></el-icon>
                 添加课程
@@ -186,7 +188,7 @@
             </div>
 
             <!-- 课程列表 -->
-            <el-table :data="classCourses" style="margin-top: 16px">
+            <el-table :data="classCourses" style="margin-top: 16px" id="course-table">
               <el-table-column prop="name" label="课程名称" min-width="200" />
               <el-table-column prop="teacherName" label="授课教师" width="120" />
               <el-table-column prop="assignedTime" label="绑定时间" width="180">
@@ -201,10 +203,11 @@
                   </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" width="150" fixed="right">
+              <el-table-column label="操作" width="220" fixed="right">
                 <template #default="{ row }">
                   <el-button link type="primary" size="small" @click="handleViewCourse(row)">
                     查看
+<el-button link type="success" size="small" @click="handleManagePacing(row)">                    进度管理                  </el-button>
                   </el-button>
                   <el-button link type="danger" size="small" @click="handleUnbindCourse(row)">
                     解绑
@@ -226,6 +229,7 @@
 
     <!-- 添加课程对话框 -->
     <CourseBindDialog
+    <CoursePacingDialog      v-model="pacingDialogVisible"      :class-id="classId"      :course-id="currentCourse?.id"      :course-name="currentCourse?.name"      @saved="handlePacingSaved"    />
       v-model="courseDialogVisible"
       :class-id="classId"
       @bind="handleBindCourse"
@@ -250,6 +254,8 @@ import {
 import { useMockStore } from '@/stores/mockStore'
 import StudentDialog from './components/StudentDialog.vue'
 import CourseBindDialog from './components/CourseBindDialog.vue'
+    <CoursePacingDialog      v-model="pacingDialogVisible"      :class-id="classId"      :course-id="currentCourse?.id"      :course-name="currentCourse?.name"      @saved="handlePacingSaved"    />
+import CoursePacingDialog from './components/CoursePacingDialog.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -264,6 +270,7 @@ const studentPageSize = ref(10)
 const selectedStudents = ref([])
 const studentDialogVisible = ref(false)
 const courseDialogVisible = ref(false)
+const pacingDialogVisible = ref(false)const currentCourse = ref(null)
 const currentStudent = ref(null)
 
 const classInfo = ref(null)
@@ -493,6 +500,7 @@ const handleBindCourse = (courseData) => {
   classInfo.value.courseCount++
   ElMessage.success('课程绑定成功')
   courseDialogVisible.value = false
+const handleManagePacing = (course) => {  currentCourse.value = course  pacingDialogVisible.value = true}const handlePacingSaved = (config) => {  console.log('课程进度配置已保存:', config)  ElMessage.success('课程进度权限已更新')}
 }
 
 const getGradeLabel = (grade) => {

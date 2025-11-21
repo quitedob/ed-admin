@@ -201,7 +201,7 @@ export function createNewRouter(data) {
     { path: '/class', redirect: '/class/management' },
     { path: '/homework', redirect: '/homework/list' },
     { path: '/exam', redirect: '/exam/list' },
-    { path: '/assignments', redirect: '/assignments/v2-list' },
+    { path: '/assignments', redirect: '/assignments/list' },
     { path: '/question-bank', redirect: '/question-bank' }
   ]
 
@@ -400,12 +400,12 @@ export function createNewRouter(data) {
     {
       path: '/assignments',
       component: Layout,
-      redirect: '/assignments/v2-list',
+      redirect: '/assignments/list',
       children: [
         {
-          path: 'v2-list',
-          name: 'V2AssignmentList',
-          component: () => import('@/views/assignments/v2-list.vue'),
+          path: 'list',
+          name: 'AssignmentList',
+          component: () => import('@/views/assignments/index.vue'),
           meta: { title: '作业管理' }
         }
       ]
@@ -438,6 +438,24 @@ export function createNewRouter(data) {
         name: 'UserDetail',
         component: () => import('@/views/users/detail/index.vue'),
         meta: { title: '用户详情' }
+      },
+      {
+        path: 'detail/:id/homework',
+        name: 'UserHomeworkRecords',
+        component: () => import('@/views/users/detail/homework.vue'),
+        meta: { title: '作业记录' }
+      },
+      {
+        path: 'detail/:id/exam',
+        name: 'UserExamRecords',
+        component: () => import('@/views/users/detail/exam.vue'),
+        meta: { title: '考试记录' }
+      },
+      {
+        path: 'detail/:id/practice',
+        name: 'UserPracticeRecords',
+        component: () => import('@/views/users/detail/practice.vue'),
+        meta: { title: '题库记录' }
       }
     ]
   })

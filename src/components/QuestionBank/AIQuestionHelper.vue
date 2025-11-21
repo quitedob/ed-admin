@@ -1,18 +1,19 @@
 <template>
-  <div class="ai-question-helper">
+  <div id="ai-question-helper" class="ai-question-helper">
     <!-- AI助手抽屉 -->
     <el-drawer
+      id="ai-drawer"
       v-model="drawerVisible"
       title="AI出题助手"
       size="50%"
       direction="rtl"
       :destroy-on-close="true"
     >
-      <div class="ai-helper-content">
+      <div id="ai-helper-content" class="ai-helper-content">
         <!-- 快速操作区 -->
-        <div class="quick-actions">
+        <div id="quick-actions" class="quick-actions">
           <h4>快速操作</h4>
-          <div class="action-buttons">
+          <div id="action-buttons" class="action-buttons">
             <el-button type="primary" @click="generateFromText">
               <el-icon><Document /></el-icon>
               从文本生成题目

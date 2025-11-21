@@ -1,15 +1,16 @@
 <template>
-  <div class="my-courses-container">
-    <div class="page-header">
+  <div class="my-courses-container" id="student-my-courses-container">
+    <div class="page-header" id="student-my-courses-header">
       <h2>我的课程</h2>
       <p>您已授权学习的课程列表</p>
     </div>
 
-    <div class="courses-grid">
+    <div class="courses-grid" id="student-my-courses-grid">
       <div
         v-for="course in coursesList"
         :key="course.id"
         class="course-card"
+        :id="`student-course-card-${course.id}`"
         @click="goToCourseDetail(course)"
       >
         <div class="course-image">
@@ -35,7 +36,7 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-if="coursesList.length === 0" class="empty-state">
+    <div v-if="coursesList.length === 0" class="empty-state" id="student-my-courses-empty">
       <el-empty description="暂无授权课程，请联系管理员获取课程权限">
         <template #image>
           <svg-icon name="course" />

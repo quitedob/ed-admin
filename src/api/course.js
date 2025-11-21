@@ -274,5 +274,25 @@ export const courseApi = {
    */
   resourceLibraryPreview: (data) => {
     return getRequest('/course/admin/resource/preview?id=' + data.id)
+  },
+
+  // 获取课程授权的班级列表
+  getAuthorizedClasses: (courseId) => {
+    return getRequest('/course/admin/course/authorized/classes?courseId=' + courseId)
+  },
+
+  // 获取班级的课次开放配置
+  getClassChapterPeriodConfig: (data) => {
+    return postRequest('/course/admin/course/class/chapter/period/config', data)
+  },
+
+  // 保存班级的课次开放配置
+  saveClassChapterPeriodConfig: (data) => {
+    return postRequest('/course/admin/course/class/chapter/period/config/save', data)
+  },
+
+  // 批量更新班级课次开放状态
+  batchUpdateClassChapterPeriodStatus: (data) => {
+    return putRequest('/course/admin/course/class/chapter/period/status/batch', data)
   }
 }

@@ -353,14 +353,6 @@ const handleSaveHomework = (data) => {
   homeworkDialogVisible.value = false
 }
 
-const handleAddQuestionsToHomework = (questions) => {
-  if (currentHomework.value) {
-    const totalScore = questions.reduce((sum, q) => sum + q.score, 0)
-    currentHomework.value.questionCount = (currentHomework.value.questionCount || 0) + questions.length
-    ElMessage.success(`已添加 ${questions.length} 道题目，总分值 ${totalScore} 分`)
-  }
-  questionDrawerVisible.value = false
-}
 
 const handleImport = () => {
   ElMessage.info('导入功能开发中...')

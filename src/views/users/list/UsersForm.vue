@@ -10,6 +10,40 @@
       <el-form-item class="form-group" label="出生日期" prop="userAge">
         <el-date-picker v-model="formModel.userAge" value-format="YYYY-MM-DD" format="YYYY-MM-DD" type="date" placeholder="请选择出生日期" />
       </el-form-item>
+      <el-form-item label="学生状态" prop="status">
+        <el-select v-model="formModel.status" placeholder="请选择学生状态" style="width: 100%">
+          <el-option label="新生" value="new">
+            <span style="color: #606266">新生</span>
+          </el-option>
+          <el-option label="在读" value="studying">
+            <span style="color: #67c23a; font-weight: 500">在读</span>
+          </el-option>
+          <el-option label="停课" value="suspended">
+            <span style="color: #e6a23c; font-weight: 500">停课</span>
+          </el-option>
+          <el-option label="封存" value="archived">
+            <span style="color: #909399">封存</span>
+          </el-option>
+          <el-option label="结课" value="finished">
+            <span style="color: #e6a23c; font-weight: 500">结课</span>
+          </el-option>
+          <el-option label="退费" value="refunded">
+            <span style="color: #f56c6c; font-weight: 500">退费</span>
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="账号状态" prop="isDisabled">
+        <el-switch
+          v-model="formModel.isDisabled"
+          :active-value="false"
+          :inactive-value="true"
+          active-text="启用"
+          inactive-text="禁用"
+        />
+        <span style="margin-left: 12px; font-size: 12px; color: #909399">
+          禁用后学生将无法登录系统
+        </span>
+      </el-form-item>
       <el-form-item class="form-group" label="备注" prop="remark">
         <el-input v-model="formModel.remark" maxlength="255" type="textarea" show-word-limit></el-input>
       </el-form-item>
@@ -44,7 +78,9 @@
   // 表单
   const formModel = ref({
     id: undefined,
-    sort: 1
+    sort: 1,
+    status: 'new',
+    isDisabled: false
   })
   const onSubmit = async () => {
     // 校验

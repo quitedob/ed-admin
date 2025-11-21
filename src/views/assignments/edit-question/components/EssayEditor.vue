@@ -1,8 +1,9 @@
 <template>
-  <div class="essay-editor">
-    <el-form label-width="120px">
+  <div id="essay-editor" class="essay-editor">
+    <el-form id="essay-form" label-width="120px">
       <el-form-item label="参考答案">
         <el-input
+          id="reference-answer-input"
           v-model="localValue.referenceAnswer"
           type="textarea"
           :rows="8"
@@ -12,6 +13,7 @@
 
       <el-form-item label="评分标准">
         <el-input
+          id="grading-criteria-input"
           v-model="localValue.gradingCriteria"
           type="textarea"
           :rows="5"
@@ -21,7 +23,7 @@
 
       <el-divider content-position="left">AI批改配置</el-divider>
 
-      <el-form-item label="启用AI辅助评分">
+      <el-form-item id="ai-grading-toggle-item" label="启用AI辅助评分">
         <el-switch 
           v-model="localValue.aiGrading"
           active-text="开启"
@@ -42,28 +44,6 @@
           />
         </el-form-item>
 
-        <el-form-item label="分数范围">
-          <el-row :gutter="12">
-            <el-col :span="12">
-              <el-input-number 
-                v-model="localValue.scoreRange.min" 
-                :min="0" 
-                :max="localValue.scoreRange.max"
-                style="width: 100%"
-              />
-              <span style="margin-left: 8px">最低分</span>
-            </el-col>
-            <el-col :span="12">
-              <el-input-number 
-                v-model="localValue.scoreRange.max" 
-                :min="localValue.scoreRange.min" 
-                :max="100"
-                style="width: 100%"
-              />
-              <span style="margin-left: 8px">最高分</span>
-            </el-col>
-          </el-row>
-        </el-form-item>
 
         <el-form-item label="AI评分权重">
           <el-slider 

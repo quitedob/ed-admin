@@ -1,16 +1,17 @@
 <template>
-  <div class="question-list-view">
+  <div id="question-list-view" class="question-list-view">
     <!-- 工具栏 -->
-    <div class="toolbar">
-      <el-button type="primary" @click="handleAddQuestion">
+    <div id="toolbar" class="toolbar">
+      <el-button id="add-question-btn" type="primary" @click="handleAddQuestion">
         <el-icon><Plus /></el-icon>
         新建题目
       </el-button>
-      <el-button @click="handleBatchImport">批量导入</el-button>
-      <el-button @click="handleManageTags">标签管理</el-button>
-      
-      <div class="toolbar-right">
+      <el-button id="batch-import-btn" @click="handleBatchImport">批量导入</el-button>
+      <el-button id="manage-tags-btn" @click="handleManageTags">标签管理</el-button>
+
+      <div id="toolbar-right" class="toolbar-right">
         <el-input
+          id="search-input"
           v-model="searchText"
           placeholder="搜索题目..."
           clearable
@@ -24,44 +25,44 @@
     </div>
 
     <!-- 题目列表 -->
-    <el-table :data="filteredQuestions" stripe style="width: 100%">
+    <el-table id="question-table" :data="filteredQuestions" stripe style="width: 100%">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="id" label="题号" width="120" />
       <el-table-column prop="type" label="题型" width="100">
-        <template #default="{ row }">
-          <el-tag :type="getTypeTagType(row.type)" size="small">
+        <template #default="{ row, $index }">
+          <el-tag :id="`type-tag-${$index}`" :type="getTypeTagType(row.type)" size="small">
             {{ getTypeLabel(row.type) }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="questionText" label="题目内容" min-width="300" show-overflow-tooltip />
       <el-table-column prop="difficulty" label="难度" width="100">
-        <template #default="{ row }">
-          <el-tag :type="getDifficultyTagType(row.difficulty)" size="small">
+        <template #default="{ row, $index }">
+          <el-tag :id="`difficulty-tag-${$index}`" :type="getDifficultyTagType(row.difficulty)" size="small">
             {{ getDifficultyLabel(row.difficulty) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="score" label="分值" width="80" />
       <el-table-column prop="tags" label="标签" width="200">
-        <template #default="{ row }">
+        <template #default="{ row, $index }">
           <el-tag
-            v-for="tag in row.tags.slice(0, 2)"
+            v-for="(tag, tagIndex) in row.tags.slice(0, 2)"
+            :id="`tag-${$index}-${tagIndex}`"
             :key="tag"
             size="small"
             style="margin-right: 4px"
           >
             {{ tag }}
           </el-tag>
-          <span v-if="row.tags.length > 2">+{{ row.tags.length - 2 }}</span>
+          <span v-if="row.tags.length > 2" :id="`more-tags-${$index}`">+{{ row.tags.length - 2 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right">
-        <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="$emit('edit', row)">
+        <template #default="{ row, $index }">
+          <el-button :id="`edit-btn-${$index}`" link type="primary" size="small" @click="$emit('edit', row)">
             编辑
           </el-button>
-          <el-button link type="danger" size="small" @click="$emit('delete', row)">
+          <el-button :id="`delete-btn-${$index}`" link type="danger" size="small" @click="$emit('delete', row)">
             删除
           </el-button>
         </template>
@@ -69,8 +70,9 @@
     </el-table>
 
     <!-- 分页 -->
-    <div class="pagination">
+    <div id="pagination" class="pagination">
       <el-pagination
+        id="question-pagination"
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
         :total="total"
@@ -81,6 +83,7 @@
 
     <!-- V2 新建/编辑题目对话框 -->
     <V2QuestionEditDialog
+      id="v2-question-edit-dialog"
       v-model="questionDialogVisible"
       :question-data="currentQuestion"
       @save="handleSaveQuestion"
@@ -88,6 +91,7 @@
 
     <!-- 标签管理对话框 -->
     <TagManageDialog
+      id="tag-manage-dialog"
       v-model="tagDialogVisible"
       :tags="availableTags"
       @save="handleSaveTags"

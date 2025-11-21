@@ -1,5 +1,5 @@
 <template>
-  <el-upload ref="upload" :before-upload="beforeAvatarUpload" :http-request="onUpload" :show-file-list="false" :multiple="true">
+  <el-upload id="file-upload" ref="upload" :before-upload="beforeAvatarUpload" :http-request="onUpload" :show-file-list="false" :multiple="true">
     <el-button type="primary">上传</el-button>
   </el-upload>
 </template>

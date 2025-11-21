@@ -4,11 +4,12 @@
     v-model="visible"
     width="600px"
     append-to-body
+    id="import-assignment-dialog"
   >
-    <div class="import-assignment-content">
+    <div class="import-assignment-content" id="import-content">
       <p>导入作业模板功能 - 支持导入完整的作业模板，包含所有题目和设置</p>
       <p>支持格式：</p>
-      <ul>
+      <ul id="supported-formats">
         <li>JSON格式作业模板</li>
         <li>Excel格式题目批量导入</li>
         <li>从其他课程复制作业</li>
@@ -19,13 +20,14 @@
         action="#"
         :auto-upload="false"
         :on-change="handleFileChange"
+        id="file-upload"
       >
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text">
+        <div class="el-upload__text" id="upload-text">
           将文件拖到此处，或<em>点击上传</em>
         </div>
         <template #tip>
-          <div class="el-upload__tip">
+          <div class="el-upload__tip" id="upload-tip">
             支持 .json/.xlsx/.xls 格式文件
           </div>
         </template>
@@ -33,9 +35,9 @@
     </div>
 
     <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleImport">导入</el-button>
+      <div class="dialog-footer" id="dialog-footer">
+        <el-button @click="handleClose" id="cancel-button">取消</el-button>
+        <el-button type="primary" @click="handleImport" id="import-button">导入</el-button>
       </div>
     </template>
   </el-dialog>

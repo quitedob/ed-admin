@@ -1,10 +1,10 @@
 <template>
-  <div class="app-container">
-    <el-card class="box-card">
+  <div class="app-container" id="assessment-analysis-container">
+    <el-card class="box-card" id="assessment-analysis-card">
       <template #header>
-        <div class="card-header">
+        <div class="card-header" id="assessment-header">
           <span>能力测评分析</span>
-          <div class="header-actions">
+          <div class="header-actions" id="assessment-header-actions">
             <el-button type="primary" @click="handleUploadExam">上传试卷</el-button>
             <el-button type="success" @click="handleBatchAnalysis">批量分析</el-button>
             <el-button @click="handleExportReport">导出报告</el-button>
@@ -13,9 +13,10 @@
       </template>
 
       <!-- 上传区域 -->
-      <div class="upload-section">
+      <div class="upload-section" id="upload-section">
         <el-upload
           class="exam-uploader"
+          id="exam-uploader"
           drag
           :action="uploadUrl"
           :on-success="handleUploadSuccess"
@@ -46,8 +47,8 @@
       </div>
 
       <!-- 分析选项 -->
-      <div class="analysis-options" v-if="hasUploadedFiles">
-        <el-form :model="analysisOptions" label-width="120px">
+      <div class="analysis-options" v-if="hasUploadedFiles" id="analysis-options">
+        <el-form :model="analysisOptions" label-width="120px" id="analysis-options-form">
           <el-row :gutter="20">
             <el-col :span="8">
               <el-form-item label="学生姓名">
@@ -108,12 +109,12 @@
       </div>
 
       <!-- 分析结果 -->
-      <div v-if="analysisResult" class="analysis-result">
-        <el-tabs v-model="activeResultTab">
+      <div v-if="analysisResult" class="analysis-result" id="analysis-result">
+        <el-tabs v-model="activeResultTab" id="analysis-result-tabs">
           <!-- 基础信息 -->
-          <el-tab-pane label="基础信息" name="basic">
-            <div class="result-section">
-              <el-descriptions :column="3" border>
+          <el-tab-pane label="基础信息" name="basic" id="basic-info-tab">
+            <div class="result-section" id="basic-info-section">
+              <el-descriptions :column="3" border id="basic-info-descriptions">
                 <el-descriptions-item label="学生姓名">{{ analysisResult.studentName }}</el-descriptions-item>
                 <el-descriptions-item label="考试类型">{{ getExamTypeLabel(analysisResult.examType) }}</el-descriptions-item>
                 <el-descriptions-item label="学科科目">{{ getSubjectLabel(analysisResult.subject) }}</el-descriptions-item>
@@ -132,14 +133,14 @@
           </el-tab-pane>
 
           <!-- 成绩分析 -->
-          <el-tab-pane label="成绩分析" name="score">
-            <div class="result-section">
-              <el-row :gutter="20">
-                <el-col :span="12">
-                  <div class="score-distribution">
+          <el-tab-pane label="成绩分析" name="score" id="score-analysis-tab">
+            <div class="result-section" id="score-analysis-section">
+              <el-row :gutter="20" id="score-analysis-row">
+                <el-col :span="12" id="score-distribution-col">
+                  <div class="score-distribution" id="score-distribution">
                     <h4>分数分布</h4>
-                    <div class="chart-container">
-                      <div class="score-bar-chart">
+                    <div class="chart-container" id="score-chart-container">
+                      <div class="score-bar-chart" id="score-bar-chart">
                         <div
                           v-for="item in scoreDistribution"
                           :key="item.range"
@@ -158,10 +159,10 @@
                     </div>
                   </div>
                 </el-col>
-                <el-col :span="12">
-                  <div class="score-comparison">
+                <el-col :span="12" id="score-comparison-col">
+                  <div class="score-comparison" id="score-comparison">
                     <h4>成绩对比</h4>
-                    <div class="comparison-item">
+                    <div class="comparison-item" id="class-average-comparison">
                       <span>班级平均分</span>
                       <el-progress
                         :percentage="analysisResult.classAverage"
@@ -194,10 +195,10 @@
           </el-tab-pane>
 
           <!-- 错题分析 -->
-          <el-tab-pane label="错题分析" name="mistakes">
-            <div class="result-section">
-              <div class="mistakes-summary">
-                <el-row :gutter="20">
+          <el-tab-pane label="错题分析" name="mistakes" id="mistakes-analysis-tab">
+            <div class="result-section" id="mistakes-analysis-section">
+              <div class="mistakes-summary" id="mistakes-summary">
+                <el-row :gutter="20" id="mistakes-stats-row">
                   <el-col :span="6">
                     <el-statistic title="错题数量" :value="analysisResult.mistakeCount" />
                   </el-col>
@@ -213,9 +214,9 @@
                 </el-row>
               </div>
 
-              <div class="mistakes-list">
+              <div class="mistakes-list" id="mistakes-list">
                 <h4>错题详情</h4>
-                <el-table :data="analysisResult.mistakeDetails" stripe>
+                <el-table :data="analysisResult.mistakeDetails" stripe id="mistakes-table">
                   <el-table-column label="题号" prop="questionNumber" width="80" />
                   <el-table-column label="题型" prop="questionType" width="100">
                     <template #default="scope">
@@ -245,11 +246,11 @@
           </el-tab-pane>
 
           <!-- 知识点分析 -->
-          <el-tab-pane label="知识点分析" name="knowledge">
-            <div class="result-section">
-              <div class="knowledge-mastery">
+          <el-tab-pane label="知识点分析" name="knowledge" id="knowledge-analysis-tab">
+            <div class="result-section" id="knowledge-analysis-section">
+              <div class="knowledge-mastery" id="knowledge-mastery">
                 <h4>知识点掌握情况</h4>
-                <el-table :data="analysisResult.knowledgeAnalysis" stripe>
+                <el-table :data="analysisResult.knowledgeAnalysis" stripe id="knowledge-table">
                   <el-table-column label="知识点" prop="knowledgePoint" />
                   <el-table-column label="题目数量" prop="questionCount" width="100" />
                   <el-table-column label="正确率" prop="accuracy" width="120">
@@ -275,11 +276,11 @@
           </el-tab-pane>
 
           <!-- 能力评估 -->
-          <el-tab-pane label="能力评估" name="capability">
-            <div class="result-section">
-              <div class="capability-radar">
+          <el-tab-pane label="能力评估" name="capability" id="capability-assessment-tab">
+            <div class="result-section" id="capability-assessment-section">
+              <div class="capability-radar" id="capability-radar">
                 <h4>能力雷达图</h4>
-                <div class="radar-container">
+                <div class="radar-container" id="radar-container">
                   <!-- 这里应该使用 ECharts 或其他图表库来绘制雷达图 -->
                   <div class="radar-placeholder">
                     <el-empty description="雷达图组件加载中..." />
@@ -287,13 +288,14 @@
                 </div>
               </div>
 
-              <div class="capability-details">
+              <div class="capability-details" id="capability-details">
                 <h4>各项能力详情</h4>
-                <el-row :gutter="20">
+                <el-row :gutter="20" id="capability-details-row">
                   <el-col
                     v-for="capability in analysisResult.capabilityDetails"
                     :key="capability.name"
                     :span="6"
+                    :id="`capability-${capability.name}`"
                   >
                     <div class="capability-item">
                       <div class="capability-name">{{ capability.name }}</div>
@@ -315,14 +317,14 @@
         </el-tabs>
 
         <!-- 操作按钮 -->
-        <div class="result-actions">
-          <el-button type="primary" @click="generateImprovementPlan">
+        <div class="result-actions" id="result-actions">
+          <el-button type="primary" @click="generateImprovementPlan" id="generate-plan-btn">
             生成提分计划
           </el-button>
-          <el-button type="success" @click="saveAnalysisResult">
+          <el-button type="success" @click="saveAnalysisResult" id="save-result-btn">
             保存分析结果
           </el-button>
-          <el-button @click="printReport">
+          <el-button @click="printReport" id="print-report-btn">
             打印报告
           </el-button>
         </div>

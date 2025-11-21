@@ -1,63 +1,65 @@
 <template>
-  <div class="homework-review-container">
+  <div class="homework-review-container" id="homework-review-container">
     <!-- 顶部导航 -->
-    <div class="top-bar">
-      <div class="title-section">
-        <el-button link @click="handleBack">
+    <div class="top-bar" id="top-bar">
+      <div class="title-section" id="title-section">
+        <el-button link @click="handleBack" id="back-button">
           <el-icon><ArrowLeft /></el-icon>
           返回
         </el-button>
         <span class="page-title">批改 > {{ homework?.title }}</span>
       </div>
-      <div class="view-tabs">
-        <el-radio-group v-model="viewMode" @change="handleViewModeChange">
+      <div class="view-tabs" id="view-tabs">
+        <el-radio-group v-model="viewMode" @change="handleViewModeChange" id="view-mode-group">
           <el-radio-button label="student">按学生</el-radio-button>
           <el-radio-button label="question">按题目</el-radio-button>
         </el-radio-group>
       </div>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" id="main-content">
       <!-- 按学生视图 -->
       <template v-if="viewMode === 'student'">
-        <div class="left-sidebar">
+        <div class="left-sidebar" id="student-sidebar">
           <!-- 搜索和筛选 -->
           <el-input
             v-model="studentSearch"
             placeholder="搜索学生..."
             clearable
+            id="student-search-input"
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
             </template>
           </el-input>
 
-          <el-select v-model="studentStatusFilter" placeholder="状态" style="width: 100%; margin-top: 12px">
+          <el-select v-model="studentStatusFilter" placeholder="状态" style="width: 100%; margin-top: 12px" id="student-status-filter">
             <el-option label="全部" value="" />
             <el-option label="待批改" value="pending" />
             <el-option label="已批改" value="graded" />
             <el-option label="未提交" value="not_submitted" />
           </el-select>
 
-          <div class="filter-stats">
+          <div class="filter-stats" id="filter-stats">
             <span class="stat-item">待批改: <strong>{{ pendingCount }}</strong></span>
           </div>
 
           <!-- 学生列表 -->
-          <div class="student-list">
+          <div class="student-list" id="student-list">
             <div
               v-for="submission in filteredSubmissions"
               :key="submission.id"
               :class="['student-item', { active: selectedSubmissionId === submission.id }]"
               @click="selectSubmission(submission.id)"
+              :id="`student-item-${submission.id}`"
             >
-              <div class="student-header">
+              <div class="student-header" :id="`student-header-${submission.id}`">
                 <el-icon :class="['status-icon', getSubmissionStatusClass(submission)]">
                   <component :is="getSubmissionStatusIcon(submission)" />
                 </el-icon>
                 <span class="student-name">{{ submission.studentName }}</span>
               </div>
-              <div class="student-score">
+              <div class="student-score" :id="`student-score-${submission.id}`">
                 <span class="score-text">{{ submission.score }}/{{ submission.maxScore }}</span>
                 <el-progress
                   :percentage="getScorePercentage(submission)"
@@ -71,24 +73,24 @@
         </div>
 
         <!-- 右侧：学生答题详情 -->
-        <div class="right-content">
-          <div v-if="selectedSubmission" class="submission-detail">
+        <div class="right-content" id="student-detail-content">
+          <div v-if="selectedSubmission" class="submission-detail" id="submission-detail">
             <!-- 学生信息卡片 -->
-            <div class="student-info-card">
+            <div class="student-info-card" id="student-info-card">
               <h3>{{ selectedSubmission.studentName }} 的作业</h3>
-              <div class="info-grid">
-                <div class="info-item">
+              <div class="info-grid" id="info-grid">
+                <div class="info-item" id="info-total-score">
                   <span class="label">总分</span>
                   <span class="value">{{ selectedSubmission.score }}/{{ selectedSubmission.maxScore }}</span>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="info-completion-rate">
                   <span class="label">完成度</span>
                   <el-progress
                     :percentage="getScorePercentage(selectedSubmission)"
                     :color="getProgressColor(getScorePercentage(selectedSubmission))"
                   />
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="info-submit-time">
                   <span class="label">提交时间</span>
                   <span class="value">{{ formatDateTime(selectedSubmission.submitTime) }}</span>
                 </div>
@@ -96,15 +98,16 @@
             </div>
 
             <!-- 题目列表 -->
-            <div class="question-answers-list">
+            <div class="question-answers-list" id="question-answers-list">
               <h4>题目列表</h4>
               <div
                 v-for="(answer, index) in selectedSubmission.answers"
                 :key="answer.questionId"
                 class="answer-item"
                 @click="handleGradeQuestion(selectedSubmission, index)"
+                :id="`answer-item-${index}`"
               >
-                <div class="answer-header">
+                <div class="answer-header" :id="`answer-header-${index}`">
                   <span class="question-number">{{ index + 1 }}.</span>
                   <el-tag :type="getTypeTagType(answer.type)" size="small">
                     {{ getTypeLabel(answer.type) }}
@@ -114,14 +117,14 @@
                   </el-icon>
                   <span class="answer-score">{{ answer.score }}/{{ answer.maxScore }}</span>
                 </div>
-                <div class="question-preview">
+                <div class="question-preview" :id="`question-preview-${index}`">
                   {{ getQuestionText(answer.questionId) }}
                 </div>
               </div>
             </div>
 
-            <div class="action-buttons">
-              <el-button type="primary" @click="handleBatchGrade">
+            <div class="action-buttons" id="action-buttons">
+              <el-button type="primary" @click="handleBatchGrade" id="batch-grade-button">
                 批量批改
               </el-button>
             </div>
@@ -133,19 +136,20 @@
 
       <!-- 按题目视图 -->
       <template v-else>
-        <div class="left-sidebar">
+        <div class="left-sidebar" id="question-sidebar">
           <!-- 搜索和筛选 -->
           <el-input
             v-model="questionSearch"
             placeholder="搜索题目..."
             clearable
+            id="question-search-input"
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
             </template>
           </el-input>
 
-          <el-select v-model="questionTypeFilter" placeholder="题型" style="width: 100%; margin-top: 12px">
+          <el-select v-model="questionTypeFilter" placeholder="题型" style="width: 100%; margin-top: 12px" id="question-type-filter">
             <el-option label="全部题型" value="" />
             <el-option label="单选题" value="single" />
             <el-option label="多选题" value="multiple" />
@@ -154,20 +158,21 @@
           </el-select>
 
           <!-- 题目列表 -->
-          <div class="question-list">
+          <div class="question-list" id="question-list">
             <div
               v-for="(question, index) in homework?.questions"
               :key="question.id"
               :class="['question-item', { active: selectedQuestionIndex === index }]"
               @click="selectQuestion(index)"
+              :id="`question-item-${index}`"
             >
-              <div class="question-header">
+              <div class="question-header" :id="`question-header-${index}`">
                 <span class="question-number">{{ index + 1 }}.</span>
                 <el-tag :type="getTypeTagType(question.type)" size="small">
                   {{ getTypeLabel(question.type) }}
                 </el-tag>
               </div>
-              <div class="question-stats">
+              <div class="question-stats" :id="`question-stats-${index}`">
                 <span class="correct-rate">
                   答对率: {{ getQuestionCorrectRate(question.id) }}%
                 </span>
@@ -180,11 +185,11 @@
         </div>
 
         <!-- 右侧：题目答题情况 -->
-        <div class="right-content">
-          <div v-if="selectedQuestion" class="question-detail">
-            <div class="question-info-card">
+        <div class="right-content" id="question-detail-content">
+          <div v-if="selectedQuestion" class="question-detail" id="question-detail">
+            <div class="question-info-card" id="question-info-card">
               <h3>第{{ selectedQuestionIndex + 1 }}题</h3>
-              <div class="question-meta">
+              <div class="question-meta" id="question-meta">
                 <el-tag :type="getTypeTagType(selectedQuestion.type)">
                   {{ getTypeLabel(selectedQuestion.type) }}
                 </el-tag>
@@ -193,21 +198,22 @@
                   答对率: {{ getQuestionCorrectRate(selectedQuestion.id) }}%
                 </span>
               </div>
-              <div class="question-content">
+              <div class="question-content" id="question-content">
                 {{ selectedQuestion.questionText }}
               </div>
             </div>
 
             <!-- 学生答题情况列表 -->
-            <div class="student-answers-list">
+            <div class="student-answers-list" id="student-answers-list">
               <h4>学生答题情况</h4>
               <div
                 v-for="submission in submissions"
                 :key="submission.id"
                 class="student-answer-item"
                 @click="handleGradeStudentQuestion(submission, selectedQuestionIndex)"
+                :id="`student-answer-${submission.id}`"
               >
-                <div class="student-info">
+                <div class="student-info" :id="`student-info-${submission.id}`">
                   <span class="student-name">{{ submission.studentName }}</span>
                   <el-icon :class="['answer-status-icon', getAnswerStatusClass(getStudentAnswer(submission, selectedQuestion.id))]">
                     <component :is="getAnswerStatusIcon(getStudentAnswer(submission, selectedQuestion.id))" />

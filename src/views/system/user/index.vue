@@ -1,22 +1,22 @@
 <template>
-  <div class="app-container">
-    <div class="page_head">
-      <div class="search_bar clearfix">
-        <el-form :model="query" inline label-width="80px">
+  <div class="app-container" id="user-management-container">
+    <div class="page_head" id="page-header">
+      <div class="search_bar clearfix" id="search-bar">
+        <el-form :model="query" inline label-width="80px" id="user-search-form">
           <el-form-item>
-            <el-input v-model="query.mobile" placeholder="请输入登录账号" prefix-icon="Search" clearable />
+            <el-input v-model="query.mobile" placeholder="请输入登录账号" prefix-icon="Search" clearable id="mobile-search-input" />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleQuery()"> 查询</el-button>
-            <el-button @click="resetQuery()">重置</el-button>
+            <el-button type="primary" @click="handleQuery()" id="query-btn"> 查询</el-button>
+            <el-button @click="resetQuery()" id="reset-btn">重置</el-button>
           </el-form-item>
         </el-form>
       </div>
-      <div class="button_bar">
-        <el-button v-permission="'sys:user:save'" type="primary" @click="openFormModal()">添加账号</el-button>
+      <div class="button_bar" id="button-bar">
+        <el-button v-permission="'sys:user:save'" type="primary" @click="openFormModal()" id="add-user-btn">添加账号</el-button>
       </div>
     </div>
-    <el-table v-loading="page.loading" :data="page.list" row-key="id" class="drag-table">
+    <el-table v-loading="page.loading" :data="page.list" row-key="id" class="drag-table" id="user-table">
       <el-table-column label="登录账号" prop="mobile" />
       <el-table-column label="用户昵称" prop="realName" />
       <el-table-column label="所属角色">

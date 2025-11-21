@@ -1,25 +1,29 @@
 <template>
-  <div class="multiple-choice-editor">
-    <div class="options-list">
-      <div 
-        v-for="(option, index) in localValue.options" 
-        :key="index" 
+  <div id="multiple-choice-editor" class="multiple-choice-editor">
+    <div id="options-list" class="options-list">
+      <div
+        v-for="(option, index) in localValue.options"
+        :key="index"
+        :id="`option-item-${index}`"
         class="option-item"
         :class="{ 'is-correct': option.isCorrect }"
       >
-        <el-checkbox 
+        <el-checkbox
+          :id="`option-checkbox-${index}`"
           v-model="option.isCorrect"
           class="option-checkbox"
           @change="updateCorrectAnswers"
         >
-          <span class="option-label">{{ option.value }}:</span>
+          <span :id="`option-label-${index}`" class="option-label">{{ option.value }}:</span>
         </el-checkbox>
         <el-input
+          :id="`option-input-${index}`"
           v-model="option.text"
           placeholder="请输入选项内容"
           class="option-input"
         />
         <el-button
+          :id="`remove-option-btn-${index}`"
           v-if="localValue.options.length > 2"
           type="danger"
           text
@@ -28,9 +32,10 @@
           <el-icon><Delete /></el-icon>
           删除
         </el-button>
-        <el-tag 
-          v-if="option.isCorrect" 
-          type="success" 
+        <el-tag
+          v-if="option.isCorrect"
+          :id="`correct-tag-${index}`"
+          type="success"
           size="small"
           class="correct-tag"
         >
@@ -39,31 +44,33 @@
       </div>
     </div>
 
-    <el-button type="primary" plain @click="addOption" class="add-btn">
+    <el-button id="add-option-btn" type="primary" plain @click="addOption" class="add-btn">
       <el-icon><Plus /></el-icon>
       添加选项
     </el-button>
 
     <el-divider />
 
-    <el-form label-width="100px">
-      <el-form-item label="参考答案">
-        <div v-if="localValue.correctAnswers.length > 0">
-          <el-tag 
-            v-for="answer in localValue.correctAnswers" 
-            :key="answer" 
-            type="success" 
+    <el-form id="multiple-choice-form" label-width="100px">
+      <el-form-item id="reference-answer-item" label="参考答案">
+        <div v-if="localValue.correctAnswers.length > 0" id="correct-answers-container">
+          <el-tag
+            v-for="(answer, aIndex) in localValue.correctAnswers"
+            :key="answer"
+            :id="`correct-answer-tag-${aIndex}`"
+            type="success"
             size="large"
             style="margin-right: 8px"
           >
             {{ answer }}
           </el-tag>
         </div>
-        <span v-else style="color: #909399">请选择正确答案（至少选择2个）</span>
+        <span v-else id="no-answer-hint" style="color: #909399">请选择正确答案（至少选择2个）</span>
       </el-form-item>
 
-      <el-form-item label="题目解析">
+      <el-form-item id="explanation-item" label="题目解析">
         <el-input
+          id="explanation-input"
           v-model="localValue.explanation"
           type="textarea"
           :rows="4"

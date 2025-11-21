@@ -1,5 +1,5 @@
 <template>
-  <span>{{ enumVal }}</span>
+  <span id="enum-value">{{ enumVal }}</span>
 </template>
 
 <script setup>

@@ -1,17 +1,19 @@
 <template>
   <el-dialog
-    v-model="visible"
-    title="标签管理"
-    width="700px"
-    @close="handleClose"
+      id="tag-manage-dialog"
+      v-model="visible"
+      title="标签管理"
+      width="700px"
+      @close="handleClose"
   >
     <!-- 工具栏 -->
-    <div class="toolbar">
-      <el-button type="primary" @click="handleAddTag">
+    <div id="tag-toolbar" class="toolbar">
+      <el-button id="add-tag-btn" type="primary" @click="handleAddTag">
         <el-icon><Plus /></el-icon>
         新建标签
       </el-button>
       <el-input
+        id="tag-search-input"
         v-model="searchText"
         placeholder="搜索标签..."
         clearable
@@ -21,7 +23,7 @@
           <el-icon><Search /></el-icon>
         </template>
       </el-input>
-      <el-select v-model="sortType" placeholder="排序" style="width: 150px; margin-left: 12px">
+      <el-select id="tag-sort-select" v-model="sortType" placeholder="排序" style="width: 150px; margin-left: 12px">
         <el-option label="按名称" value="name" />
         <el-option label="按使用频率" value="usage" />
         <el-option label="按创建时间" value="time" />
@@ -29,7 +31,7 @@
     </div>
 
     <!-- 标签列表 -->
-    <el-table :data="filteredTags" stripe style="width: 100%; margin-top: 16px">
+    <el-table id="tag-table" :data="filteredTags" stripe style="width: 100%; margin-top: 16px">
       <el-table-column type="selection" width="55" />
       <el-table-column label="标签名称" min-width="150">
         <template #default="{ row }">
@@ -59,7 +61,7 @@
     </el-table>
 
     <!-- 分页 -->
-    <div class="pagination">
+    <div id="tag-pagination" class="pagination">
       <el-pagination
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
@@ -70,18 +72,19 @@
     </div>
 
     <template #footer>
-      <el-button @click="handleClose">关闭</el-button>
-      <el-button type="primary" @click="handleSave">保存</el-button>
+      <el-button id="close-tag-dialog-btn" @click="handleClose">关闭</el-button>
+      <el-button id="save-tags-btn" type="primary" @click="handleSave">保存</el-button>
     </template>
 
     <!-- 新建/编辑标签对话框 -->
     <el-dialog
+      id="tag-form-dialog"
       v-model="tagFormVisible"
       :title="isEditMode ? '编辑标签' : '新建标签'"
       width="500px"
       append-to-body
     >
-      <el-form ref="tagFormRef" :model="tagForm" :rules="tagRules" label-width="80px">
+      <el-form id="tag-form" ref="tagFormRef" :model="tagForm" :rules="tagRules" label-width="80px">
         <el-form-item label="标签名称" prop="name">
           <el-input v-model="tagForm.name" placeholder="请输入标签名称" />
         </el-form-item>

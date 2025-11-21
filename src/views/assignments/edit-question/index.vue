@@ -1,23 +1,23 @@
 <template>
-  <div class="question-edit-page">
+  <div class="question-edit-page" id="question-edit-page">
     <!-- 顶部操作栏 -->
-    <div class="page-header">
-      <el-breadcrumb separator=">">
+    <div class="page-header" id="page-header">
+      <el-breadcrumb separator=">" id="breadcrumb">
         <el-breadcrumb-item :to="{ path: '/assignments' }">题库</el-breadcrumb-item>
         <el-breadcrumb-item>{{ bankName }}</el-breadcrumb-item>
         <el-breadcrumb-item>{{ isEdit ? '编辑题目' : '新建题目' }}</el-breadcrumb-item>
       </el-breadcrumb>
-      
-      <div class="header-actions">
-        <el-button @click="handlePreview">
+
+      <div class="header-actions" id="header-actions">
+        <el-button @click="handlePreview" id="preview-button">
           <el-icon><View /></el-icon>
           预览
         </el-button>
-        <el-button type="primary" @click="handleSave" :loading="saving">
+        <el-button type="primary" @click="handleSave" :loading="saving" id="save-button">
           <el-icon><Check /></el-icon>
           保存
         </el-button>
-        <el-button @click="handleCancel">
+        <el-button @click="handleCancel" id="cancel-button">
           <el-icon><Close /></el-icon>
           取消
         </el-button>
@@ -25,29 +25,30 @@
     </div>
 
     <!-- 主内容区 -->
-    <div class="page-content">
-      <el-scrollbar height="calc(100vh - 120px)">
-        <div class="content-wrapper">
+    <div class="page-content" id="page-content">
+      <el-scrollbar height="calc(100vh - 120px)" id="main-scrollbar">
+        <div class="content-wrapper" id="content-wrapper">
           <!-- 基本信息区 -->
-          <el-card class="info-card" shadow="never">
+          <el-card class="info-card" shadow="never" id="info-card">
             <template #header>
               <span class="card-title">题目基本信息</span>
             </template>
             
-            <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+            <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" id="question-form">
               <el-row :gutter="20">
                 <el-col :span="6">
                   <el-form-item label="题号" prop="questionNumber">
-                    <el-input v-model="form.questionNumber" placeholder="自动生成" disabled />
+                    <el-input v-model="form.questionNumber" placeholder="自动生成" disabled id="question-number-input" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="6">
                   <el-form-item label="题型" prop="type">
-                    <el-select 
-                      v-model="form.type" 
-                      placeholder="请选择题型" 
+                    <el-select
+                      v-model="form.type"
+                      placeholder="请选择题型"
                       @change="handleTypeChange"
                       style="width: 100%"
+                      id="question-type-select"
                     >
                       <el-option label="单选题" value="single">
                         <el-icon><CircleCheck /></el-icon>
@@ -88,14 +89,6 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="6">
-                  <el-form-item label="分值" prop="score">
-                    <el-input-number 
-                      v-model="form.score" 
-                      :min="1" 
-                      :max="100" 
-                      style="width: 100%"
-                    />
-                  </el-form-item>
                 </el-col>
               </el-row>
 
@@ -279,7 +272,6 @@ const form = ref({
   questionNumber: `Q${Date.now()}`,
   type: 'single',
   difficulty: 'easy',
-  score: 10,
   tags: [],
   questionText: '',
   // 单选题
@@ -309,15 +301,6 @@ const form = ref({
     blanks: [
       { id: 1, answers: [''] }
     ],
-    scoringMethod: 'all', // all: 全对得分, partial: 部分得分
-    explanation: ''
-  },
-  // 问答题
-  essay: {
-    referenceAnswer: '',
-    gradingCriteria: '',
-    aiGrading: false,
-    scoreRange: { min: 0, max: 10 },
     explanation: ''
   },
   // 编程题
@@ -339,8 +322,6 @@ const rules = {
   type: [{ required: true, message: '请选择题型', trigger: 'change' }],
   difficulty: [{ required: true, message: '请选择难度', trigger: 'change' }],
   questionText: [{ required: true, message: '请输入题目内容', trigger: 'blur' }],
-  score: [{ required: true, message: '请输入分值', trigger: 'blur' }]
-}
 
 // 方法
 const getTypeTitle = () => {

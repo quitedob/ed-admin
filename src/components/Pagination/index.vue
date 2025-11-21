@@ -1,6 +1,7 @@
 <!-- 基于 element-plus 的 el-pagination 简单封装，方便统一 -->
 <template>
   <el-pagination
+    id="pagination"
     v-show="props.total > 0"
     v-model:current-page="currentPage"
     v-model:page-size="pageSize"

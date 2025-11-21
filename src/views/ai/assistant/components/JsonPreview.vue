@@ -1,10 +1,10 @@
 <template>
-  <div class="json-preview">
-    <el-card>
+  <div id="json-preview" class="json-preview">
+    <el-card id="json-card" class="preview-card">
       <template #header>
-        <div class="preview-header">
+        <div id="preview-header" class="preview-header">
           <span>JSON预览</span>
-          <div class="header-actions">
+          <div id="header-actions" class="header-actions">
             <el-button type="text" @click="copyJson">
               <el-icon><DocumentCopy /></el-icon>
               复制

@@ -1,7 +1,7 @@
 <template>
-  <el-dialog :append-to-body="true" :model-value="true" :title="props.title" width="800px" center align-center :destroy-on-close="true" @close="handleClose">
-    <div class="search_bar clearfix">
-      <el-form :model="query" inline label-width="80px">
+  <el-dialog id="lecturer-selector-dialog" :append-to-body="true" :model-value="true" :title="props.title" width="800px" center align-center :destroy-on-close="true" @close="handleClose">
+    <div id="lecturer-search-bar" class="search_bar clearfix">
+      <el-form id="lecturer-search-form" :model="query" inline label-width="80px">
         <el-form-item label="讲师名称">
           <el-input v-model="query.lecturerName" />
         </el-form-item>
@@ -11,7 +11,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-table v-loading="page.loading" :data="page.list">
+    <el-table id="lecturer-table" v-loading="page.loading" :data="page.list">
       <el-table-column label="讲师信息">
         <template #default="scope">
           <img :alt="scope.row.lecturerName" :src="scope.row.lecturerHead" style="height: 40px; width: auto; border-radius: 50%; vertical-align: middle" />

@@ -1,10 +1,10 @@
 <template>
-  <el-dialog :append-to-body="true" :model-value="props.visible" :title="props.title" width="1000px" align-center :destroy-on-close="true" @close="handleClose">
-    <el-tabs v-if="props.resourceType === 0" v-model="activeName" @tab-click="handleTablClick">
+  <el-dialog id="resource-selector-dialog" :append-to-body="true" :model-value="props.visible" :title="props.title" width="1000px" align-center :destroy-on-close="true" @close="handleClose">
+    <el-tabs id="resource-tabs" v-if="props.resourceType === 0" v-model="activeName" @tab-click="handleTablClick">
       <el-tab-pane :key="0" :label="'全部'" :name="0" />
       <el-tab-pane v-for="item in tabPanes" :key="item.code" :label="item.desc" :name="item.code" />
     </el-tabs>
-    <el-form :model="query" class="filter-container" inline label-width="100px">
+    <el-form id="resource-search-form" :model="query" class="filter-container" inline label-width="100px">
       <el-form-item label="资源名称">
         <el-input v-model="query.resourceName" />
       </el-form-item>
@@ -15,12 +15,12 @@
       </el-form-item>
     </el-form>
 
-    <div class="table-container">
+    <div id="resource-table-container" class="table-container">
       <!-- 目录 -->
       <cascader-category v-model:category-id="query.categoryId" :category-type="2" @refresh="handlePage" />
-      <div class="table-main">
-        <div v-if="props.resourceType === 4" v-loading="page.loading" class="table-main-card">
-          <div v-for="(item, index) in page.list" :key="index" class="table-main-card-item" @click="handleCard(item)">
+      <div id="table-main" class="table-main">
+        <div v-if="props.resourceType === 4" id="image-card-grid" v-loading="page.loading" class="table-main-card">
+          <div v-for="(item, index) in page.list" :key="index" :id="`card-item-${index}`" class="table-main-card-item" @click="handleCard(item)">
             <div v-if="item['check']" class="card-check" />
             <img class="table-main-card-item-img" :src="item.resourceUrl" />
             <div class="table-main-card-item-name">{{ item.resourceName }}</div>
@@ -30,7 +30,7 @@
             </div>
           </div>
         </div>
-        <el-table v-else v-loading="page.loading" :data="page.list">
+        <el-table id="resource-table" v-else v-loading="page.loading" :data="page.list">
           <el-table-column label="资源名称" prop="resourceName">
             <template #default="scope">
               <span>{{ scope.row.resourceName }}</span>
@@ -66,7 +66,7 @@
       </div>
     </div>
     <template #footer>
-      <span class="dialog-footer">
+      <span id="resource-dialog-footer" class="dialog-footer">
         <el-button @click="handleClose()">取消</el-button>
         <el-button type="primary" @click="handleSubmit()">确定</el-button>
       </span>

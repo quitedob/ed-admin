@@ -359,6 +359,72 @@ export function generateAllMockData() {
 
 // Mock API
 export const mockApi = {
+  getQuestionBank(params = {}) {
+    return Promise.resolve({
+      records: generateQuestions(50),
+      total: 50
+    })
+  },
+
+  getQuestionDetail(id) {
+    const questions = generateQuestions(50)
+    const question = questions.find(q => q.id === id)
+    return Promise.resolve(question || {})
+  },
+
+  addQuestion(data) {
+    return Promise.resolve({
+      id: `q_${Date.now()}`,
+      ...data,
+      createdAt: new Date().toISOString()
+    })
+  },
+
+  updateQuestion(id, data) {
+    return Promise.resolve({
+      id,
+      ...data,
+      updatedAt: new Date().toISOString()
+    })
+  },
+
+  deleteQuestion(id) {
+    return Promise.resolve({ success: true })
+  },
+
+  importQuestions(questions) {
+    return Promise.resolve({
+      imported: questions.length,
+      failed: 0,
+      timestamp: new Date().toISOString()
+    })
+  },
+
+  exportQuestions(data) {
+    return Promise.resolve({
+      url: '/export/questions.xlsx',
+      timestamp: new Date().toISOString()
+    })
+  },
+
+  getQuestionStats() {
+    return Promise.resolve({
+      total: 150,
+      byType: {
+        single: 50,
+        multiple: 40,
+        fill: 30,
+        essay: 20,
+        programming: 10
+      },
+      byDifficulty: {
+        easy: 50,
+        medium: 60,
+        hard: 40
+      }
+    })
+  },
+
   getCourseDetail(courseId) {
     return Promise.resolve({
       id: courseId,
@@ -465,6 +531,13 @@ export const mockApi = {
           questions: []
         }
       ]
+    })
+  },
+
+  getHomeworks(params = {}) {
+    return Promise.resolve({
+      records: generateHomeworks('class_001', 4),
+      total: 4
     })
   },
 

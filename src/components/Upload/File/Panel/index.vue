@@ -1,10 +1,10 @@
 <!--全局上传文件列表组件-->
 <template>
-  <div v-show="fileList.length > 0" class="fixed_upload_panel">
-    <div class="upload_file_container" :class="{ hidden_list: !listing }">
-      <div class="upload_head">
-        <div class="upload_text">文件列表（{{ successFileList.length }}/{{ fileList.length }}）</div>
-        <div class="dialog_btn">
+  <div v-show="fileList.length > 0" id="upload-panel" class="fixed_upload_panel">
+    <div id="upload-file-container" class="upload_file_container" :class="{ hidden_list: !listing }">
+      <div id="upload-head" class="upload_head">
+        <div id="upload-text" class="upload_text">文件列表（{{ successFileList.length }}/{{ fileList.length }}）</div>
+        <div id="dialog-btn" class="dialog_btn">
           <el-icon v-if="!listing" class="" title="展开列表" @click="listing = true">
             <FullScreen />
           </el-icon>
@@ -16,8 +16,8 @@
           </el-icon>
         </div>
       </div>
-      <div v-show="listing" class="upload_file_list">
-        <div v-for="item in fileList" :key="item.uid" class="upload_file_item">
+      <div v-show="listing" id="upload-file-list" class="upload_file_list">
+        <div v-for="(item, index) in fileList" :key="item.uid" :id="`file-item-${index}`" class="upload_file_item">
           <div class="file_name">{{ item.fileName }}</div>
           <div class="file_size">{{ transformSize(item.fileSize) }}</div>
           <div class="file_progress_number">{{ item.progress }} %</div>

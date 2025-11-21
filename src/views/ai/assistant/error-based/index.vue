@@ -1,6 +1,6 @@
 <template>
-  <div class="error-based-container">
-    <div class="page-header">
+  <div id="error-based-container" class="error-based-container">
+    <div id="page-header" class="page-header">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/ai/assistant' }">智能作业生成</el-breadcrumb-item>
         <el-breadcrumb-item>基于错题生成</el-breadcrumb-item>
@@ -10,9 +10,9 @@
     </div>
 
     <!-- 数据选择区域 -->
-    <el-card class="selection-card">
+    <el-card id="selection-card" class="selection-card">
       <template #header>
-        <div class="card-header">
+        <div id="selection-header" class="card-header">
           <span>数据选择与筛选</span>
           <el-button type="primary" size="small" @click="loadData">
             <el-icon><Refresh /></el-icon>
@@ -79,7 +79,7 @@
 
         <el-form-item label="选择记录">
           <el-checkbox-group v-model="filterForm.recordIds" :disabled="!filterForm.classId">
-            <div v-for="record in filteredRecords" :key="record.id" class="record-checkbox">
+            <div v-for="record in filteredRecords" :key="record.id" :id="`record-checkbox-${record.id}`" class="record-checkbox">
               <el-checkbox :label="record.id">
                 <span class="record-name">{{ record.name }}</span>
                 <el-tag :type="record.type === 'exam' ? 'danger' : 'success'" size="small">
@@ -106,16 +106,16 @@
     </el-card>
 
     <!-- 分析结果区域 -->
-    <div v-if="analysisResult" class="analysis-result">
+    <div v-if="analysisResult" id="analysis-result" class="analysis-result">
       <el-row :gutter="20">
         <!-- 左侧：错题统计 -->
         <el-col :span="8">
-          <el-card class="stat-card">
+          <el-card id="stat-card" class="stat-card">
             <template #header>
               <span>错题统计</span>
             </template>
-            <div class="stat-items">
-              <div class="stat-item">
+            <div id="stat-items" class="stat-items">
+              <div id="stat-total-errors" class="stat-item">
                 <span class="label">总错题数</span>
                 <span class="value">{{ analysisResult.totalErrors }}</span>
               </div>
@@ -192,7 +192,7 @@
       </el-row>
 
       <!-- 生成选项 -->
-      <el-card class="generation-card">
+      <el-card id="generation-card" class="generation-card">
         <template #header>
           <span>生成选项</span>
         </template>
@@ -248,7 +248,7 @@
       </el-card>
 
       <!-- 生成结果预览 -->
-      <div v-if="generationResult" class="result-preview">
+      <div v-if="generationResult" id="result-preview" class="result-preview">
         <el-card>
           <template #header>
             <span>生成结果预览</span>
@@ -259,7 +259,7 @@
     </div>
 
     <!-- 上传纸质试卷对话框 -->
-    <el-dialog v-model="uploadDialogVisible" title="上传纸质试卷" width="600px">
+    <el-dialog id="upload-dialog" v-model="uploadDialogVisible" title="上传纸质试卷" width="600px">
       <el-upload
         drag
         action="#"

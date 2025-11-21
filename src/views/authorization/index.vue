@@ -1,10 +1,10 @@
 <template>
-  <div class="app-container">
-    <el-card class="box-card">
+  <div class="app-container" id="authorization-management-container">
+    <el-card class="box-card" id="authorization-main-card">
       <template #header>
-        <div class="card-header">
+        <div class="card-header" id="authorization-card-header">
           <span>学员授权管理</span>
-          <div class="header-actions">
+          <div class="header-actions" id="authorization-header-actions">
             <el-button type="primary" @click="handleBatchAuth">批量授权</el-button>
             <el-button type="success" @click="handleBatchAuthByClass">按班级授权</el-button>
             <el-button @click="handleExport">导出数据</el-button>
@@ -13,7 +13,7 @@
       </template>
 
       <!-- 统计信息 -->
-      <div class="stats-section">
+      <div class="stats-section" id="authorization-stats-section">
         <el-row :gutter="20">
           <el-col :span="4">
             <el-statistic title="总授权数" :value="statsData.totalAuths" />
@@ -37,7 +37,7 @@
       </div>
 
       <!-- 搜索区域 -->
-      <el-form :model="queryParams" ref="queryRef" :inline="true" label-width="80px">
+      <el-form :model="queryParams" ref="queryRef" :inline="true" label-width="80px" id="authorization-search-form">
         <el-form-item label="学生姓名" prop="studentName">
           <el-input
             v-model="queryParams.studentName"
@@ -85,7 +85,7 @@
       </el-form>
 
       <!-- 表格操作按钮 -->
-      <el-row :gutter="10" class="mb8">
+      <el-row :gutter="10" class="mb8" id="authorization-table-actions">
         <el-col :span="1.5">
           <el-button
             type="success"
@@ -121,7 +121,7 @@
       </el-row>
 
       <!-- 数据表格 -->
-      <el-table v-loading="loading" :data="authList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="authList" @selection-change="handleSelectionChange" id="authorization-data-table">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="学生信息" align="center" width="200">
           <template #default="scope">
@@ -215,7 +215,7 @@
     </el-card>
 
     <!-- 批量授权对话框 -->
-    <el-dialog title="批量授权" v-model="batchAuthOpen" width="800px" append-to-body>
+    <el-dialog title="批量授权" v-model="batchAuthOpen" width="800px" append-to-body id="authorization-batch-dialog">
       <el-form ref="batchAuthRef" :model="batchAuthForm" :rules="batchAuthRules" label-width="100px">
         <el-form-item label="授权方式" prop="authType">
           <el-radio-group v-model="batchAuthForm.authType">
@@ -339,8 +339,8 @@
     </el-dialog>
 
     <!-- 授权详情对话框 -->
-    <el-dialog title="授权详情" v-model="detailOpen" width="900px" append-to-body>
-      <div v-if="currentAuth" class="auth-detail">
+    <el-dialog title="授权详情" v-model="detailOpen" width="900px" append-to-body id="authorization-detail-dialog">
+      <div v-if="currentAuth" class="auth-detail" id="authorization-detail-content">
         <el-descriptions :column="2" border>
           <el-descriptions-item label="学生姓名">{{ currentAuth.studentName }}</el-descriptions-item>
           <el-descriptions-item label="手机号">{{ currentAuth.studentMobile }}</el-descriptions-item>
@@ -361,7 +361,7 @@
         </el-descriptions>
 
         <!-- 学习进度 -->
-        <div class="study-progress-section" v-if="currentAuth.studyProgress !== undefined">
+        <div class="study-progress-section" id="authorization-study-progress" v-if="currentAuth.studyProgress !== undefined">
           <h4>学习进度</h4>
           <el-row :gutter="20">
             <el-col :span="12">
@@ -374,7 +374,7 @@
         </div>
 
         <!-- 学习历史 -->
-        <div class="study-history-section">
+        <div class="study-history-section" id="authorization-study-history">
           <h4>学习历史</h4>
           <el-timeline>
             <el-timeline-item

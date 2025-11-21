@@ -1,7 +1,7 @@
 <template>
-  <el-dialog :append-to-body="true" :model-value="visible" title="图标选择" width="460px" center align-center :destroy-on-close="true" @close="handleClose">
-    <div class="icon-content">
-      <span v-for="item in iconArray" :key="item" class="icon-name" @click="handleClick(item)"> <icon :name="item" class="icon-item" /><br />{{ item }} </span>
+  <el-dialog id="svg-selector-dialog" :append-to-body="true" :model-value="visible" title="图标选择" width="460px" center align-center :destroy-on-close="true" @close="handleClose">
+    <div id="icon-content" class="icon-content">
+      <span v-for="(item, index) in iconArray" :key="item" :id="`icon-item-${index}`" class="icon-name" @click="handleClick(item)"> <icon :name="item" class="icon-item" /><br />{{ item }} </span>
     </div>
   </el-dialog>
 </template>

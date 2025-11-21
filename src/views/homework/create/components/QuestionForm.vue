@@ -1,149 +1,153 @@
 <template>
-  <div class="question-form-container">
-    <div class="question-header">
+  <div id="question-form-container" class="question-form-container">
+    <div id="question-form-header" class="question-header">
       <el-input
         v-model="localQuestion.name"
         placeholder="题目名称（如：单选题）"
         style="width: 200px; margin-right: 10px;"
+        id="question-name-input"
       />
-      <el-select v-model="localQuestion.type" placeholder="题型" style="width: 120px; margin-right: 10px;">
+      <el-select v-model="localQuestion.type" placeholder="题型" style="width: 120px; margin-right: 10px;" id="question-type-select">
         <el-option label="单选题" value="single" />
         <el-option label="多选题" value="multiple" />
         <el-option label="填空题" value="fill" />
         <el-option label="简答题" value="essay" />
         <el-option label="OJ题" value="hoj" />
       </el-select>
-      <el-button type="danger" size="small" @click="handleRemove">
+      <el-button type="danger" size="small" @click="handleRemove" id="delete-question-btn">
         <el-icon><Delete /></el-icon>
         删除题目
       </el-button>
     </div>
 
-    <div class="question-content">
-      <div class="question-summary">
-        <el-tag type="info">
+    <div id="question-form-content" class="question-content">
+      <div id="question-summary" class="question-summary">
+        <el-tag type="info" id="summary-tag">
           已选择 {{ (localQuestion.questions || []).length }} 道题目，总分：{{ calculateTotal() }} 分
         </el-tag>
       </div>
 
-      <el-divider content-position="left">
+      <el-divider content-position="left" id="management-divider">
         <span style="color: #409eff; font-weight: 500;">题目管理</span>
       </el-divider>
 
-      <div class="questions-section">
-        <div class="action-buttons-group">
-          <el-button type="success" size="small" @click="showQuestionBankSelector">
+      <div id="questions-section" class="questions-section">
+        <div id="action-buttons-group" class="action-buttons-group">
+          <el-button type="success" size="small" @click="showQuestionBankSelector" id="select-from-bank-btn">
             <el-icon><FolderOpened /></el-icon>
             从题库选择题目
           </el-button>
         </div>
 
-        <div class="action-tips">
-          <el-text size="small" type="info">
+        <div id="action-tips" class="action-tips">
+          <el-text size="small" type="info" id="operation-tips">
             <el-icon><InfoFilled /></el-icon>
             操作说明：点击"从题库选择题目"从现有题库中选择相应类型的题目
           </el-text>
         </div>
 
-        <div class="questions-list">
+        <div id="questions-list" class="questions-list">
           <div
             v-for="(question, index) in (localQuestion.questions || [])"
             :key="question.id"
             class="question-item"
+            :id="`question-item-${index}`"
           >
-            <div class="question-header">
-              <span class="question-number">题目 {{ index + 1 }}</span>
-              <el-tag :type="getQuestionTypeTag(question.type)" size="small">
+            <div class="question-header" :id="`question-header-${index}`">
+              <span class="question-number" :id="`question-number-${index}`">题目 {{ index + 1 }}</span>
+              <el-tag :type="getQuestionTypeTag(question.type)" size="small" :id="`question-type-tag-${index}`">
                 {{ getQuestionTypeLabel(question.type) }}
               </el-tag>
-              <div class="score-section">
+              <div class="score-section" :id="`score-section-${index}`">
                 <el-input-number
                   v-model="question.score"
                   :min="1"
                   :max="100"
                   size="small"
                   @change="handleScoreChange"
+                  :id="`score-input-${index}`"
                 />
                 <span class="score-unit">分</span>
               </div>
             </div>
 
-            <div class="question-content">
-              <div class="question-title-section">
+            <div class="question-content" :id="`question-content-${index}`">
+              <div class="question-title-section" :id="`title-section-${index}`">
                 <span class="content-label">题目标题:</span>
-                <span class="question-title">{{ question.title || '无标题' }}</span>
+                <span class="question-title" :id="`question-title-${index}`">{{ question.title || '无标题' }}</span>
               </div>
 
-              <div class="question-content-section">
+              <div class="question-content-section" :id="`content-section-${index}`">
                 <span class="content-label">题目内容:</span>
-                <span class="question-text">{{ question.content || '无内容' }}</span>
+                <span class="question-text" :id="`question-text-${index}`">{{ question.content || '无内容' }}</span>
               </div>
 
               <!-- 选项显示 -->
-              <div v-if="question.type === 'single' || question.type === 'multiple'" class="options-section">
+              <div v-if="question.type === 'single' || question.type === 'multiple'" class="options-section" :id="`options-section-${index}`">
                 <span class="content-label">选项:</span>
-                <div v-if="question.options && question.options.length > 0" class="options-list">
-                  <div v-for="option in question.options" :key="option.id" class="option-item">
+                <div v-if="question.options && question.options.length > 0" class="options-list" :id="`options-list-${index}`">
+                  <div v-for="option in question.options" :key="option.id" class="option-item" :id="`option-${index}-${option.id || option.value}`">
                     <span class="option-value">{{ option.value }}.</span>
                     <span class="option-text">{{ option.text || '(空选项)' }}</span>
                   </div>
                 </div>
-                <span v-else class="empty-options">暂无选项</span>
+                <span v-else class="empty-options" :id="`empty-options-${index}`">暂无选项</span>
               </div>
 
               <!-- 答案显示 -->
-              <div v-if="question.type === 'single'" class="answer-section">
+              <div v-if="question.type === 'single'" class="answer-section" :id="`answer-section-${index}`">
                 <span class="content-label">正确答案:</span>
-                <span class="answer-text">{{ question.correctAnswer || '未设置' }}</span>
+                <span class="answer-text" :id="`answer-text-${index}`">{{ question.correctAnswer || '未设置' }}</span>
               </div>
-              <div v-else-if="question.type === 'multiple'" class="answer-section">
+              <div v-else-if="question.type === 'multiple'" class="answer-section" :id="`answer-section-${index}`">
                 <span class="content-label">正确答案:</span>
-                <span class="answer-text">{{ question.correctAnswers?.join(', ') || '未设置' }}</span>
+                <span class="answer-text" :id="`answer-text-${index}`">{{ question.correctAnswers?.join(', ') || '未设置' }}</span>
               </div>
-              <div v-else-if="question.type === 'fill'" class="answer-section">
+              <div v-else-if="question.type === 'fill'" class="answer-section" :id="`answer-section-${index}`">
                 <span class="content-label">参考答案:</span>
-                <span class="answer-text">{{ question.correctAnswers?.join(', ') || '未设置' }}</span>
+                <span class="answer-text" :id="`answer-text-${index}`">{{ question.correctAnswers?.join(', ') || '未设置' }}</span>
               </div>
-              <div v-else-if="question.type === 'essay'" class="answer-section">
+              <div v-else-if="question.type === 'essay'" class="answer-section" :id="`answer-section-${index}`">
                 <span class="content-label">参考答案:</span>
-                <span class="answer-text">{{ question.referenceAnswer || '未设置' }}</span>
+                <span class="answer-text" :id="`answer-text-${index}`">{{ question.referenceAnswer || '未设置' }}</span>
               </div>
 
               <!-- 题目标签 -->
-              <div v-if="question.tags && question.tags.length > 0" class="tags-section">
+              <div v-if="question.tags && question.tags.length > 0" class="tags-section" :id="`tags-section-${index}`">
                 <span class="content-label">标签:</span>
                 <el-tag
                   v-for="tag in question.tags"
                   :key="tag"
                   size="small"
                   style="margin-right: 5px;"
+                  :id="`tag-${index}-${tag}`"
                 >
                   {{ tag }}
                 </el-tag>
               </div>
 
               <!-- 来源和分值信息 -->
-              <div class="source-section">
+              <div class="source-section" :id="`source-section-${index}`">
                 <span class="content-label">来源:</span>
-                <span class="source-text">题库 (ID: {{ question.bankQuestionId || question.id }})</span>
-                <span v-if="question.isFromBank && question.originalScore !== question.score" class="modified-indicator">
+                <span class="source-text" :id="`source-text-${index}`">题库 (ID: {{ question.bankQuestionId || question.id }})</span>
+                <span v-if="question.isFromBank && question.originalScore !== question.score" class="modified-indicator" :id="`modified-indicator-${index}`">
                   <el-tag type="warning" size="small">已修改分值: {{ question.originalScore }} → {{ question.score }}</el-tag>
                 </span>
-                <span v-else-if="question.isFromBank" class="score-info">
+                <span v-else-if="question.isFromBank" class="score-info" :id="`score-info-${index}`">
                   <el-text size="small" type="info">可修改分值</el-text>
                 </span>
               </div>
             </div>
 
-            <div class="question-actions">
-              <el-button type="danger" size="small" @click="removeQuestion(index)">
+            <div class="question-actions" :id="`question-actions-${index}`">
+              <el-button type="danger" size="small" @click="removeQuestion(index)" :id="`remove-question-btn-${index}`">
                 <el-icon><Delete /></el-icon>
                 移除
               </el-button>
             </div>
           </div>
 
-          <el-empty v-if="(localQuestion.questions || []).length === 0" description="暂无题目，点击上方按钮从题库选择题目" :image-size="80" />
+          <el-empty v-if="(localQuestion.questions || []).length === 0" description="暂无题目，点击上方按钮从题库选择题目" :image-size="80" id="empty-questions" />
         </div>
       </div>
     </div>
@@ -154,24 +158,26 @@
       :title="`从题库选择${getQuestionTypeLabel(localQuestion.type)}`"
       width="900px"
       append-to-body
+      id="question-bank-selector-dialog"
     >
-      <div class="question-selector-content">
+      <div id="question-selector-content" class="question-selector-content">
         <!-- 搜索区域 -->
-        <div class="search-section">
+        <div id="search-section" class="search-section">
           <el-input
             v-model="searchKeyword"
             placeholder="搜索题目内容..."
             clearable
             style="width: 300px; margin-right: 10px;"
+            id="search-input"
           >
             <template #append>
-              <el-button type="primary" @click="searchQuestions">
+              <el-button type="primary" @click="searchQuestions" id="search-btn">
                 <el-icon><Search /></el-icon>
                 搜索
               </el-button>
             </template>
           </el-input>
-          <el-button @click="refreshQuestions">
+          <el-button @click="refreshQuestions" id="refresh-btn">
             <el-icon><Refresh /></el-icon>
             刷新
           </el-button>
@@ -182,6 +188,7 @@
           v-loading="loading"
           :data="availableQuestions"
           max-height="400"
+          id="available-questions-table"
         >
           <el-table-column label="题目ID" width="80" prop="id" />
           <el-table-column label="题目类型" width="100">
@@ -207,6 +214,7 @@
                 size="small"
                 @click="selectSingleQuestion(scope.row)"
                 :disabled="isQuestionSelected(scope.row.id)"
+                :id="`select-btn-${scope.row.id}`"
               >
                 {{ isQuestionSelected(scope.row.id) ? '已选择' : '选择' }}
               </el-button>
@@ -219,6 +227,7 @@
                 :key="tag"
                 size="small"
                 style="margin-right: 5px;"
+                :id="`table-tag-${scope.row.id}-${tag}`"
               >
                 {{ tag }}
               </el-tag>
@@ -227,7 +236,7 @@
         </el-table>
 
         <!-- 分页 -->
-        <div class="pagination-wrapper">
+        <div id="pagination-wrapper" class="pagination-wrapper">
           <el-pagination
             v-model:current-page="currentPage"
             v-model:page-size="pageSize"
@@ -236,13 +245,14 @@
             layout="total, sizes, prev, pager, next, jumper"
             @size-change="handlePageChange"
             @current-change="handlePageChange"
+            id="question-pagination"
           />
         </div>
       </div>
 
       <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="questionBankSelectorVisible = false">关闭</el-button>
+        <div id="dialog-footer" class="dialog-footer">
+          <el-button @click="questionBankSelectorVisible = false" id="close-dialog-btn">关闭</el-button>
         </div>
       </template>
     </el-dialog>

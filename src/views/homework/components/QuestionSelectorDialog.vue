@@ -1,14 +1,16 @@
 <template>
   <el-dialog
-    v-model="visible"
-    title="从题库选择题目"
-    width="90%"
-    @close="handleClose"
+      id="question-selector-dialog"
+      v-model="visible"
+      title="从题库选择题目"
+      width="90%"
+      @close="handleClose"
   >
-    <div class="question-selector">
+    <div id="question-selector" class="question-selector">
       <!-- 筛选区域 -->
-      <div class="filter-section">
+      <div id="question-filter-section" class="filter-section">
         <el-input
+          id="question-search-input"
           v-model="searchText"
           placeholder="搜索题目..."
           clearable
@@ -20,6 +22,7 @@
         </el-input>
 
         <el-select
+          id="question-type-filter"
           v-model="filterType"
           placeholder="题型"
           clearable
@@ -32,6 +35,7 @@
         </el-select>
 
         <el-select
+          id="question-difficulty-filter"
           v-model="filterDifficulty"
           placeholder="难度"
           clearable
@@ -45,6 +49,7 @@
 
       <!-- 题目列表 -->
       <el-table
+        id="question-table"
         :data="filteredQuestions"
         stripe
         style="width: 100%; margin-top: 16px"
@@ -88,6 +93,7 @@
 
       <!-- 分页 -->
       <el-pagination
+        id="question-pagination"
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
         :page-sizes="[10, 20, 50]"
@@ -98,9 +104,9 @@
     </div>
 
     <template #footer>
-      <span>已选择 {{ selectedQuestions.length }} 道题目</span>
-      <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" @click="handleConfirm" :disabled="selectedQuestions.length === 0">
+      <span id="selected-count">已选择 {{ selectedQuestions.length }} 道题目</span>
+      <el-button id="cancel-question-select-btn" @click="handleClose">取消</el-button>
+      <el-button id="confirm-question-select-btn" type="primary" @click="handleConfirm" :disabled="selectedQuestions.length === 0">
         确定添加
       </el-button>
     </template>

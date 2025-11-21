@@ -221,15 +221,21 @@ export class ErrorHandler {
       return error
     }
 
+    // Handle null or undefined errors
+    if (!error) {
+      return new AppError('Unknown error occurred', ErrorType.UNKNOWN, ErrorLevel.ERROR, undefined, null, null)
+    }
+
     if (error.name === 'AxiosError') {
       return new ApiError(error)
     }
 
-    if (error.message.includes('Network Error')) {
+    if (error.message && error.message.includes('Network Error')) {
       return new NetworkError(error)
     }
 
-    return new AppError(error.message, ErrorType.UNKNOWN, ErrorLevel.ERROR, undefined, null, error)
+    const message = error.message || String(error) || 'Unknown error occurred'
+    return new AppError(message, ErrorType.UNKNOWN, ErrorLevel.ERROR, undefined, null, error)
   }
 
   // 记录错误

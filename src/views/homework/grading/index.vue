@@ -1,15 +1,15 @@
 <template>
-  <div class="homework-grading-page">
+  <div id="homework-grading-page" class="homework-grading-page">
     <!-- 顶部导航栏 -->
-    <div class="page-header">
-      <el-breadcrumb separator=">">
+    <div id="page-header" class="page-header">
+      <el-breadcrumb separator=">" id="grading-breadcrumb">
         <el-breadcrumb-item :to="{ path: '/homework/list' }">作业管理</el-breadcrumb-item>
         <el-breadcrumb-item>批改</el-breadcrumb-item>
         <el-breadcrumb-item>{{ homework?.title }}</el-breadcrumb-item>
       </el-breadcrumb>
 
-      <div class="header-actions">
-        <el-radio-group v-model="viewMode" size="default">
+      <div id="header-actions" class="header-actions">
+        <el-radio-group v-model="viewMode" size="default" id="view-mode-toggle">
           <el-radio-button value="student">
             <el-icon><User /></el-icon>
             按学生
@@ -23,13 +23,14 @@
     </div>
 
     <!-- 主内容区 -->
-    <div class="page-content">
+    <div id="page-content" class="page-content">
       <!-- 按学生视图 -->
       <template v-if="viewMode === 'student'">
         <StudentGradingView
           :homework="homework"
           :submissions="submissions"
           @grade-question="handleGradeQuestion"
+          id="student-grading-view"
         />
       </template>
 
@@ -39,6 +40,7 @@
           :homework="homework"
           :submissions="submissions"
           @grade-question="handleGradeQuestion"
+          id="question-grading-view"
         />
       </template>
     </div>

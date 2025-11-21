@@ -1,10 +1,10 @@
 <template>
-  <div class="app-container">
-    <el-card class="box-card">
+  <div class="app-container" id="assessment-plan-container">
+    <el-card class="box-card" id="assessment-plan-card">
       <template #header>
-        <div class="card-header">
+        <div class="card-header" id="plan-header">
           <span>提分计划管理</span>
-          <div class="header-actions">
+          <div class="header-actions" id="plan-header-actions">
             <el-button type="primary" @click="handleCreatePlan">创建计划</el-button>
             <el-button type="success" @click="handleBatchGenerate">批量生成</el-button>
             <el-button @click="handleExportPlans">导出计划</el-button>
@@ -13,7 +13,7 @@
       </template>
 
       <!-- 搜索筛选 -->
-      <el-form :model="queryParams" ref="queryRef" :inline="true" label-width="80px">
+      <el-form :model="queryParams" ref="queryRef" :inline="true" label-width="80px" id="plan-search-form">
         <el-form-item label="学生姓名" prop="studentName">
           <el-input
             v-model="queryParams.studentName"
@@ -48,7 +48,7 @@
       </el-form>
 
       <!-- 数据表格 -->
-      <el-table v-loading="loading" :data="planList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="planList" @selection-change="handleSelectionChange" id="plans-table">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="计划ID" align="center" prop="id" width="80" />
         <el-table-column label="学生信息" align="center" width="150">
@@ -116,12 +116,13 @@
         v-model:page="queryParams.pageCurrent"
         v-model:limit="queryParams.pageSize"
         @pagination="getList"
+        id="plans-pagination"
       />
     </el-card>
 
     <!-- 创建/编辑计划对话框 -->
-    <el-dialog :title="title" v-model="open" width="800px" append-to-body>
-      <el-form ref="planRef" :model="form" :rules="rules" label-width="100px">
+    <el-dialog :title="title" v-model="open" width="800px" append-to-body id="plan-form-dialog">
+      <el-form ref="planRef" :model="form" :rules="rules" label-width="100px" id="plan-form">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="学生姓名" prop="studentId">
@@ -220,12 +221,12 @@
     </el-dialog>
 
     <!-- 计划详情对话框 -->
-    <el-dialog title="提分计划详情" v-model="detailOpen" width="90%" append-to-body>
-      <div v-if="currentPlan" class="plan-detail">
+    <el-dialog title="提分计划详情" v-model="detailOpen" width="90%" append-to-body id="plan-detail-dialog">
+      <div v-if="currentPlan" class="plan-detail" id="plan-detail-content">
         <!-- 基本信息 -->
-        <div class="detail-section">
+        <div class="detail-section" id="basic-info-section">
           <h3>基本信息</h3>
-          <el-descriptions :column="3" border>
+          <el-descriptions :column="3" border id="basic-info-descriptions">
             <el-descriptions-item label="计划名称">{{ currentPlan.planName }}</el-descriptions-item>
             <el-descriptions-item label="学生">{{ currentPlan.studentName }}</el-descriptions-item>
             <el-descriptions-item label="学科">{{ getSubjectLabel(currentPlan.subject) }}</el-descriptions-item>
@@ -247,10 +248,10 @@
         </div>
 
         <!-- 计划日历 -->
-        <div class="detail-section">
+        <div class="detail-section" id="calendar-section">
           <h3>计划日历</h3>
-          <div class="plan-calendar">
-            <el-calendar v-model="calendarDate">
+          <div class="plan-calendar" id="plan-calendar">
+            <el-calendar v-model="calendarDate" id="plan-calendar-component">
               <template #date-cell="{ data }">
                 <div class="calendar-cell">
                   <p :class="{ 'is-today': isToday(data.day) }">{{ data.day.split('-')[2] }}</p>
@@ -270,9 +271,9 @@
         </div>
 
         <!-- 任务列表 -->
-        <div class="detail-section">
+        <div class="detail-section" id="tasks-section">
           <h3>任务列表</h3>
-          <el-table :data="currentPlan.tasks" stripe>
+          <el-table :data="currentPlan.tasks" stripe id="tasks-table">
             <el-table-column label="任务名称" prop="title" />
             <el-table-column label="任务类型" prop="type" width="120">
               <template #default="scope">
@@ -316,13 +317,13 @@
         </div>
 
         <!-- 进度统计 -->
-        <div class="detail-section">
+        <div class="detail-section" id="progress-section">
           <h3>进度统计</h3>
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <div class="progress-chart">
+          <el-row :gutter="20" id="progress-stats-row">
+            <el-col :span="12" id="progress-chart-col">
+              <div class="progress-chart" id="progress-chart">
                 <h4>任务完成情况</h4>
-                <div class="chart-container">
+                <div class="chart-container" id="chart-container">
                   <!-- 这里应该使用图表库显示饼图 -->
                   <div class="chart-placeholder">
                     <el-empty description="图表加载中..." />
@@ -330,23 +331,23 @@
                 </div>
               </div>
             </el-col>
-            <el-col :span="12">
-              <div class="progress-stats">
+            <el-col :span="12" id="progress-stats-col">
+              <div class="progress-stats" id="progress-stats">
                 <h4>统计数据</h4>
-                <div class="stats-grid">
-                  <div class="stat-item">
+                <div class="stats-grid" id="stats-grid">
+                  <div class="stat-item" id="on-time-rate-stat">
                     <div class="stat-value">{{ currentPlan.onTimeRate }}%</div>
                     <div class="stat-label">按时完成率</div>
                   </div>
-                  <div class="stat-item">
+                  <div class="stat-item" id="avg-study-time-stat">
                     <div class="stat-value">{{ currentPlan.avgStudyTime }}h</div>
                     <div class="stat-label">平均学习时间</div>
                   </div>
-                  <div class="stat-item">
+                  <div class="stat-item" id="streak-days-stat">
                     <div class="stat-value">{{ currentPlan.streakDays }}天</div>
                     <div class="stat-label">连续学习天数</div>
                   </div>
-                  <div class="stat-item">
+                  <div class="stat-item" id="total-study-time-stat">
                     <div class="stat-value">{{ currentPlan.totalStudyTime }}h</div>
                     <div class="stat-label">总学习时间</div>
                   </div>

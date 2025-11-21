@@ -1,22 +1,24 @@
 <template>
   <el-dialog
-    v-model="visible"
-    :title="homework ? '编辑作业' : '新建作业'"
-    width="700px"
-    @close="handleClose"
+      id="homework-dialog"
+      v-model="visible"
+      :title="homework ? '编辑作业' : '新建作业'"
+      width="700px"
+      @close="handleClose"
   >
     <el-form
+      id="homework-form"
       ref="formRef"
       :model="formData"
       :rules="rules"
       label-width="100px"
     >
       <el-form-item label="作业标题" prop="title">
-        <el-input v-model="formData.title" placeholder="请输入作业标题" />
+        <el-input id="homework-title-input" v-model="formData.title" placeholder="请输入作业标题" />
       </el-form-item>
 
       <el-form-item label="班级" prop="classId">
-        <el-select v-model="formData.classId" placeholder="请选择班级">
+        <el-select id="class-select" v-model="formData.classId" placeholder="请选择班级">
           <el-option
             v-for="cls in classes"
             :key="cls.id"
@@ -27,11 +29,12 @@
       </el-form-item>
 
       <el-form-item label="课程">
-        <el-input v-model="formData.courseName" placeholder="请输入课程名称（可选）" />
+        <el-input id="course-name-input" v-model="formData.courseName" placeholder="请输入课程名称（可选）" />
       </el-form-item>
 
       <el-form-item label="截止时间" prop="dueDate">
         <el-date-picker
+          id="due-date-picker"
           v-model="formData.dueDate"
           type="datetime"
           placeholder="选择截止时间"
@@ -42,6 +45,7 @@
 
       <el-form-item label="描述">
         <el-input
+          id="homework-description-input"
           v-model="formData.description"
           type="textarea"
           :rows="3"
@@ -50,15 +54,17 @@
       </el-form-item>
 
       <el-form-item label="添加题目">
-        <div class="questions-section">
-          <div class="questions-list">
+        <div id="questions-section" class="questions-section">
+          <div id="questions-list" class="questions-list">
             <div
               v-for="(question, index) in formData.questions"
               :key="index"
+              :id="`question-item-${index}`"
               class="question-item"
             >
               <span class="question-text">{{ question.title }}</span>
               <el-button
+                :id="`remove-question-btn-${index}`"
                 type="danger"
                 size="small"
                 @click="removeQuestion(index)"
@@ -68,7 +74,7 @@
             </div>
           </div>
 
-          <el-button type="primary" size="small" @click="showQuestionSelector">
+          <el-button id="add-question-btn" type="primary" size="small" @click="showQuestionSelector">
             <el-icon><Plus /></el-icon>
             从题库添加
           </el-button>
@@ -76,7 +82,7 @@
       </el-form-item>
 
       <el-form-item label="状态">
-        <el-radio-group v-model="formData.status">
+        <el-radio-group id="homework-status-radio" v-model="formData.status">
           <el-radio label="draft">保存为草稿</el-radio>
           <el-radio label="published">发布</el-radio>
         </el-radio-group>
@@ -84,8 +90,8 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
+      <el-button id="cancel-homework-btn" @click="handleClose">取消</el-button>
+      <el-button id="save-homework-btn" type="primary" @click="handleSubmit">保存</el-button>
     </template>
   </el-dialog>
 

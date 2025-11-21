@@ -1,7 +1,7 @@
 <template>
-  <div class="student-list-container">
+  <div class="student-list-container" id="users-student-list-container">
     <!-- 顶部操作栏 -->
-    <div class="top-bar">
+    <div class="top-bar" id="users-student-top-bar">
       <div class="title-section">
         <h2>学生管理</h2>
         <div class="stats">
@@ -25,7 +25,7 @@
     </div>
 
     <!-- 筛选栏 -->
-    <div class="filter-bar">
+    <div class="filter-bar" id="users-student-filter-bar">
       <el-input
         v-model="searchText"
         placeholder="搜索学号、姓名..."
@@ -46,20 +46,24 @@
 
       <el-select v-model="filterStatus" placeholder="状态" clearable style="width: 150px">
         <el-option label="全部状态" value="" />
-        <el-option label="在读" value="active" />
-        <el-option label="休学" value="inactive" />
-        <el-option label="已毕业" value="graduated" />
+        <el-option label="新生" value="new" />
+        <el-option label="在读" value="studying" />
+        <el-option label="停课" value="suspended" />
+        <el-option label="封存" value="archived" />
+        <el-option label="结课" value="finished" />
+        <el-option label="退费" value="refunded" />
       </el-select>
 
       <el-button @click="handleReset">重置</el-button>
     </div>
 
     <!-- 学生表格 -->
-    <div class="table-container">
+    <div class="table-container" id="users-student-table-container">
       <el-table
         :data="paginatedStudents"
         @selection-change="handleSelectionChange"
         stripe
+        id="users-student-data-table"
       >
         <el-table-column type="selection" width="55" />
         <el-table-column prop="studentId" label="学号" width="120" />
@@ -75,9 +79,21 @@
             {{ formatLearningTime(scope.row.statistics?.learningTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="100" align="center">
+        <el-table-column label="状态" width="120" align="center">
           <template #default="scope">
-            {{ getStatusLabel(scope.row.status) }}
+            <el-tag :type="getStatusTagType(scope.row.status)" size="small">
+              {{ getStatusLabel(scope.row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="启用/禁用" width="100" align="center">
+          <template #default="scope">
+            <el-switch
+              v-model="scope.row.isDisabled"
+              :active-value="false"
+              :inactive-value="true"
+              @change="handleToggleDisable(scope.row)"
+            />
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180" fixed="right">
@@ -199,7 +215,8 @@ const initMockData = () => {
         averageScore: 82.5,
         learningTime: 4560
       },
-      status: 'active',
+      status: 'studying',
+      isDisabled: false,
       createdAt: '2024-09-01T10:00:00Z'
     },
     {
@@ -222,7 +239,8 @@ const initMockData = () => {
         averageScore: 90.0,
         learningTime: 5200
       },
-      status: 'active',
+      status: 'studying',
+      isDisabled: false,
       createdAt: '2024-09-01T10:00:00Z'
     },
     {
@@ -245,8 +263,95 @@ const initMockData = () => {
         averageScore: 72.0,
         learningTime: 3800
       },
-      status: 'active',
+      status: 'suspended',
+      isDisabled: false,
       createdAt: '2024-09-01T10:00:00Z'
+    },
+    {
+      id: 'stu_004',
+      studentId: '20240004',
+      name: '赵六',
+      phone: '13800138002',
+      email: 'zhaoliu@example.com',
+      classes: [],
+      courses: [],
+      statistics: {
+        totalHomeworks: 0,
+        completedHomeworks: 0,
+        totalExams: 0,
+        completedExams: 0,
+        averageScore: 0,
+        learningTime: 0
+      },
+      status: 'new',
+      isDisabled: false,
+      createdAt: '2024-12-01T10:00:00Z'
+    },
+    {
+      id: 'stu_005',
+      studentId: '20240005',
+      name: '孙七',
+      phone: '13800138003',
+      email: 'sunqi@example.com',
+      classes: [
+        { id: 'class_001', name: '前端开发一班', joinTime: '2024-09-01T10:00:00Z' }
+      ],
+      courses: [
+        { id: 'course_001', name: 'JavaScript基础', progress: 100, score: 95 }
+      ],
+      statistics: {
+        totalHomeworks: 10,
+        completedHomeworks: 10,
+        totalExams: 2,
+        completedExams: 2,
+        averageScore: 95.0,
+        learningTime: 6000
+      },
+      status: 'finished',
+      isDisabled: false,
+      createdAt: '2024-09-01T10:00:00Z'
+    },
+    {
+      id: 'stu_006',
+      studentId: '20240006',
+      name: '周八',
+      phone: '13800138004',
+      email: 'zhouba@example.com',
+      classes: [
+        { id: 'class_002', name: '前端开发二班', joinTime: '2024-09-01T10:00:00Z' }
+      ],
+      courses: [],
+      statistics: {
+        totalHomeworks: 0,
+        completedHomeworks: 0,
+        totalExams: 0,
+        completedExams: 0,
+        averageScore: 0,
+        learningTime: 120
+      },
+      status: 'archived',
+      isDisabled: true,
+      createdAt: '2024-09-01T10:00:00Z'
+    },
+    {
+      id: 'stu_007',
+      studentId: '20240007',
+      name: '吴九',
+      phone: '13800138005',
+      email: 'wujiu@example.com',
+      classes: [],
+      courses: [],
+      statistics: {
+        totalHomeworks: 5,
+        completedHomeworks: 2,
+        totalExams: 1,
+        completedExams: 0,
+        averageScore: 45.0,
+        learningTime: 800
+      },
+      status: 'refunded',
+      isDisabled: true,
+      createdAt: '2024-10-01T10:00:00Z'
     }
   ]
 }
@@ -356,20 +461,42 @@ const getClassesDisplay = (classes) => {
 
 const getStatusLabel = (status) => {
   const map = {
-    active: '在读',
-    inactive: '休学',
-    graduated: '已毕业'
+    new: '新生',
+    studying: '在读',
+    suspended: '停课',
+    archived: '封存',
+    finished: '结课',
+    refunded: '退费'
   }
   return map[status] || status
 }
 
 const getStatusTagType = (status) => {
   const map = {
-    active: 'success',
-    inactive: 'warning',
-    graduated: 'info'
+    new: '',
+    studying: 'success',
+    suspended: 'warning',
+    archived: 'info',
+    finished: 'warning',
+    refunded: 'danger'
   }
   return map[status] || ''
+}
+
+// 切换启用/禁用状态
+const handleToggleDisable = async (student) => {
+  try {
+    const action = student.isDisabled ? '禁用' : '启用'
+    
+    // TODO: 调用API更新禁用状态
+    // await updateStudentDisable(student.id, student.isDisabled)
+    
+    ElMessage.success(`已${action}学生：${student.name}`)
+  } catch (error) {
+    ElMessage.error('操作失败：' + error.message)
+    // 回滚状态
+    student.isDisabled = !student.isDisabled
+  }
 }
 
 const formatLearningTime = (minutes) => {

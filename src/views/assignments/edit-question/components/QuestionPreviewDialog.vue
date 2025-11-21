@@ -1,29 +1,28 @@
 <template>
   <el-dialog
+    id="question-preview-dialog"
     v-model="visible"
     title="题目预览"
     width="800px"
     top="5vh"
     @close="handleClose"
   >
-    <div class="question-preview">
+    <div id="question-preview" class="question-preview">
       <!-- 题目头部信息 -->
-      <div class="question-header">
-        <div class="header-left">
-          <el-tag :type="getTypeTagType(questionData.type)" size="large">
+      <div id="question-header" class="question-header">
+        <div id="header-left" class="header-left">
+          <el-tag id="type-tag" :type="getTypeTagType(questionData.type)" size="large">
             {{ getTypeLabel(questionData.type) }}
           </el-tag>
-          <el-tag :type="getDifficultyTagType(questionData.difficulty)" size="large">
+          <el-tag id="difficulty-tag" :type="getDifficultyTagType(questionData.difficulty)" size="large">
             {{ getDifficultyLabel(questionData.difficulty) }}
           </el-tag>
-          <el-tag type="info" size="large">
-            {{ questionData.score }}分
-          </el-tag>
         </div>
-        <div class="header-right">
-          <el-tag 
-            v-for="tag in questionData.tags" 
-            :key="tag" 
+        <div id="header-right" class="header-right">
+          <el-tag
+            v-for="(tag, tagIndex) in questionData.tags"
+            :id="`tag-${tagIndex}`"
+            :key="tag"
             size="small"
             style="margin-left: 8px"
           >
@@ -33,25 +32,27 @@
       </div>
 
       <!-- 题目内容 -->
-      <div class="question-content">
-        <div class="question-number">题号: {{ questionData.questionNumber }}</div>
-        <div class="question-text">{{ questionData.questionText || '(题目内容为空)' }}</div>
+      <div id="question-content" class="question-content">
+        <div id="question-number" class="question-number">题号: {{ questionData.questionNumber }}</div>
+        <div id="question-text" class="question-text">{{ questionData.questionText || '(题目内容为空)' }}</div>
       </div>
 
       <!-- 单选题预览 -->
-      <div v-if="questionData.type === 'single'" class="question-options">
-        <el-radio-group v-model="previewAnswer" disabled>
-          <div 
-            v-for="option in questionData.singleChoice.options" 
+      <div v-if="questionData.type === 'single'" id="single-choice-preview" class="question-options">
+        <el-radio-group id="single-choice-group" v-model="previewAnswer" disabled>
+          <div
+            v-for="(option, index) in questionData.singleChoice.options"
             :key="option.value"
+            :id="`single-option-${index}`"
             class="option-item"
           >
             <el-radio :label="option.value">
-              <span class="option-label">{{ option.value }}.</span>
-              <span class="option-text">{{ option.text || '(选项内容为空)' }}</span>
+              <span :id="`single-option-label-${index}`" class="option-label">{{ option.value }}.</span>
+              <span :id="`single-option-text-${index}`" class="option-text">{{ option.text || '(选项内容为空)' }}</span>
             </el-radio>
-            <el-tag 
+            <el-tag
               v-if="option.value === questionData.singleChoice.correctAnswer"
+              :id="`single-correct-tag-${index}`"
               type="success"
               size="small"
               style="margin-left: 12px"
@@ -63,19 +64,21 @@
       </div>
 
       <!-- 多选题预览 -->
-      <div v-if="questionData.type === 'multiple'" class="question-options">
-        <el-checkbox-group v-model="previewAnswers" disabled>
-          <div 
-            v-for="option in questionData.multipleChoice.options" 
+      <div v-if="questionData.type === 'multiple'" id="multiple-choice-preview" class="question-options">
+        <el-checkbox-group id="multiple-choice-group" v-model="previewAnswers" disabled>
+          <div
+            v-for="(option, index) in questionData.multipleChoice.options"
             :key="option.value"
+            :id="`multiple-option-${index}`"
             class="option-item"
           >
             <el-checkbox :label="option.value">
-              <span class="option-label">{{ option.value }}.</span>
-              <span class="option-text">{{ option.text || '(选项内容为空)' }}</span>
+              <span :id="`multiple-option-label-${index}`" class="option-label">{{ option.value }}.</span>
+              <span :id="`multiple-option-text-${index}`" class="option-text">{{ option.text || '(选项内容为空)' }}</span>
             </el-checkbox>
-            <el-tag 
+            <el-tag
               v-if="option.isCorrect"
+              :id="`multiple-correct-tag-${index}`"
               type="success"
               size="small"
               style="margin-left: 12px"
@@ -87,18 +90,20 @@
       </div>
 
       <!-- 填空题预览 -->
-      <div v-if="questionData.type === 'fill'" class="fill-blanks">
-        <div 
-          v-for="(blank, index) in questionData.fillBlanks.blanks" 
+      <div v-if="questionData.type === 'fill'" id="fill-blanks-preview" class="fill-blanks">
+        <div
+          v-for="(blank, index) in questionData.fillBlanks.blanks"
           :key="blank.id"
+          :id="`blank-item-${index}`"
           class="blank-item"
         >
-          <div class="blank-label">第{{ index + 1 }}空:</div>
-          <el-input placeholder="请输入答案" disabled />
-          <div class="blank-answers">
+          <div :id="`blank-label-${index}`" class="blank-label">第{{ index + 1 }}空:</div>
+          <el-input :id="`blank-input-${index}`" placeholder="请输入答案" disabled />
+          <div :id="`blank-answers-${index}`" class="blank-answers">
             <span style="color: #909399; margin-right: 8px">参考答案:</span>
-            <el-tag 
-              v-for="(answer, aIndex) in blank.answers" 
+            <el-tag
+              v-for="(answer, aIndex) in blank.answers"
+              :id="`blank-answer-${index}-${aIndex}`"
               :key="aIndex"
               type="success"
               size="small"
@@ -108,47 +113,47 @@
             </el-tag>
           </div>
         </div>
-        <div class="scoring-method">
+        <div id="scoring-method" class="scoring-method">
           <el-icon><InfoFilled /></el-icon>
-          评分方式: {{ questionData.fillBlanks.scoringMethod === 'all' ? '全对得分' : '部分得分' }}
         </div>
       </div>
 
       <!-- 问答题预览 -->
-      <div v-if="questionData.type === 'essay'" class="essay-answer">
+      <div v-if="questionData.type === 'essay'" id="essay-preview" class="essay-answer">
         <el-input
+          id="essay-textarea"
           type="textarea"
           :rows="6"
           placeholder="请输入你的答案..."
           disabled
         />
-        <div v-if="questionData.essay.aiGrading" class="ai-grading-info">
+        <div v-if="questionData.essay.aiGrading" id="ai-grading-info" class="ai-grading-info">
           <el-icon><Cpu /></el-icon>
           <span>本题启用AI辅助评分</span>
         </div>
       </div>
 
       <!-- 编程题预览 -->
-      <div v-if="questionData.type === 'programming'" class="programming-info">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="HOJ题目ID">
+      <div v-if="questionData.type === 'programming'" id="programming-preview" class="programming-info">
+        <el-descriptions id="programming-descriptions" :column="2" border>
+          <el-descriptions-item id="hoj-id-item" label="HOJ题目ID">
             {{ questionData.programming.hojProblemId || 'N/A' }}
           </el-descriptions-item>
-          <el-descriptions-item label="题目名称">
+          <el-descriptions-item id="problem-name-item" label="题目名称">
             {{ questionData.programming.problemName || 'N/A' }}
           </el-descriptions-item>
-          <el-descriptions-item label="时间限制">
+          <el-descriptions-item id="time-limit-item" label="时间限制">
             {{ questionData.programming.timeLimit }}ms
           </el-descriptions-item>
-          <el-descriptions-item label="内存限制">
+          <el-descriptions-item id="memory-limit-item" label="内存限制">
             {{ questionData.programming.memoryLimit }}MB
           </el-descriptions-item>
-          <el-descriptions-item label="必做">
+          <el-descriptions-item id="required-item" label="必做">
             <el-tag :type="questionData.programming.required ? 'success' : 'info'" size="small">
               {{ questionData.programming.required ? '是' : '否' }}
             </el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="多次提交">
+          <el-descriptions-item id="multiple-submit-item" label="多次提交">
             <el-tag :type="questionData.programming.multipleSubmit ? 'success' : 'info'" size="small">
               {{ questionData.programming.multipleSubmit ? '允许' : '不允许' }}
             </el-tag>
@@ -157,19 +162,19 @@
       </div>
 
       <!-- 题目解析 -->
-      <div v-if="getExplanation()" class="question-explanation">
-        <el-divider content-position="left">
+      <div v-if="getExplanation()" id="question-explanation" class="question-explanation">
+        <el-divider id="explanation-divider" content-position="left">
           <el-icon><Document /></el-icon>
           题目解析
         </el-divider>
-        <div class="explanation-content">
+        <div id="explanation-content" class="explanation-content">
           {{ getExplanation() }}
         </div>
       </div>
     </div>
 
     <template #footer>
-      <el-button type="primary" @click="handleClose">关闭</el-button>
+      <el-button id="close-btn" type="primary" @click="handleClose">关闭</el-button>
     </template>
   </el-dialog>
 </template>

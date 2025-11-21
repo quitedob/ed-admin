@@ -1,10 +1,11 @@
 <template>
-  <div class="assignment-list">
+  <div class="assignment-list" id="assignment-list">
     <el-table
       v-loading="loading"
       :data="assignments"
       @selection-change="handleSelectionChange"
       style="width: 100%"
+      id="assignments-table"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="题目ID" align="center" prop="id" width="100">
@@ -14,11 +15,11 @@
       </el-table-column>
       <el-table-column label="题目标题" align="left" prop="title" min-width="200" show-overflow-tooltip>
         <template #default="scope">
-          <div class="assignment-title">
-            <el-link type="primary" @click="$emit('view', scope.row)">
+          <div class="assignment-title" :id="`assignment-title-${scope.row.id}`">
+            <el-link type="primary" @click="$emit('view', scope.row)" :id="`view-link-${scope.row.id}`">
               {{ scope.row.basicInfo?.title || scope.row.title }}
             </el-link>
-            <div class="assignment-meta">
+            <div class="assignment-meta" :id="`assignment-meta-${scope.row.id}`">
               <el-tag size="small" :type="getTypeTagType(scope.row.basicInfo?.type)">
                 {{ getTypeLabel(scope.row.basicInfo?.type) }}
               </el-tag>
@@ -33,13 +34,13 @@
       <el-table-column label="所属班级" align="center" prop="className" width="140" show-overflow-tooltip />
       <el-table-column label="操作" align="center" width="160" fixed="right">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="$emit('edit', scope.row)">
+          <el-button link type="primary" size="small" @click="$emit('edit', scope.row)" :id="`edit-btn-${scope.row.id}`">
             编辑
           </el-button>
-          <el-button link type="primary" size="small" @click="$emit('view-answers', scope.row)">
+          <el-button link type="primary" size="small" @click="$emit('view-answers', scope.row)" :id="`view-answers-btn-${scope.row.id}`">
             答题情况
           </el-button>
-          <el-button link type="danger" size="small" @click="$emit('delete', scope.row)">
+          <el-button link type="danger" size="small" @click="$emit('delete', scope.row)" :id="`delete-btn-${scope.row.id}`">
             删除
           </el-button>
         </template>

@@ -4,11 +4,12 @@
     title="授权班级"
     width="70%"
     @close="handleClose"
+    id="lecturer-authorize-dialog"
   >
-    <div class="authorize-container">
+    <div class="authorize-container" id="lecturer-authorize-container">
       <el-row :gutter="20" style="height: 400px;">
         <!-- 左侧：可选班级列表 -->
-        <el-col :span="10" class="left-panel">
+        <el-col :span="10" class="left-panel" id="lecturer-authorize-available-panel">
           <div class="panel-header">
             <h4>可选班级</h4>
             <el-input

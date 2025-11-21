@@ -1,9 +1,9 @@
 <template>
-  <div class="ai-assistant">
-    <div class="assistant-container">
+  <div id="ai-assistant" class="ai-assistant">
+    <div id="assistant-container" class="assistant-container">
       <!-- 左侧边栏 -->
-      <div class="sidebar">
-        <div class="sidebar-header">
+      <div id="sidebar" class="sidebar">
+        <div id="sidebar-header" class="sidebar-header">
           <h3>智能作业生成</h3>
           <el-button type="primary" size="small" @click="refreshHistory">
             <el-icon><Refresh /></el-icon>
@@ -12,10 +12,11 @@
         </div>
 
         <!-- 项目历史 -->
-        <div class="history-list">
+        <div id="history-list" class="history-list">
           <div
             v-for="project in projectHistory"
             :key="project.id"
+            :id="`history-item-${project.id}`"
             class="history-item"
             :class="{ active: currentProject?.id === project.id }"
             @click="selectProject(project)"
@@ -42,9 +43,9 @@
         </div>
 
         <!-- 使用帮助 -->
-        <div class="help-panel">
+        <div id="help-panel" class="help-panel">
           <h4>使用帮助</h4>
-          <div class="help-list">
+          <div id="help-list" class="help-list">
             <div class="help-item" @click="showGuide('upload')">
               <el-icon><Upload /></el-icon>
               <span>上传文件指南</span>
@@ -62,15 +63,15 @@
       </div>
 
       <!-- 主要内容区域 -->
-      <div class="main-content">
-        <div class="content-header">
+      <div id="main-content" class="main-content">
+        <div id="content-header" class="content-header">
           <h2>智能作业生成助手</h2>
           <p>选择您需要的功能，快速创建高质量的试卷和作业</p>
         </div>
 
         <!-- 功能卡片区域 -->
-        <div class="function-cards">
-          <div class="function-card upload-card" @click="navigateTo('upload-generate')">
+        <div id="function-cards" class="function-cards">
+          <div id="upload-card" class="function-card upload-card" @click="navigateTo('upload-generate')">
             <div class="card-icon">
               <el-icon><Upload /></el-icon>
             </div>
@@ -88,7 +89,7 @@
             </div>
           </div>
 
-          <div class="function-card error-card" @click="navigateTo('error-based')">
+          <div id="error-card" class="function-card error-card" @click="navigateTo('error-based')">
             <div class="card-icon">
               <el-icon><DataAnalysis /></el-icon>
             </div>
@@ -106,7 +107,7 @@
             </div>
           </div>
 
-          <div class="function-card custom-card" @click="navigateTo('custom-generate')">
+          <div id="custom-card" class="function-card custom-card" @click="navigateTo('custom-generate')">
             <div class="card-icon">
               <el-icon><Setting /></el-icon>
             </div>
@@ -126,20 +127,20 @@
         </div>
 
         <!-- 快速统计 -->
-        <div class="quick-stats">
-          <div class="stat-item">
+        <div id="quick-stats" class="quick-stats">
+          <div id="stat-generated" class="stat-item">
             <div class="stat-number">{{ stats.totalGenerated }}</div>
             <div class="stat-label">已生成试卷</div>
           </div>
-          <div class="stat-item">
+          <div id="stat-questions" class="stat-item">
             <div class="stat-number">{{ stats.totalQuestions }}</div>
             <div class="stat-label">题目总数</div>
           </div>
-          <div class="stat-item">
+          <div id="stat-success-rate" class="stat-item">
             <div class="stat-number">{{ stats.successRate }}%</div>
             <div class="stat-label">成功率</div>
           </div>
-          <div class="stat-item">
+          <div id="stat-avg-time" class="stat-item">
             <div class="stat-number">{{ stats.avgTime }}s</div>
             <div class="stat-label">平均生成时间</div>
           </div>
@@ -147,12 +148,12 @@
       </div>
 
       <!-- 右侧面板 -->
-      <div class="right-panel">
+      <div id="right-panel" class="right-panel">
         <!-- 最新动态 -->
-        <div class="recent-activities">
+        <div id="recent-activities" class="recent-activities">
           <h4>最新动态</h4>
-          <div class="activity-list">
-            <div v-for="activity in recentActivities" :key="activity.id" class="activity-item">
+          <div id="activity-list" class="activity-list">
+            <div v-for="activity in recentActivities" :key="activity.id" :id="`activity-item-${activity.id}`" class="activity-item">
               <div class="activity-icon">
                 <el-icon :class="getActivityIcon(activity.type)">
                   <component :is="getActivityIcon(activity.type)" />
@@ -167,9 +168,9 @@
         </div>
 
         <!-- 系统信息 -->
-        <div class="system-info">
+        <div id="system-info" class="system-info">
           <h4>系统信息</h4>
-          <div class="info-item">
+          <div id="info-model-version" class="info-item">
             <span class="info-label">模型版本:</span>
             <span class="info-value">v2.1.0</span>
           </div>
@@ -184,7 +185,7 @@
         </div>
 
         <!-- 快速操作 -->
-        <div class="quick-actions">
+        <div id="quick-actions" class="quick-actions">
           <h4>快速操作</h4>
           <el-button type="primary" size="small" @click="exportAllProjects">
             <el-icon><Download /></el-icon>
@@ -203,8 +204,8 @@
     </div>
 
     <!-- 帮助对话框 -->
-    <el-dialog v-model="showHelpDialog" :title="helpTitle" width="600px">
-      <div v-html="helpContent" class="help-content"></div>
+    <el-dialog id="help-dialog" v-model="showHelpDialog" :title="helpTitle" width="600px">
+      <div id="help-content" v-html="helpContent" class="help-content"></div>
       <template #footer>
         <el-button @click="showHelpDialog = false">关闭</el-button>
       </template>

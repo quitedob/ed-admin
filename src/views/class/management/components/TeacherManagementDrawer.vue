@@ -6,7 +6,24 @@
     @close="handleClose"
   >
     <div class="teacher-management-container">
-      <el-row :gutter="20" style="height: 100%;">
+      <!-- 全局搜索框 -->
+      <div class="global-search">
+        <el-input
+          v-model="teacherSearch"
+          placeholder="搜索老师姓名或工号..."
+          clearable
+          size="default"
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
+        </el-input>
+        <div v-if="teacherSearch" class="search-hint">
+          找到 {{ availableHeadTeachers.length + availableTeachingTeachers.length }} 位可添加的老师
+        </div>
+      </div>
+
+      <el-row :gutter="20" style="height: calc(100% - 80px);">
         <!-- 班主任管理 -->
         <el-col :span="12" class="panel">
           <div class="panel-header">
@@ -40,14 +57,17 @@
           <div class="add-section">
             <el-select
               v-model="selectedHeadTeacher"
-              placeholder="选择班主任"
+              placeholder="搜索班主任"
               size="small"
               style="width: 100%; margin-bottom: 8px;"
+              filterable
+              clearable
+              :filter-method="filterHeadTeachers"
             >
               <el-option
-                v-for="teacher in availableHeadTeachers"
+                v-for="teacher in filteredHeadTeachers"
                 :key="teacher.id"
-                :label="teacher.name"
+                :label="`${teacher.name} (${teacher.id})`"
                 :value="teacher"
               />
             </el-select>
@@ -95,14 +115,17 @@
           <div class="add-section">
             <el-select
               v-model="selectedTeachingTeacher"
-              placeholder="选择授课老师"
+              placeholder="搜索授课老师"
               size="small"
               style="width: 100%; margin-bottom: 8px;"
+              filterable
+              clearable
+              :filter-method="filterTeachingTeachers"
             >
               <el-option
-                v-for="teacher in availableTeachingTeachers"
+                v-for="teacher in filteredTeachingTeachers"
                 :key="teacher.id"
-                :label="teacher.name"
+                :label="`${teacher.name} (${teacher.id})`"
                 :value="teacher"
               />
             </el-select>
@@ -129,8 +152,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -145,8 +169,11 @@ const visible = computed({
 })
 
 // 响应式数据
+const teacherSearch = ref('')
 const selectedHeadTeacher = ref(null)
 const selectedTeachingTeacher = ref(null)
+const filteredHeadTeachers = ref([])
+const filteredTeachingTeachers = ref([])
 
 // 模拟班主任列表
 const headTeachers = ref([
@@ -178,7 +205,18 @@ const availableHeadTeachers = computed(() => {
     ...headTeachers.value.map(t => t.id),
     ...teachingTeachers.value.map(t => t.id)
   ])
-  return allTeachers.value.filter(t => !usedIds.has(t.id))
+  let available = allTeachers.value.filter(t => !usedIds.has(t.id))
+  
+  // 应用全局搜索过滤
+  if (teacherSearch.value) {
+    const searchLower = teacherSearch.value.toLowerCase()
+    available = available.filter(t => 
+      t.name.toLowerCase().includes(searchLower) ||
+      t.id.toLowerCase().includes(searchLower)
+    )
+  }
+  
+  return available
 })
 
 const availableTeachingTeachers = computed(() => {
@@ -186,10 +224,48 @@ const availableTeachingTeachers = computed(() => {
     ...headTeachers.value.map(t => t.id),
     ...teachingTeachers.value.map(t => t.id)
   ])
-  return allTeachers.value.filter(t => !usedIds.has(t.id))
+  let available = allTeachers.value.filter(t => !usedIds.has(t.id))
+  
+  // 应用全局搜索过滤
+  if (teacherSearch.value) {
+    const searchLower = teacherSearch.value.toLowerCase()
+    available = available.filter(t => 
+      t.name.toLowerCase().includes(searchLower) ||
+      t.id.toLowerCase().includes(searchLower)
+    )
+  }
+  
+  return available
 })
 
+// 初始化过滤列表
+const initFilteredTeachers = () => {
+  filteredHeadTeachers.value = availableHeadTeachers.value
+  filteredTeachingTeachers.value = availableTeachingTeachers.value
+}
+
 // 方法
+const filterHeadTeachers = (query) => {
+  if (!query) {
+    filteredHeadTeachers.value = availableHeadTeachers.value
+  } else {
+    filteredHeadTeachers.value = availableHeadTeachers.value.filter(teacher => 
+      teacher.name.toLowerCase().includes(query.toLowerCase()) ||
+      teacher.id.toLowerCase().includes(query.toLowerCase())
+    )
+  }
+}
+
+const filterTeachingTeachers = (query) => {
+  if (!query) {
+    filteredTeachingTeachers.value = availableTeachingTeachers.value
+  } else {
+    filteredTeachingTeachers.value = availableTeachingTeachers.value.filter(teacher => 
+      teacher.name.toLowerCase().includes(query.toLowerCase()) ||
+      teacher.id.toLowerCase().includes(query.toLowerCase())
+    )
+  }
+}
 const removeHeadTeacher = (teacher) => {
   const index = headTeachers.value.findIndex(t => t.id === teacher.id)
   if (index > -1) {
@@ -238,6 +314,16 @@ const handleSave = () => {
   ElMessage.success('老师列表已保存')
   handleClose()
 }
+
+// 监听可用老师列表变化，更新过滤列表
+watch([availableHeadTeachers, availableTeachingTeachers], () => {
+  initFilteredTeachers()
+}, { deep: true })
+
+// 组件挂载时初始化
+onMounted(() => {
+  initFilteredTeachers()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -245,6 +331,21 @@ const handleSave = () => {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.global-search {
+  margin-bottom: 20px;
+  
+  :deep(.el-input__wrapper) {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .search-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #409eff;
+    padding-left: 12px;
+  }
 }
 
 .panel {

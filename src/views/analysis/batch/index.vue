@@ -1,10 +1,10 @@
 <template>
-  <div class="batch-analysis">
-    <el-card class="analysis-card">
+  <div class="batch-analysis" id="batch-analysis-container">
+    <el-card class="analysis-card" id="analysis-card">
       <template #header>
-        <div class="card-header">
+        <div class="card-header" id="analysis-header">
           <span>批量数据分析</span>
-          <div class="header-actions">
+          <div class="header-actions" id="header-actions">
             <el-button type="primary" @click="showBatchOperationDialog = true">
               <el-icon><Operation /></el-icon>
               批量操作
@@ -18,25 +18,25 @@
       </template>
 
       <!-- 统计概览 -->
-      <div class="stats-overview">
-        <el-row :gutter="20">
+      <div class="stats-overview" id="stats-overview">
+        <el-row :gutter="20" id="overview-stats-row">
           <el-col :span="6">
-            <el-statistic title="学生总数" :value="overviewData.totalStudents">
+            <el-statistic title="学生总数" :value="overviewData.totalStudents" id="total-students-stat">
               <template #suffix>人</template>
             </el-statistic>
           </el-col>
           <el-col :span="6">
-            <el-statistic title="活跃学生" :value="overviewData.activeStudents">
+            <el-statistic title="活跃学生" :value="overviewData.activeStudents" id="active-students-stat">
               <template #suffix>人</template>
             </el-statistic>
           </el-col>
           <el-col :span="6">
-            <el-statistic title="平均成绩" :value="overviewData.averageScore">
+            <el-statistic title="平均成绩" :value="overviewData.averageScore" id="average-score-stat">
               <template #suffix">分</template>
             </el-statistic>
           </el-col>
           <el-col :span="6">
-            <el-statistic title="平均学习时长" :value="overviewData.averageStudyTime">
+            <el-statistic title="平均学习时长" :value="overviewData.averageStudyTime" id="average-study-time-stat">
               <template #suffix">分钟</template>
             </el-statistic>
           </el-col>
@@ -44,12 +44,12 @@
       </div>
 
       <!-- 分析标签页 -->
-      <el-tabs v-model="activeTab" @tab-change="handleTabChange">
+      <el-tabs v-model="activeTab" @tab-change="handleTabChange" id="analysis-tabs">
         <!-- 学生分析 -->
-        <el-tab-pane label="学生分析" name="students">
-          <div class="tab-content">
+        <el-tab-pane label="学生分析" name="students" id="students-tab">
+          <div class="tab-content" id="students-tab-content">
             <!-- 筛选条件 -->
-            <el-form :inline="true" :model="studentFilters" class="filter-form">
+            <el-form :inline="true" :model="studentFilters" class="filter-form" id="student-filter-form">
               <el-form-item label="班级">
                 <el-select v-model="studentFilters.classId" placeholder="选择班级" clearable style="width: 150px">
                   <el-option label="前端开发基础班" :value="1" />
@@ -82,6 +82,7 @@
               :data="studentList"
               stripe
               @selection-change="handleStudentSelection"
+              id="students-table"
             >
               <el-table-column type="selection" width="55" />
               <el-table-column prop="name" label="姓名" width="100" />
@@ -142,31 +143,33 @@
             </el-table>
 
             <!-- 分页 -->
-            <div class="pagination-container">
+            <div class="pagination-container" id="students-pagination">
               <Pagination
                 v-show="studentTotal > 0"
                 :total="studentTotal"
                 v-model:page="studentFilters.page"
                 v-model:limit="studentFilters.limit"
                 @pagination="getStudentAnalysis"
+                id="students-pagination-component"
               />
             </div>
           </div>
         </el-tab-pane>
 
         <!-- 风险预警 -->
-        <el-tab-pane label="风险预警" name="risk">
-          <div class="tab-content">
+        <el-tab-pane label="风险预警" name="risk" id="risk-tab">
+          <div class="tab-content" id="risk-tab-content">
             <el-alert
               title="风险预警说明"
               type="warning"
               description="系统会自动识别可能存在学习困难的学生，包括成绩偏低、学习时长不足、练习完成率低等情况。"
               :closable="false"
               style="margin-bottom: 20px;"
+              id="risk-alert"
             />
 
             <!-- 风险筛选 -->
-            <el-form :inline="true" :model="riskFilters" class="filter-form">
+            <el-form :inline="true" :model="riskFilters" class="filter-form" id="risk-filter-form">
               <el-form-item label="风险等级">
                 <el-select v-model="riskFilters.riskLevel" placeholder="选择风险等级" clearable style="width: 120px">
                   <el-option label="高风险" value="high" />
@@ -186,22 +189,22 @@
             </el-form>
 
             <!-- 风险统计 -->
-            <div class="risk-stats" v-if="riskStatistics">
-              <el-row :gutter="20">
+            <div class="risk-stats" v-if="riskStatistics" id="risk-stats">
+              <el-row :gutter="20" id="risk-stats-row">
                 <el-col :span="8">
-                  <el-statistic title="高风险学生" :value="riskStatistics.highRisk" value-style="color: #f56c6c" />
+                  <el-statistic title="高风险学生" :value="riskStatistics.highRisk" value-style="color: #f56c6c" id="high-risk-stat" />
                 </el-col>
                 <el-col :span="8">
-                  <el-statistic title="中风险学生" :value="riskStatistics.mediumRisk" value-style="color: #e6a23c" />
+                  <el-statistic title="中风险学生" :value="riskStatistics.mediumRisk" value-style="color: #e6a23c" id="medium-risk-stat" />
                 </el-col>
                 <el-col :span="8">
-                  <el-statistic title="低风险学生" :value="riskStatistics.lowRisk" value-style="color: #409eff" />
+                  <el-statistic title="低风险学生" :value="riskStatistics.lowRisk" value-style="color: #409eff" id="low-risk-stat" />
                 </el-col>
               </el-row>
             </div>
 
             <!-- 风险学生列表 -->
-            <el-table v-loading="riskLoading" :data="riskStudents" stripe style="margin-top: 20px;">
+            <el-table v-loading="riskLoading" :data="riskStudents" stripe style="margin-top: 20px;" id="risk-students-table">
               <el-table-column prop="name" label="姓名" width="100" />
               <el-table-column prop="studentId" label="学号" width="120" />
               <el-table-column prop="className" label="班级" width="150" />
@@ -247,11 +250,11 @@
         </el-tab-pane>
 
         <!-- 课程统计 -->
-        <el-tab-pane label="课程统计" name="courses">
-          <div class="tab-content">
-            <el-row :gutter="20">
-              <el-col :span="12" v-for="course in courseStats" :key="course.courseId">
-                <el-card class="course-stat-card">
+        <el-tab-pane label="课程统计" name="courses" id="courses-tab">
+          <div class="tab-content" id="courses-tab-content">
+            <el-row :gutter="20" id="course-stats-row">
+              <el-col :span="12" v-for="course in courseStats" :key="course.courseId" :id="`course-${course.courseId}`">
+                <el-card class="course-stat-card" :id="`course-card-${course.courseId}`">
                   <template #header>
                     <div class="course-header">
                       <span>{{ course.courseName }}</span>
@@ -302,9 +305,9 @@
         </el-tab-pane>
 
         <!-- 作业分析 -->
-        <el-tab-pane label="作业分析" name="assignments">
-          <div class="tab-content">
-            <el-table v-loading="assignmentsLoading" :data="assignmentData" stripe>
+        <el-tab-pane label="作业分析" name="assignments" id="assignments-tab">
+          <div class="tab-content" id="assignments-tab-content">
+            <el-table v-loading="assignmentsLoading" :data="assignmentData" stripe id="assignments-table">
               <el-table-column prop="assignmentName" label="作业名称" min-width="200" />
               <el-table-column prop="courseName" label="所属课程" width="150" />
               <el-table-column prop="totalAssigned" label="布置人数" width="100" />
@@ -357,8 +360,8 @@
     </el-card>
 
     <!-- 批量操作对话框 -->
-    <el-dialog v-model="showBatchOperationDialog" title="批量操作" width="600px">
-      <el-form :model="batchOperationForm" label-width="100px">
+    <el-dialog v-model="showBatchOperationDialog" title="批量操作" width="600px" id="batch-operation-dialog">
+      <el-form :model="batchOperationForm" label-width="100px" id="batch-operation-form">
         <el-form-item label="操作类型">
           <el-radio-group v-model="batchOperationForm.type">
             <el-radio label="status">更新状态</el-radio>
@@ -431,9 +434,9 @@
     </el-dialog>
 
     <!-- 学生详情对话框 -->
-    <el-dialog v-model="showStudentDetailDialog" :title="`${currentStudent?.name} - 详细信息`" width="900px">
-      <div v-if="currentStudent" class="student-detail">
-        <el-descriptions :column="3" border>
+    <el-dialog v-model="showStudentDetailDialog" :title="`${currentStudent?.name} - 详细信息`" width="900px" id="student-detail-dialog">
+      <div v-if="currentStudent" class="student-detail" id="student-detail-content">
+        <el-descriptions :column="3" border id="student-descriptions">
           <el-descriptions-item label="姓名">{{ currentStudent.name }}</el-descriptions-item>
           <el-descriptions-item label="学号">{{ currentStudent.studentId }}</el-descriptions-item>
           <el-descriptions-item label="班级">{{ currentStudent.className }}</el-descriptions-item>
@@ -453,28 +456,28 @@
         </el-descriptions>
 
         <!-- 成绩分布 -->
-        <div class="score-distribution" style="margin-top: 20px;">
+        <div class="score-distribution" style="margin-top: 20px;" id="score-distribution">
           <h4>成绩分布</h4>
-          <el-row :gutter="20">
-            <el-col :span="6">
+          <el-row :gutter="20" id="score-distribution-row">
+            <el-col :span="6" id="assignment-score-col">
               <div class="score-item">
                 <div class="score-label">作业成绩</div>
                 <div class="score-value">{{ currentStudent.assignmentScore }}分</div>
               </div>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="6" id="quiz-score-col">
               <div class="score-item">
                 <div class="score-label">测验成绩</div>
                 <div class="score-value">{{ currentStudent.quizScore }}分</div>
               </div>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="6" id="project-score-col">
               <div class="score-item">
                 <div class="score-label">项目成绩</div>
                 <div class="score-value">{{ currentStudent.projectScore }}分</div>
               </div>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="6" id="participation-score-col">
               <div class="score-item">
                 <div class="score-label">参与度</div>
                 <div class="score-value">{{ currentStudent.participationScore }}分</div>
@@ -486,11 +489,11 @@
     </el-dialog>
 
     <!-- 学生趋势对话框 -->
-    <el-dialog v-model="showStudentTrendDialog" :title="`${currentStudent?.name} - 学习趋势`" width="800px">
-      <div v-if="trendData.length > 0" class="trend-chart">
+    <el-dialog v-model="showStudentTrendDialog" :title="`${currentStudent?.name} - 学习趋势`" width="800px" id="student-trend-dialog">
+      <div v-if="trendData.length > 0" class="trend-chart" id="trend-chart-container">
         <div id="trendChart" style="width: 100%; height: 400px;"></div>
       </div>
-      <div v-else class="no-data">
+      <div v-else class="no-data" id="no-trend-data">
         <el-empty description="暂无趋势数据" />
       </div>
     </el-dialog>

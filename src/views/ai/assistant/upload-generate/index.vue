@@ -1,6 +1,6 @@
 <template>
-  <div class="upload-generate">
-    <div class="page-header">
+  <div id="upload-generate" class="upload-generate">
+    <div id="page-header" class="page-header">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/ai/assistant' }">智能作业生成</el-breadcrumb-item>
         <el-breadcrumb-item>上传并生成</el-breadcrumb-item>
@@ -9,18 +9,18 @@
       <p>上传现有试卷或作业文件，AI将为您生成类似内容和格式的新试卷</p>
     </div>
 
-    <div class="content-container">
+    <div id="content-container" class="content-container">
       <!-- 文件上传区域 -->
-      <div class="upload-section">
-        <el-card>
+      <div id="upload-section" class="upload-section">
+        <el-card id="upload-card" class="config-card">
           <template #header>
-            <div class="card-header">
+            <div id="upload-header" class="card-header">
               <span>文件上传</span>
               <el-tag type="info">支持 PDF, Word, JSON</el-tag>
             </div>
           </template>
 
-          <div class="upload-area">
+          <div id="upload-area" class="upload-area">
             <el-upload
               class="upload-dragger"
               drag
@@ -47,6 +47,7 @@
             <div
               v-for="file in fileList"
               :key="file.uid"
+              :id="`file-item-${file.uid}`"
               class="file-item"
             >
               <div class="file-info">
@@ -68,10 +69,10 @@
       </div>
 
       <!-- 参数设置区域 -->
-      <div class="settings-section">
-        <el-card>
+      <div id="settings-section" class="settings-section">
+        <el-card id="settings-card" class="config-card">
           <template #header>
-            <div class="card-header">
+            <div id="settings-header" class="card-header">
               <span>生成参数设置</span>
               <el-button type="primary" size="small" @click="useTemplate">
                 使用模板

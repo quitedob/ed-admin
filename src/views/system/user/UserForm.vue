@@ -1,23 +1,23 @@
 <template>
-  <el-dialog :append-to-body="true" :model-value="visible" :title="formModel.id ? '修改' : '添加'" width="600px" center align-center :destroy-on-close="true" @close="onClose">
-    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="80px">
-      <el-form-item v-if="!formModel.id" label="登录账号" prop="mobile">
-        <el-input v-model="formModel.mobile" class="form-group" />
+  <el-dialog :append-to-body="true" :model-value="visible" :title="formModel.id ? '修改' : '添加'" width="600px" center align-center :destroy-on-close="true" @close="onClose" id="user-form-dialog">
+    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="80px" id="user-form">
+      <el-form-item v-if="!formModel.id" label="登录账号" prop="mobile" id="mobile-form-item">
+        <el-input v-model="formModel.mobile" class="form-group" id="mobile-input" />
       </el-form-item>
-      <el-form-item v-if="!formModel.id" label="登录密码" prop="mobilePwd">
-        <el-input v-model="formModel.mobilePwd" class="form-group" show-password />
+      <el-form-item v-if="!formModel.id" label="登录密码" prop="mobilePwd" id="password-form-item">
+        <el-input v-model="formModel.mobilePwd" class="form-group" show-password id="password-input" />
       </el-form-item>
-      <el-form-item label="用户昵称" prop="realName">
-        <el-input v-model="formModel.realName" class="form-group" maxlength="50" show-word-limit />
+      <el-form-item label="用户昵称" prop="realName" id="nickname-form-item">
+        <el-input v-model="formModel.realName" class="form-group" maxlength="50" show-word-limit id="nickname-input" />
       </el-form-item>
-      <el-form-item label="备注" prop="remark">
-        <el-input v-model="formModel.remark" class="form-group" maxlength="500" show-word-limit type="textarea" />
+      <el-form-item label="备注" prop="remark" id="remark-form-item">
+        <el-input v-model="formModel.remark" class="form-group" maxlength="500" show-word-limit type="textarea" id="remark-input" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="onClose()">取 消</el-button>
-        <el-button type="primary" @click="onSubmit()">确 定</el-button>
+      <div class="dialog-footer" id="user-form-footer">
+        <el-button @click="onClose()" id="user-form-cancel-btn">取 消</el-button>
+        <el-button type="primary" @click="onSubmit()" id="user-form-submit-btn">确 定</el-button>
       </div>
     </template>
   </el-dialog>

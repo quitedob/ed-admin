@@ -1,9 +1,9 @@
 <template>
-  <div class="student-personal">
+  <div class="student-personal" id="student-personal-container">
     <!-- 个人信息卡片 -->
-    <el-row :gutter="20" class="info-section">
+    <el-row :gutter="20" class="info-section" id="student-info-section">
       <el-col :span="24">
-        <el-card class="profile-card">
+        <el-card class="profile-card" id="student-profile-card">
           <div class="profile-header">
             <div class="profile-avatar">
               <el-avatar :size="80" :src="studentInfo.avatar" />
@@ -26,7 +26,7 @@
     </el-row>
 
     <!-- 学习统计 -->
-    <el-row :gutter="20" class="stats-section">
+    <el-row :gutter="20" class="stats-section" id="student-stats-section">
       <el-col :span="6">
         <el-statistic title="已完成作业" :value="stats.completedHomeworks" />
       </el-col>
@@ -42,10 +42,10 @@
     </el-row>
 
     <!-- 标签页 -->
-    <el-tabs v-model="activeTab" class="content-tabs">
+    <el-tabs v-model="activeTab" class="content-tabs" id="student-content-tabs">
       <!-- 我的作业 -->
       <el-tab-pane label="我的作业" name="homework">
-        <div class="tab-content">
+        <div class="tab-content" id="student-homework-tab">
           <div class="content-header">
             <el-input
               v-model="searchText"
@@ -102,7 +102,7 @@
 
       <!-- 我的考试 -->
       <el-tab-pane label="我的考试" name="exam">
-        <div class="tab-content">
+        <div class="tab-content" id="student-exam-tab">
           <div class="content-header">
             <el-input
               v-model="searchText"
@@ -155,7 +155,7 @@
 
       <!-- 错题本 -->
       <el-tab-pane label="错题本" name="errorQuestions">
-        <div class="tab-content">
+        <div class="tab-content" id="student-error-questions-tab">
           <div class="content-header">
             <el-input
               v-model="searchText"
@@ -204,7 +204,7 @@
 
       <!-- 学习分析 -->
       <el-tab-pane label="学习分析" name="analysis">
-        <div class="tab-content">
+        <div class="tab-content" id="student-analysis-tab">
           <el-row :gutter="20">
             <el-col :span="12">
               <el-card>

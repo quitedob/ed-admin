@@ -1,16 +1,16 @@
 <template>
-  <div class="app-container">
-    <div class="page_head">
-      <div class="search_bar clearfix">
-        <el-form :model="query" inline label-width="80px">
+  <div class="app-container" id="category-management-container">
+    <div class="page_head" id="page-header">
+      <div class="search_bar clearfix" id="search-bar">
+        <el-form :model="query" inline label-width="80px" id="category-form">
           <el-form-item>
-            <el-button v-permission="'category:save'" type="primary" @click="openFormModal()">添加分类</el-button>
-            <el-button @click="resetQuery()">刷新</el-button>
+            <el-button v-permission="'category:save'" type="primary" @click="openFormModal()" id="add-category-btn">添加分类</el-button>
+            <el-button @click="resetQuery()" id="refresh-btn">刷新</el-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
-    <el-table v-loading="page.loading" :data="page.list" :tree-props="{ children: 'childrenList' }" row-key="id">
+    <el-table v-loading="page.loading" :data="page.list" :tree-props="{ children: 'childrenList' }" row-key="id" id="category-table">
       <el-table-column label="名称" prop="categoryName">
         <template #default="scope">
           <span>{{ scope.row.categoryName }}</span>

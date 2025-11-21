@@ -1,22 +1,22 @@
 <template>
-  <div class="app-container">
-    <div class="page_head">
-      <div class="search_bar clearfix">
-        <el-form :model="query" inline label-width="80px">
+  <div class="app-container" id="role-management-container">
+    <div class="page_head" id="page-header">
+      <div class="search_bar clearfix" id="search-bar">
+        <el-form :model="query" inline label-width="80px" id="role-search-form">
           <el-form-item>
-            <el-input v-model="query.roleName" placeholder="请输入角色名称" prefix-icon="Search" clearable />
+            <el-input v-model="query.roleName" placeholder="请输入角色名称" prefix-icon="Search" clearable id="role-name-input" />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleQuery()"> 查询</el-button>
-            <el-button @click="resetQuery()">重置</el-button>
+            <el-button type="primary" @click="handleQuery()" id="query-btn"> 查询</el-button>
+            <el-button @click="resetQuery()" id="reset-btn">重置</el-button>
           </el-form-item>
         </el-form>
       </div>
-      <div class="button_bar">
-        <el-button v-permission="'sys:role:save'" type="primary" @click="openFormModal(null)">添加角色</el-button>
+      <div class="button_bar" id="button-bar">
+        <el-button v-permission="'sys:role:save'" type="primary" @click="openFormModal(null)" id="add-role-btn">添加角色</el-button>
       </div>
     </div>
-    <el-table v-loading="page.loading" :data="page.list" row-key="id" class="drag-table">
+    <el-table v-loading="page.loading" :data="page.list" row-key="id" class="drag-table" id="role-table">
       <el-table-column label="角色名称" prop="roleName" />
       <el-table-column label="备注" prop="remark" />
       <el-table-column label="状态">

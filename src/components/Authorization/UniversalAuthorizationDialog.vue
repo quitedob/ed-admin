@@ -4,10 +4,11 @@
     :title="`授权${getTypeLabel(authType)}`"
     width="70%"
     @close="handleClose"
+    id="universal-authorization-dialog"
   >
-    <div class="authorization-dialog">
+    <div class="authorization-dialog" id="universal-authorization-content">
       <!-- 左侧：学生/员工选择 -->
-      <div class="left-panel">
+      <div class="left-panel" id="universal-auth-left-panel">
         <h4>选择{{ targetType === 'student' ? '学生' : '员工' }}</h4>
         <el-input
           v-model="searchText"

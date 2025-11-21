@@ -246,6 +246,7 @@ import { ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Delete, Document, Setting, Edit } from '@element-plus/icons-vue'
 import EnhancedEditor from '@/components/QuestionBank/EnhancedEditor.vue'
+import { questionTags, getTagsByCategory } from '@/utils/tagData'
 
 const props = defineProps({
   modelValue: {
@@ -309,36 +310,10 @@ const questionTypes = [
   { label: '编程题', value: 'programming' },
 ]
 
-// 可用标签列表
-const availableTags = [
-  // 算法类别
-  '排序', '搜索', '哈希表', '二分查找', '双指针', '递归', '分治', '数学',
-  '位运算', '贪心', '动态规划', '回溯', '穷举', '模拟',
-
-  // 数据结构
-  '数组', '字符串', '链表', '栈', '队列', '堆', '字典树', '并查集',
-  '树', '二叉树', '平衡树', '红黑树', '图', '有向图', '无向图',
-
-  // 技巧和模式
-  '滑动窗口', '单调栈', '前缀和', '差分数组', '倍增', 'LCA', '拓扑排序',
-  '最短路', '最小生成树', '网络流', '字符串匹配', 'KMP', 'Trie',
-
-  // 难度标签
-  '入门', '简单', '中等', '困难', '挑战',
-
-  // 来源标签
-  'LeetCode', 'Codeforces', 'AtCoder', 'HDU', 'POJ', 'UVA', 'SPOJ',
-
-  // 课程标签
-  '算法基础', '数据结构', '图论', '数论', '组合数学', '计算几何',
-
-  // 编程语言
-  'Java', 'Python', 'C++', 'JavaScript', 'C', 'Go', 'Rust',
-
-  // 概念标签
-  '面向对象', '基础概念', 'Java基础', '数据类型', '接口', '设计模式', '架构',
-  '填空题', '判断题', '简答题', '编程题'
-]
+// 可用标签列表 - 从标签库获取
+const availableTags = computed(() => {
+  return questionTags.map(tag => tag.name)
+})
 
 // 监听传入数据变化
 watch(() => props.questionData, (newVal) => {

@@ -1,10 +1,10 @@
 <template>
-  <div class="app-container">
-    <el-card class="box-card">
+  <div class="app-container" id="learning-report-container">
+    <el-card class="box-card" id="learning-report-card">
       <template #header>
-        <div class="card-header">
+        <div class="card-header" id="report-header">
           <span>个人学习报告</span>
-          <div class="header-actions">
+          <div class="header-actions" id="report-header-actions">
             <el-button type="primary" @click="handleGenerateReport">生成报告</el-button>
             <el-button type="success" @click="handleBatchGenerate">批量生成</el-button>
             <el-button @click="handleExportReport">导出报告</el-button>
@@ -13,7 +13,7 @@
       </template>
 
       <!-- 查询条件 -->
-      <el-form :model="queryParams" :inline="true" label-width="80px">
+      <el-form :model="queryParams" :inline="true" label-width="80px" id="report-search-form">
         <el-form-item label="学生姓名" prop="studentName">
           <el-select v-model="queryParams.studentId" placeholder="请选择学生" filterable clearable>
             <el-option
@@ -51,10 +51,10 @@
       </el-form>
 
       <!-- 报告内容 -->
-      <div v-if="reportData" class="report-content">
+      <div v-if="reportData" class="report-content" id="report-content">
         <!-- 报告头部 -->
-        <div class="report-header">
-          <div class="student-info">
+        <div class="report-header" id="report-content-header">
+          <div class="student-info" id="student-info-section">
             <el-avatar :src="reportData.student.avatar" :size="64">
               {{ reportData.student.name?.charAt(0) }}
             </el-avatar>
@@ -67,35 +67,35 @@
               </p>
             </div>
           </div>
-          <div class="report-summary">
-            <el-row :gutter="20">
+          <div class="report-summary" id="report-summary">
+            <el-row :gutter="20" id="summary-stats-row">
               <el-col :span="6">
-                <el-statistic title="总体评分" :value="reportData.overallScore" suffix="分" />
+                <el-statistic title="总体评分" :value="reportData.overallScore" suffix="分" id="overall-score-stat" />
               </el-col>
               <el-col :span="6">
-                <el-statistic title="学习时长" :value="reportData.totalStudyTime" suffix="小时" />
+                <el-statistic title="学习时长" :value="reportData.totalStudyTime" suffix="小时" id="total-study-time-stat" />
               </el-col>
               <el-col :span="6">
-                <el-statistic title="完成率" :value="reportData.completionRate" suffix="%" />
+                <el-statistic title="完成率" :value="reportData.completionRate" suffix="%" id="completion-rate-stat" />
               </el-col>
               <el-col :span="6">
-                <el-statistic title="进步幅度" :value="reportData.improvement" suffix="分" />
+                <el-statistic title="进步幅度" :value="reportData.improvement" suffix="分" id="improvement-stat" />
               </el-col>
             </el-row>
           </div>
         </div>
 
         <!-- 报告标签页 -->
-        <el-tabs v-model="activeReportTab" class="report-tabs">
+        <el-tabs v-model="activeReportTab" class="report-tabs" id="report-tabs">
           <!-- 学业成绩 -->
-          <el-tab-pane label="学业成绩" name="grades">
-            <div class="report-section">
+          <el-tab-pane label="学业成绩" name="grades" id="grades-tab">
+            <div class="report-section" id="grades-section">
               <h3>成绩概览</h3>
-              <el-row :gutter="20">
-                <el-col :span="12">
-                  <div class="grade-chart">
+              <el-row :gutter="20" id="grades-overview-row">
+                <el-col :span="12" id="grade-trend-col">
+                  <div class="grade-chart" id="grade-trend-chart">
                     <h4>成绩趋势</h4>
-                    <div class="chart-container">
+                    <div class="chart-container" id="grade-trend-container">
                       <!-- 这里应该使用 ECharts 显示折线图 -->
                       <div class="chart-placeholder">
                         <el-empty description="成绩趋势图表" />

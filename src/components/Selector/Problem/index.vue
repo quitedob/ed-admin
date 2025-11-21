@@ -1,15 +1,16 @@
 <template>
   <el-dialog
-    title="选择编程题目"
-    :model-value="visible"
-    width="80%"
-    append-to-body
-    @close="handleClose"
+      id="problem-selector-dialog"
+      title="选择编程题目"
+      :model-value="visible"
+      width="80%"
+      append-to-body
+      @close="handleClose"
   >
-    <div class="problem-selector">
+    <div id="problem-selector" class="problem-selector">
       <!-- 搜索筛选 -->
-      <div class="filter-section">
-        <el-form :inline="true" :model="queryParams" size="small">
+      <div id="problem-filter-section" class="filter-section">
+        <el-form id="problem-search-form" :inline="true" :model="queryParams" size="small">
           <el-form-item label="题目标题">
             <el-input
               v-model="queryParams.title"
@@ -53,8 +54,9 @@
       </div>
 
       <!-- 题目列表 -->
-      <div class="problem-list">
+      <div id="problem-list" class="problem-list">
         <el-table
+          id="problem-table"
           ref="problemTableRef"
           v-loading="loading"
           :data="problemList"
@@ -125,9 +127,9 @@
       </div>
 
       <!-- 已选择的题目 -->
-      <div class="selected-problems" v-if="selectedProblems.length > 0">
+      <div id="selected-problems" class="selected-problems" v-if="selectedProblems.length > 0">
         <h4>已选择的题目 ({{ selectedProblems.length }})</h4>
-        <div class="selected-list">
+        <div id="selected-list" class="selected-list">
           <el-tag
             v-for="problem in selectedProblems"
             :key="problem.id"
@@ -142,7 +144,7 @@
     </div>
 
     <template #footer>
-      <div class="dialog-footer">
+      <div id="problem-dialog-footer" class="dialog-footer">
         <el-button @click="handleClose">取消</el-button>
         <el-button type="primary" @click="handleConfirm" :disabled="selectedProblems.length === 0">
           确定选择 ({{ selectedProblems.length }})
@@ -151,11 +153,11 @@
     </template>
 
     <!-- 题目预览对话框 -->
-    <el-dialog title="题目预览" v-model="previewVisible" width="70%" append-to-body>
-      <div v-if="currentProblem" class="problem-preview">
-        <div class="preview-header">
+    <el-dialog id="problem-preview-dialog" title="题目预览" v-model="previewVisible" width="70%" append-to-body>
+      <div v-if="currentProblem" id="problem-preview" class="problem-preview">
+        <div id="preview-header" class="preview-header">
           <h3>{{ currentProblem.id }}. {{ currentProblem.title }}</h3>
-          <div class="preview-meta">
+          <div id="preview-meta" class="preview-meta">
             <el-tag :type="getDifficultyTagType(currentProblem.difficulty)">
               {{ getDifficultyLabel(currentProblem.difficulty) }}
             </el-tag>
@@ -166,30 +168,30 @@
           </div>
         </div>
 
-        <div class="preview-content">
-          <div class="content-section">
+        <div id="preview-content" class="preview-content">
+          <div id="description-section" class="content-section">
             <h4>题目描述</h4>
             <div class="content-text" v-html="currentProblem.description"></div>
           </div>
 
-          <div class="content-section">
+          <div id="input-format-section" class="content-section">
             <h4>输入格式</h4>
             <div class="content-text" v-html="currentProblem.inputFormat"></div>
           </div>
 
-          <div class="content-section">
+          <div id="output-format-section" class="content-section">
             <h4>输出格式</h4>
             <div class="content-text" v-html="currentProblem.outputFormat"></div>
           </div>
 
-          <div class="content-section">
+          <div id="sample-section" class="content-section">
             <h4>样例</h4>
-            <div class="sample-section">
-              <div class="sample-item">
+            <div id="sample-container" class="sample-section">
+              <div id="sample-input" class="sample-item">
                 <h5>输入</h5>
                 <pre class="sample-content">{{ currentProblem.sampleInput }}</pre>
               </div>
-              <div class="sample-item">
+              <div id="sample-output" class="sample-item">
                 <h5>输出</h5>
                 <pre class="sample-content">{{ currentProblem.sampleOutput }}</pre>
               </div>

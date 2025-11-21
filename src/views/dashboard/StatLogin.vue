@@ -1,5 +1,5 @@
 <template>
-  <el-card class="title-info">
+  <el-card class="title-info" id="login-stats-card">
     <template #header>最近14天人数统计</template>
     <div id="axis" class="axis" />
   </el-card>

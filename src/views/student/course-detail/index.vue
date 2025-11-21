@@ -1,5 +1,5 @@
 <template>
-  <div class="course-detail-container">
+  <div class="course-detail-container" id="student-course-detail-container">
     <!-- AI助教组件 -->
     <chat-interface
       v-if="currentLesson"
@@ -9,7 +9,7 @@
     />
     
     <!-- 使用课程内容渲染器 -->
-    <div v-if="useRenderer" class="renderer-view">
+    <div v-if="useRenderer" class="renderer-view" id="student-course-renderer-view">
       <div class="renderer-header">
         <el-button @click="useRenderer = false" :icon="ArrowLeft">返回传统视图</el-button>
       </div>
@@ -17,9 +17,9 @@
     </div>
 
     <!-- 传统学习视图 -->
-    <div v-else class="traditional-view">
+    <div v-else class="traditional-view" id="student-course-traditional-view">
       <!-- 课程头部信息 -->
-    <div class="course-header">
+    <div class="course-header" id="student-course-header">
       <div class="course-info">
         <img :src="courseInfo.coverImage" :alt="courseInfo.courseName" class="course-cover" />
         <div class="course-meta">
@@ -46,14 +46,15 @@
     </div>
 
     <!-- 课程目录 -->
-    <div class="course-content">
-      <div class="content-sidebar">
+    <div class="course-content" id="student-course-content">
+      <div class="content-sidebar" id="student-course-sidebar">
         <h3>课程目录</h3>
         <div class="chapter-list">
           <div
             v-for="chapter in courseChapters"
             :key="chapter.id"
             class="chapter-item"
+            :id="`student-chapter-${chapter.id}`"
           >
             <div class="chapter-header" @click="toggleChapter(chapter)">
               <span class="chapter-title">{{ chapter.chapterName }}</span>
@@ -68,6 +69,7 @@
                 v-for="lesson in chapter.lessons"
                 :key="lesson.id"
                 class="lesson-item"
+                :id="`student-lesson-${lesson.id}`"
                 :class="{ active: lesson.id === currentLessonId }"
                 @click="selectLesson(lesson)"
               >
@@ -97,7 +99,7 @@
         </div>
       </div>
 
-      <div class="content-main">
+      <div class="content-main" id="student-course-main">
         <!-- 学习内容区域 -->
         <div v-if="currentLesson" class="lesson-content-area">
           <div class="lesson-header">

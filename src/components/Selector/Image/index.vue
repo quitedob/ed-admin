@@ -1,15 +1,15 @@
 <template>
-  <div style="display: flex; align-items: flex-start">
-    <el-image :src="imageUrl" :preview-src-list="[imageUrl]" :style="'width:' + width + ';height:' + height + ';'">
+  <div id="image-selector-container" style="display: flex; align-items: flex-start">
+    <el-image id="selected-image" :src="imageUrl" :preview-src-list="[imageUrl]" :style="'width:' + width + ';height:' + height + ';'">
       <template #error>
-        <div class="image-slot">
+        <div id="image-error-slot" class="image-slot">
           <el-icon><Picture /></el-icon>
         </div>
       </template>
     </el-image>
-    <div class="image-box">
-      <el-button type="primary" @click="handleSelect">选择图片</el-button>
-      <div class="image-box-info">{{ props.sugImg }}</div>
+    <div id="image-controls" class="image-box">
+      <el-button id="select-image-btn" type="primary" @click="handleSelect">选择图片</el-button>
+      <div id="image-info" class="image-box-info">{{ props.sugImg }}</div>
     </div>
   </div>
   <selector-resource v-if="picVisible" :title="'选择图片'" :resource-type="4" :visible="picVisible" @close="handleCallback" />

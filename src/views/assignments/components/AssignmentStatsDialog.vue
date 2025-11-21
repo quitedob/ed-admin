@@ -4,62 +4,63 @@
     v-model="visible"
     width="800px"
     append-to-body
+    id="assignment-stats-dialog"
   >
-    <div class="assignment-stats" v-if="assignmentData">
-      <el-row :gutter="20" class="stats-overview">
-        <el-col :span="6">
-          <el-statistic title="总学生数" :value="statsData.totalStudents" />
+    <div class="assignment-stats" v-if="assignmentData" id="assignment-stats-content">
+      <el-row :gutter="20" class="stats-overview" id="stats-overview-row">
+        <el-col :span="6" id="total-students-stat-col">
+          <el-statistic title="总学生数" :value="statsData.totalStudents" id="total-students-stat" />
         </el-col>
-        <el-col :span="6">
-          <el-statistic title="已提交" :value="statsData.submittedCount" />
+        <el-col :span="6" id="submitted-count-col">
+          <el-statistic title="已提交" :value="statsData.submittedCount" id="submitted-count-stat" />
         </el-col>
-        <el-col :span="6">
-          <el-statistic title="提交率" :value="statsData.completionRate" suffix="%" />
+        <el-col :span="6" id="completion-rate-col">
+          <el-statistic title="提交率" :value="statsData.completionRate" suffix="%" id="completion-rate-stat" />
         </el-col>
-        <el-col :span="6">
-          <el-statistic title="平均完成度" :value="statsData.averageCompletionRate" suffix="%" />
+        <el-col :span="6" id="avg-completion-col">
+          <el-statistic title="平均完成度" :value="statsData.averageCompletionRate" suffix="%" id="avg-completion-stat" />
         </el-col>
       </el-row>
 
       <el-divider />
 
-      <div class="completion-distribution">
+      <div class="completion-distribution" id="completion-distribution">
         <h4>完成度分布</h4>
-        <div class="completion-ranges">
-          <div class="completion-range">
+        <div class="completion-ranges" id="completion-ranges">
+          <div class="completion-range" id="excellent-range">
             <span class="range-label">90-100%:</span>
-            <el-progress :percentage="statsData.completionDistribution.excellent" color="#67c23a" />
+            <el-progress :percentage="statsData.completionDistribution.excellent" color="#67c23a" id="excellent-progress" />
           </div>
-          <div class="completion-range">
+          <div class="completion-range" id="good-range">
             <span class="range-label">60-89%:</span>
-            <el-progress :percentage="statsData.completionDistribution.good" color="#409eff" />
+            <el-progress :percentage="statsData.completionDistribution.good" color="#409eff" id="good-progress" />
           </div>
-          <div class="completion-range">
+          <div class="completion-range" id="average-range">
             <span class="range-label">30-59%:</span>
-            <el-progress :percentage="statsData.completionDistribution.average" color="#e6a23c" />
+            <el-progress :percentage="statsData.completionDistribution.average" color="#e6a23c" id="average-progress" />
           </div>
-          <div class="completion-range">
+          <div class="completion-range" id="poor-range">
             <span class="range-label">0-29%:</span>
-            <el-progress :percentage="statsData.completionDistribution.poor" color="#f56c6c" />
+            <el-progress :percentage="statsData.completionDistribution.poor" color="#f56c6c" id="poor-progress" />
           </div>
         </div>
       </div>
 
       <el-divider />
 
-      <div class="question-stats">
+      <div class="question-stats" id="question-stats-section">
         <h4>题目答题情况</h4>
-        <el-table :data="statsData.questionStats" style="width: 100%">
+        <el-table :data="statsData.questionStats" style="width: 100%" id="question-stats-table">
           <el-table-column prop="questionTitle" label="题目" />
           <el-table-column prop="type" label="类型" width="100">
             <template #default="scope">
-              <el-tag size="small">{{ getQuestionTypeLabel(scope.row.type) }}</el-tag>
+              <el-tag size="small" :id="`question-type-tag-${scope.$index}`">{{ getQuestionTypeLabel(scope.row.type) }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="answeredCount" label="作答人数" width="100" />
+          <el-table-column prop="answeredCount" label="作答人数" width="100" :id="`answered-count-${scope.$index}`" />
           <el-table-column prop="correctRate" label="正确率" width="120">
             <template #default="scope">
-              <span :style="{ color: getCorrectRateColor(scope.row.correctRate) }">
+              <span :style="{ color: getCorrectRateColor(scope.row.correctRate) }" :id="`correct-rate-${scope.$index}`">
                 {{ scope.row.correctRate }}%
               </span>
             </template>
@@ -69,8 +70,8 @@
     </div>
 
     <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="handleClose">关闭</el-button>
+      <div class="dialog-footer" id="stats-dialog-footer">
+        <el-button @click="handleClose" id="stats-close-btn">关闭</el-button>
       </div>
     </template>
   </el-dialog>

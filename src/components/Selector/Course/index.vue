@@ -1,6 +1,6 @@
 <template>
-  <el-dialog :append-to-body="true" :model-value="props.visible" :title="props.title" width="800px" align-center :destroy-on-close="true" @close="handleClose">
-    <el-form :model="query" class="filter-container" inline label-width="100px">
+  <el-dialog id="course-selector-dialog" :append-to-body="true" :model-value="props.visible" :title="props.title" width="800px" align-center :destroy-on-close="true" @close="handleClose">
+    <el-form id="course-search-form" :model="query" class="filter-container" inline label-width="100px">
       <el-form-item label="课程名称">
         <el-input v-model="query.courseName" />
       </el-form-item>
@@ -9,7 +9,7 @@
         <el-button class="filter-item" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-    <el-table v-loading="page.loading" :data="page.list">
+    <el-table id="course-table" v-loading="page.loading" :data="page.list">
       <el-table-column :min-width="130" label="课程信息">
         <template #default="scope">
           <img :alt="scope.row.courseName" :src="scope.row.courseLogo" style="float: left; height: 50px; width: 90px; vertical-align: middle; border-radius: 5px" />
