@@ -1,0 +1,1158 @@
+<template>
+  <div class="ai-assistant">
+    <div class="assistant-container">
+      <!-- 左侧边栏 -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h3>AI助教</h3>
+          <el-button type="primary" size="small" @click="createNewConversation">
+            <el-icon><Plus /></el-icon>
+            新对话
+          </el-button>
+        </div>
+
+        <!-- 对话历史 -->
+        <div class="conversation-list">
+          <div
+            v-for="conversation in conversationList"
+            :key="conversation.id"
+            class="conversation-item"
+            :class="{ active: currentConversation?.id === conversation.id }"
+            @click="selectConversation(conversation)"
+          >
+            <div class="conversation-title">{{ conversation.title }}</div>
+            <div class="conversation-meta">
+              <span class="course">{{ conversation.courseName }}</span>
+              <span class="time">{{ formatTime(conversation.updatedAt) }}</span>
+            </div>
+            <div class="conversation-actions">
+              <el-button type="text" size="small" @click.stop="deleteConversation(conversation)">
+                <el-icon><Delete /></el-icon>
+              </el-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 学习建议 -->
+        <div class="suggestions-panel" v-if="suggestions.length > 0">
+          <h4>学习建议</h4>
+          <div class="suggestion-list">
+            <div
+              v-for="suggestion in suggestions"
+              :key="suggestion.id"
+              class="suggestion-item"
+              @click="openSuggestion(suggestion)"
+            >
+              <el-icon :class="getSuggestionIcon(suggestion.type)">
+                <component :is="getSuggestionIcon(suggestion.type)" />
+              </el-icon>
+              <div class="suggestion-content">
+                <div class="suggestion-title">{{ suggestion.title }}</div>
+                <div class="suggestion-desc">{{ suggestion.description }}</div>
+              </div>
+              <el-tag :type="getPriorityType(suggestion.priority)" size="small">
+                {{ getPriorityLabel(suggestion.priority) }}
+              </el-tag>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主要对话区域 -->
+      <div class="main-content">
+        <div class="chat-header" v-if="currentConversation">
+          <div class="chat-title">
+            <h3>{{ currentConversation.title }}</h3>
+            <div class="chat-context">
+              <el-tag type="info" size="small">{{ currentConversation.courseName }}</el-tag>
+              <el-tag type="warning" size="small">{{ currentConversation.chapterName }}</el-tag>
+            </div>
+          </div>
+          <div class="chat-actions">
+            <el-button type="text" @click="clearChat">
+              <el-icon><Refresh /></el-icon>
+              清空对话
+            </el-button>
+            <el-button type="text" @click="exportChat">
+              <el-icon><Download /></el-icon>
+              导出对话
+            </el-button>
+          </div>
+        </div>
+
+        <!-- 对话消息区域 -->
+        <div class="chat-messages" ref="messagesContainer">
+          <div v-if="!currentConversation" class="welcome-message">
+            <div class="welcome-content">
+              <el-icon class="welcome-icon"><ChatDotRound /></el-icon>
+              <h2>欢迎使用AI助教</h2>
+              <p>我是你的学习助手，可以帮你：</p>
+              <ul>
+                <li>解答编程问题和概念疑惑</li>
+                <li>分析代码并提供优化建议</li>
+                <li>提供学习思路和解题提示</li>
+                <li>推荐相关学习资源</li>
+              </ul>
+              <div class="quick-actions">
+                <el-button type="primary" @click="askAboutConcept">询问概念</el-button>
+                <el-button type="success" @click="analyzeCode">分析代码</el-button>
+                <el-button type="warning" @click="getHint">获取提示</el-button>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="messages-list">
+            <div
+              v-for="message in currentConversation.messages"
+              :key="message.id"
+              class="message"
+              :class="message.type"
+            >
+              <div class="message-avatar">
+                <el-avatar v-if="message.type === 'user'" :size="32">
+                  <el-icon><User /></el-icon>
+                </el-avatar>
+                <el-avatar v-else :size="32" class="ai-avatar">
+                  🤖
+                </el-avatar>
+              </div>
+              <div class="message-content">
+                <div class="message-text" v-html="formatMessage(message.content)"></div>
+                <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+                <!-- AI消息的建议操作 -->
+                <div v-if="message.type === 'ai' && message.suggestions" class="message-suggestions">
+                  <div
+                    v-for="suggestion in message.suggestions"
+                    :key="suggestion.id"
+                    class="suggestion-chip"
+                    @click="applySuggestion(suggestion)"
+                  >
+                    <el-icon><Guide /></el-icon>
+                    {{ suggestion.title }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 打字指示器 -->
+          <div v-if="isTyping" class="typing-indicator">
+            <div class="typing-avatar">
+              <el-avatar :size="32" class="ai-avatar">
+                🤖
+              </el-avatar>
+            </div>
+            <div class="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="chat-input">
+          <div class="input-toolbar">
+            <el-button type="text" size="small" @click="insertCodeBlock">
+              <el-icon><Document /></el-icon>
+              代码块
+            </el-button>
+            <el-button type="text" size="small" @click="attachFile">
+              <el-icon><Paperclip /></el-icon>
+              附件
+            </el-button>
+            <el-button type="text" size="small" @click="voiceInput">
+              <el-icon><Microphone /></el-icon>
+              语音
+            </el-button>
+          </div>
+          <div class="input-area">
+            <el-input
+              v-model="inputMessage"
+              type="textarea"
+              :rows="3"
+              placeholder="输入你的问题，按Ctrl+Enter发送..."
+              @keydown.ctrl.enter="sendMessage"
+              resize="none"
+            />
+            <el-button
+              type="primary"
+              :loading="isTyping"
+              @click="sendMessage"
+              :disabled="!inputMessage.trim()"
+            >
+              <el-icon><Promotion /></el-icon>
+              发送
+            </el-button>
+          </div>
+          <div class="quick-questions">
+            <span>快速提问：</span>
+            <el-button
+              v-for="question in quickQuestions"
+              :key="question"
+              type="text"
+              size="small"
+              @click="setQuickQuestion(question)"
+            >
+              {{ question }}
+            </el-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧面板 -->
+      <div class="right-panel">
+        <!-- 知识卡片 -->
+        <div class="knowledge-cards">
+          <h4>相关知识</h4>
+          <div class="card-list">
+            <div v-for="hint in relevantHints" :key="hint.id" class="knowledge-card">
+              <div class="card-header">
+                <h5>{{ hint.title }}</h5>
+                <el-tag :type="getDifficultyType(hint.difficulty)" size="small">
+                  {{ getDifficultyLabel(hint.difficulty) }}
+                </el-tag>
+              </div>
+              <div class="card-content">
+                {{ hint.content.substring(0, 100) }}...
+              </div>
+              <div class="card-footer">
+                <el-button type="text" size="small" @click="viewHint(hint)">
+                  查看详情
+                </el-button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 代码示例 -->
+        <div class="code-examples" v-if="codeExamples.length > 0">
+          <h4>代码示例</h4>
+          <div class="example-list">
+            <div v-for="example in codeExamples" :key="example.id" class="code-example">
+              <div class="example-header">
+                <span>{{ example.concept }} - {{ example.language }}</span>
+                <el-button type="text" size="small" @click="copyCode(example.code)">
+                  <el-icon><CopyDocument /></el-icon>
+                </el-button>
+              </div>
+              <pre class="code-block"><code>{{ example.code }}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 知识详情对话框 -->
+    <el-dialog v-model="showHintDialog" :title="currentHint?.title" width="600px">
+      <div v-if="currentHint" class="hint-detail">
+        <div class="hint-meta">
+          <el-tag :type="getDifficultyType(currentHint.difficulty)">
+            {{ getDifficultyLabel(currentHint.difficulty) }}
+          </el-tag>
+          <div class="hint-tags">
+            <el-tag
+              v-for="tag in currentHint.tags"
+              :key="tag"
+              size="small"
+              style="margin-right: 4px;"
+            >
+              {{ tag }}
+            </el-tag>
+          </div>
+        </div>
+        <div class="hint-content" v-html="formatMessage(currentHint.content)"></div>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  Plus,
+  Delete,
+  Refresh,
+  Download,
+  ChatDotRound,
+  User,
+  Guide,
+  Document,
+  Paperclip,
+  Microphone,
+  Promotion,
+  CopyDocument
+} from '@element-plus/icons-vue'
+import aiApi from '@/api/ai'
+
+// 响应式数据
+const conversationList = ref([])
+const currentConversation = ref(null)
+const suggestions = ref([])
+const relevantHints = ref([])
+const codeExamples = ref([])
+const inputMessage = ref('')
+const isTyping = ref(false)
+const messagesContainer = ref()
+const showHintDialog = ref(false)
+const currentHint = ref(null)
+
+// 快速问题
+const quickQuestions = ref([
+  '什么是闭包？',
+  'Vue组件如何通信？',
+  '如何调试JavaScript代码？',
+  '算法解题思路'
+])
+
+// 获取对话列表
+const getConversations = async () => {
+  try {
+    const response = await aiApi.getConversations({ limit: 20 })
+    if (response.code === 200) {
+      conversationList.value = response.data.items
+    }
+  } catch (error) {
+    console.error('获取对话列表失败:', error)
+  }
+}
+
+// 获取学习建议
+const getSuggestions = async () => {
+  try {
+    const response = await aiApi.getSuggestions(1, 1) // 模拟用户ID和课程ID
+    if (response.code === 200) {
+      suggestions.value = response.data
+    }
+  } catch (error) {
+    console.error('获取学习建议失败:', error)
+  }
+}
+
+// 获取相关提示
+const getRelevantHints = async () => {
+  try {
+    const response = await aiApi.getHints({ category: 'debugging' })
+    if (response.code === 200) {
+      relevantHints.value = response.data.slice(0, 3)
+    }
+  } catch (error) {
+    console.error('获取相关提示失败:', error)
+  }
+}
+
+// 创建新对话
+const createNewConversation = () => {
+  const newConversation = {
+    id: Date.now(),
+    title: '新对话',
+    messages: [],
+    createdAt: new Date().toLocaleString(),
+    updatedAt: new Date().toLocaleString(),
+    courseId: 1,
+    courseName: 'JavaScript基础编程',
+    chapterId: 1,
+    chapterName: '第1章：变量与数据类型'
+  }
+
+  currentConversation.value = newConversation
+  conversationList.value.unshift(newConversation)
+}
+
+// 选择对话
+const selectConversation = (conversation) => {
+  currentConversation.value = conversation
+  // 更新相关内容
+  updateRelevantContent()
+}
+
+// 删除对话
+const deleteConversation = async (conversation) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这个对话吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+
+    const response = await aiApi.deleteConversation(conversation.id)
+    if (response.code === 200) {
+      const index = conversationList.value.findIndex(item => item.id === conversation.id)
+      if (index > -1) {
+        conversationList.value.splice(index, 1)
+      }
+
+      if (currentConversation.value?.id === conversation.id) {
+        currentConversation.value = null
+      }
+
+      ElMessage.success('对话删除成功')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败')
+    }
+  }
+}
+
+// 发送消息
+const sendMessage = async () => {
+  if (!inputMessage.value.trim()) return
+
+  // 如果没有当前对话，创建新对话
+  if (!currentConversation.value) {
+    createNewConversation()
+  }
+
+  const userMessage = {
+    id: Date.now(),
+    type: 'user',
+    content: inputMessage.value,
+    timestamp: new Date().toLocaleString()
+  }
+
+  currentConversation.value.messages.push(userMessage)
+  const messageContent = inputMessage.value
+  inputMessage.value = ''
+
+  // 滚动到底部
+  await nextTick()
+  scrollToBottom()
+
+  // 显示打字指示器
+  isTyping.value = true
+
+  try {
+    const response = await aiApi.sendMessage({
+      message: messageContent,
+      conversationId: currentConversation.value.id
+    })
+
+    if (response.code === 200) {
+      const aiMessage = {
+        id: response.data.id,
+        type: 'ai',
+        content: response.data.content,
+        timestamp: response.data.timestamp,
+        suggestions: response.data.suggestions || []
+      }
+
+      currentConversation.value.messages.push(aiMessage)
+      currentConversation.value.updatedAt = aiMessage.timestamp
+      currentConversation.value.title = generateConversationTitle(currentConversation.value.messages)
+
+      // 更新相关内容
+      updateRelevantContent()
+    }
+  } catch (error) {
+    ElMessage.error('发送消息失败')
+  } finally {
+    isTyping.value = false
+    await nextTick()
+    scrollToBottom()
+  }
+}
+
+// 生成对话标题
+const generateConversationTitle = (messages) => {
+  const userMessages = messages.filter(msg => msg.type === 'user')
+  if (userMessages.length > 0) {
+    const firstMessage = userMessages[0].content
+    return firstMessage.length > 20 ? firstMessage.substring(0, 20) + '...' : firstMessage
+  }
+  return '新对话'
+}
+
+// 滚动到底部
+const scrollToBottom = () => {
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+  }
+}
+
+// 更新相关内容
+const updateRelevantContent = () => {
+  // 根据对话内容更新相关的知识卡片和代码示例
+  if (currentConversation.value && currentConversation.value.messages.length > 0) {
+    // 模拟更新相关提示
+    getRelevantHints()
+
+    // 模拟生成代码示例
+    if (Math.random() > 0.5) {
+      codeExamples.value = [
+        {
+          id: 1,
+          concept: '闭包',
+          language: 'JavaScript',
+          code: `function counter() {\n  let count = 0;\n  return function() {\n    count++;\n    return count;\n  };\n}`
+        }
+      ]
+    }
+  }
+}
+
+// 清空对话
+const clearChat = async () => {
+  if (!currentConversation.value) return
+
+  try {
+    await ElMessageBox.confirm('确定要清空当前对话吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+
+    currentConversation.value.messages = []
+    ElMessage.success('对话已清空')
+  } catch (error) {
+    // 用户取消
+  }
+}
+
+// 导出对话
+const exportChat = () => {
+  if (!currentConversation.value) return
+
+  // 模拟导出对话
+  const content = currentConversation.value.messages
+    .map(msg => `[${msg.timestamp}] ${msg.type === 'user' ? '用户' : 'AI助教'}: ${msg.content}`)
+    .join('\n\n')
+
+  const blob = new Blob([content], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${currentConversation.value.title}.txt`
+  a.click()
+  URL.revokeObjectURL(url)
+
+  ElMessage.success('对话导出成功')
+}
+
+// 快速操作
+const askAboutConcept = () => {
+  inputMessage.value = '请解释JavaScript中的重要概念'
+}
+
+const analyzeCode = () => {
+  inputMessage.value = '请帮我分析这段代码的问题：function factorial(n) { return n * factorial(n - 1); }'
+}
+
+const getHint = () => {
+  inputMessage.value = '我在学习递归时遇到了困难，能给一些学习建议吗？'
+}
+
+// 设置快速问题
+const setQuickQuestion = (question) => {
+  inputMessage.value = question
+}
+
+// 工具栏操作
+const insertCodeBlock = () => {
+  inputMessage.value += '\n```javascript\n// 在这里输入你的代码\n```\n'
+}
+
+const attachFile = () => {
+  ElMessage.info('文件上传功能开发中...')
+}
+
+const voiceInput = () => {
+  ElMessage.info('语音输入功能开发中...')
+}
+
+// 打开建议
+const openSuggestion = (suggestion) => {
+  inputMessage.value = `我想了解更多关于"${suggestion.title}"的内容`
+  sendMessage()
+}
+
+// 应用建议
+const applySuggestion = (suggestion) => {
+  inputMessage.value = suggestion.title
+  sendMessage()
+}
+
+// 查看提示详情
+const viewHint = (hint) => {
+  currentHint.value = hint
+  showHintDialog.value = true
+}
+
+// 复制代码
+const copyCode = async (code) => {
+  try {
+    await navigator.clipboard.writeText(code)
+    ElMessage.success('代码已复制到剪贴板')
+  } catch (error) {
+    ElMessage.error('复制失败')
+  }
+}
+
+// 格式化时间
+const formatTime = (timeString) => {
+  const date = new Date(timeString)
+  const now = new Date()
+  const diff = now - date
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+
+  if (days === 0) {
+    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  } else if (days === 1) {
+    return '昨天'
+  } else if (days < 7) {
+    return `${days}天前`
+  } else {
+    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+  }
+}
+
+// 格式化消息内容
+const formatMessage = (content) => {
+  return content
+    .replace(/\n/g, '<br>')
+    .replace(/```(\w+)?\n([\s\S]*?)\n```/g, '<pre class="code-block"><code>$2</code></pre>')
+    .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+}
+
+// 获取建议图标
+const getSuggestionIcon = (type) => {
+  const iconMap = {
+    concept: 'Reading',
+    exercise: 'EditPen',
+    reading: 'Document'
+  }
+  return iconMap[type] || 'Guide'
+}
+
+// 获取优先级类型
+const getPriorityType = (priority) => {
+  const typeMap = {
+    high: 'danger',
+    medium: 'warning',
+    low: 'info'
+  }
+  return typeMap[priority] || 'info'
+}
+
+// 获取优先级标签
+const getPriorityLabel = (priority) => {
+  const labelMap = {
+    high: '高优先级',
+    medium: '中优先级',
+    low: '低优先级'
+  }
+  return labelMap[priority] || '普通'
+}
+
+// 获取难度类型
+const getDifficultyType = (difficulty) => {
+  const typeMap = {
+    beginner: 'success',
+    intermediate: 'warning',
+    advanced: 'danger'
+  }
+  return typeMap[difficulty] || 'info'
+}
+
+// 获取难度标签
+const getDifficultyLabel = (difficulty) => {
+  const labelMap = {
+    beginner: '初级',
+    intermediate: '中级',
+    advanced: '高级'
+  }
+  return labelMap[difficulty] || '未知'
+}
+
+// 组件挂载
+onMounted(() => {
+  getConversations()
+  getSuggestions()
+  getRelevantHints()
+})
+</script>
+
+<style scoped>
+.ai-assistant {
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+.assistant-container {
+  display: flex;
+  height: 100%;
+}
+
+/* 左侧边栏 */
+.sidebar {
+  width: 300px;
+  background: white;
+  border-right: 1px solid #e4e7ed;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #e4e7ed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  color: #303133;
+}
+
+.conversation-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.conversation-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+.conversation-item:hover {
+  background: #f5f7fa;
+}
+
+.conversation-item.active {
+  background: #ecf5ff;
+  border-left: 3px solid #409eff;
+}
+
+.conversation-title {
+  font-weight: 500;
+  color: #303133;
+  margin-bottom: 4px;
+}
+
+.conversation-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #909399;
+}
+
+.conversation-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.conversation-item:hover .conversation-actions {
+  opacity: 1;
+}
+
+.suggestions-panel {
+  padding: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+.suggestions-panel h4 {
+  margin: 0 0 12px 0;
+  color: #303133;
+}
+
+.suggestion-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.suggestion-item:hover {
+  background: #ecf5ff;
+}
+
+.suggestion-content {
+  flex: 1;
+}
+
+.suggestion-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #303133;
+}
+
+.suggestion-desc {
+  font-size: 11px;
+  color: #909399;
+  margin-top: 2px;
+}
+
+/* 主要内容区域 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #e4e7ed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-title h3 {
+  margin: 0 0 8px 0;
+  color: #303133;
+}
+
+.chat-context {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.welcome-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.welcome-icon {
+  font-size: 64px;
+  color: #409eff;
+  margin-bottom: 20px;
+}
+
+.welcome-content h2 {
+  margin: 0 0 16px 0;
+  color: #303133;
+}
+
+.welcome-content p {
+  color: #606266;
+  margin-bottom: 20px;
+}
+
+.welcome-content ul {
+  text-align: left;
+  color: #606266;
+  margin-bottom: 30px;
+}
+
+.welcome-content li {
+  margin-bottom: 8px;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.messages-list {
+  min-height: 100%;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 20px;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.message.user {
+  flex-direction: row-reverse;
+}
+
+.message.user .message-content {
+  background: #409eff;
+  color: white;
+}
+
+.message-content {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #f4f4f5;
+  position: relative;
+}
+
+.message-text {
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.message-time {
+  font-size: 12px;
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.message-suggestions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.suggestion-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(64, 158, 255, 0.1);
+  border: 1px solid #409eff;
+  border-radius: 16px;
+  color: #409eff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.suggestion-chip:hover {
+  background: rgba(64, 158, 255, 0.2);
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  background: #f4f4f5;
+  border-radius: 12px;
+}
+
+.typing-dots span {
+  width: 8px;
+  height: 8px;
+  background: #909399;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+}
+
+.chat-input {
+  padding: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+.input-toolbar {
+  margin-bottom: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.input-area {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.input-area .el-textarea {
+  flex: 1;
+}
+
+.quick-questions {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.quick-questions span {
+  font-size: 12px;
+  color: #909399;
+}
+
+/* 右侧面板 */
+.right-panel {
+  width: 300px;
+  background: white;
+  border-left: 1px solid #e4e7ed;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.knowledge-cards,
+.code-examples {
+  margin-bottom: 30px;
+}
+
+.knowledge-cards h4,
+.code-examples h4 {
+  margin: 0 0 16px 0;
+  color: #303133;
+}
+
+.knowledge-card {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-header h5 {
+  margin: 0;
+  font-size: 14px;
+  color: #303133;
+}
+
+.card-content {
+  font-size: 12px;
+  color: #606266;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.card-footer {
+  text-align: right;
+}
+
+.code-example {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.example-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f5f7fa;
+  border-bottom: 1px solid #e4e7ed;
+  font-size: 12px;
+  color: #606266;
+}
+
+.code-block {
+  margin: 0;
+  padding: 12px;
+  background: #f8f8f8;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-x: auto;
+}
+
+.hint-detail {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.hint-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.hint-tags {
+  display: flex;
+  gap: 4px;
+}
+
+.hint-content {
+  line-height: 1.8;
+  color: #303133;
+}
+
+/* 样式重写 */
+:deep(.ai-avatar) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+:deep(.code-block) {
+  background: #2d2d2d;
+  color: #f8f8f2;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-x: auto;
+}
+
+:deep(.inline-code) {
+  background: #f1f1f1;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  color: #e83e8c;
+}
+
+:deep(.el-textarea__inner) {
+  border-radius: 12px;
+}
+
+:deep(.el-button--text) {
+  padding: 4px 8px;
+}
+</style>

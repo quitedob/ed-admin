@@ -1,0 +1,744 @@
+
+<template>
+  <div class="class-management-container" id="class-management-container">
+    <div class="main-content" id="main-content">
+      <!-- 左侧工具栏 -->
+      <div class="left-sidebar" id="left-sidebar">
+        <!-- 操作按钮 -->
+        <div class="action-buttons" id="action-buttons">
+          <el-button
+            v-if="hasPermission('class:create')"
+            type="primary"
+            class="new-class-btn"
+            @click="handleCreateClass"
+            id="new-class-btn"
+          >
+            <el-icon><Plus /></el-icon>
+            新建班级
+          </el-button>
+          <el-button
+            v-if="hasPermission('class:import')"
+            class="import-btn"
+            @click="handleBatchImport"
+            id="import-btn"
+          >
+            <el-icon><Upload /></el-icon>
+            批量导入
+          </el-button>
+        </div>
+
+        <!-- 筛选器 -->
+        <div class="filters" id="filters">
+          <div class="filter-section" id="grade-filter-section">
+            <div class="filter-label">年级</div>
+            <el-select v-model="filterGrade" placeholder="不定年级" clearable id="grade-select">
+              <el-option label="不定年级" value="" />
+              <el-option label="一年级" value="grade1" />
+              <el-option label="二年级" value="grade2" />
+              <el-option label="三年级" value="grade3" />
+              <el-option label="四年级" value="grade4" />
+              <el-option label="五年级" value="grade5" />
+              <el-option label="六年级" value="grade6" />
+              <el-option label="初一" value="grade7" />
+              <el-option label="初二" value="grade8" />
+              <el-option label="初三" value="grade9" />
+              <el-option label="高一" value="grade10" />
+              <el-option label="高二" value="grade11" />
+              <el-option label="高三" value="grade12" />
+            </el-select>
+          </div>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="search-section" id="search-section">
+          <el-input
+            v-model="searchText"
+            placeholder="搜索班级..."
+            clearable
+            id="class-search-input"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </div>
+      </div>
+
+      <!-- 右侧班级卡片网格 -->
+      <div class="right-content" id="right-content">
+        <div class="content-header" id="content-header">
+          <h2>
+            班级管理
+            <el-tag v-if="!hasGlobalView" type="info" size="small" style="margin-left: 8px;">
+              我的班级
+            </el-tag>
+          </h2>
+          <div class="stats" id="stats">
+            <span>共 {{ filteredClasses.length }} 个班级</span>
+            <span>总学生数: {{ totalStudents }}</span>
+          </div>
+        </div>
+
+        <div class="class-grid" id="class-grid">
+          <el-row :gutter="20">
+            <el-col
+              v-for="classItem in paginatedClasses"
+              :key="classItem.id"
+              :span="8"
+            >
+              <el-card class="class-card" shadow="hover" :id="`class-card-${classItem.id}`">
+                <div class="card-header" :id="`card-header-${classItem.id}`">
+                  <div class="class-info" :id="`class-info-${classItem.id}`">
+                    <h3 class="class-name">{{ classItem.name }}</h3>
+                    <el-tag :type="getStatusTagType(classItem.status)" size="small">
+                      {{ getStatusLabel(classItem.status) }}
+                    </el-tag>
+                  </div>
+                  <el-tag type="info">{{ getGradeLabel(classItem.grade) }}</el-tag>
+                </div>
+
+                <div class="card-description" :id="`card-description-${classItem.id}`">
+                  {{ classItem.description || '暂无描述' }}
+                </div>
+
+                <div class="card-stats" :id="`card-stats-${classItem.id}`">
+                  <div class="stat-item" :id="`stat-students-${classItem.id}`">
+                    <el-icon><User /></el-icon>
+                    <span>{{ classItem.studentCount }}名学生</span>
+                  </div>
+                  <div class="stat-item" :id="`stat-teachers-${classItem.id}`">
+                    <el-icon><UserFilled /></el-icon>
+                    <span>{{ classItem.teacherCount }}名老师</span>
+                  </div>
+                  <div class="stat-item" :id="`stat-courses-${classItem.id}`">
+                    <el-icon><Reading /></el-icon>
+                    <span>{{ classItem.courseCount }}门课程</span>
+                  </div>
+                  <div class="stat-item" :id="`stat-assignments-${classItem.id}`">
+                    <el-icon><Edit /></el-icon>
+                    <span>{{ getResourceCount(classItem, 'assignments') }}个作业</span>
+                  </div>
+                  <div class="stat-item" :id="`stat-exams-${classItem.id}`">
+                    <el-icon><Calendar /></el-icon>
+                    <span>{{ getResourceCount(classItem, 'exams') }}场考试</span>
+                  </div>
+                  <div class="stat-item class-code-item" :id="`stat-class-code-${classItem.id}`">
+                    <span class="code-label">班级码:</span>
+                    <el-input
+                      v-model="classItem.code"
+                      size="small"
+                      class="code-input"
+                      readonly
+                      disabled
+                    />
+                    <el-tooltip content="班级码由系统自动生成，不可修改" placement="top">
+                      <el-icon style="color: #909399; cursor: help">
+                        <QuestionFilled />
+                      </el-icon>
+                    </el-tooltip>
+                  </div>
+                </div>
+
+                <div class="card-head-teachers" :id="`card-head-teachers-${classItem.id}`">
+                  <span class="label">班主任：</span>
+                  <el-tag
+                    v-for="teacher in classItem.headTeachers"
+                    :key="teacher.id"
+                    size="small"
+                    style="margin-right: 4px;"
+                  >
+                    {{ teacher.name }}
+                  </el-tag>
+                </div>
+
+                <div class="card-actions" :id="`card-actions-${classItem.id}`">
+                  <el-button
+                    v-if="hasPermission('class:edit')"
+                    link
+                    type="primary"
+                    size="small"
+                    @click="handleEdit(classItem)"
+                  >
+                    编辑信息
+                  </el-button>
+                  <el-button
+                    v-if="hasPermission('class:manage-resources')"
+                    link
+                    type="primary"
+                    size="small"
+                    @click="handleManageResources(classItem)"
+                  >
+                    权限管理
+                  </el-button>
+                  <el-button
+                    v-if="hasPermission('class:delete')"
+                    link
+                    type="danger"
+                    size="small"
+                    @click="handleDeleteClass(classItem)"
+                  >
+                    删除
+                  </el-button>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+
+          <el-empty v-if="filteredClasses.length === 0" description="暂无班级" />
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :total="filteredClasses.length"
+            :page-sizes="[9, 18, 36]"
+            layout="total, sizes, prev, pager, next"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 新建/编辑班级对话框 -->
+    <ClassDialog
+      v-model="classDialogVisible"
+      :class-data="currentClass"
+      @save="handleSaveClass"
+    />
+
+    <!-- 统一资源管理抽屉 -->
+    <ResourceManagementDrawer
+      v-model="resourceDrawerVisible"
+      :class-data="currentClass"
+      @save="handleResourcesSave"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  Plus,
+  Upload,
+  Search,
+  User,
+  UserFilled,
+  Reading,
+  Calendar,
+  View,
+  Edit,
+  Delete,
+  QuestionFilled
+} from '@element-plus/icons-vue'
+import ClassDialog from './components/ClassDialog.vue'
+import ResourceManagementDrawer from './components/ResourceManagementDrawer.vue'
+import { usePermission } from '@/composables/usePermission'
+import { useUserStore } from '@/store/modules/user'
+
+const router = useRouter()
+
+// 权限控制
+const { hasPermission, filterAuthorizedClasses, hasGlobalView } = usePermission()
+
+// 调试：输出权限信息
+console.log('[班级管理] 是否有全局视角:', hasGlobalView.value)
+console.log('[班级管理] 授权班级ID:', useUserStore().authorizedClassIds)
+
+// 响应式数据
+const searchText = ref('')
+const filterGrade = ref('')
+const filterMajor = ref('')
+const filterSemester = ref('')
+const currentPage = ref(1)
+const pageSize = ref(9)
+const classDialogVisible = ref(false)
+const currentClass = ref(null)
+const resourceDrawerVisible = ref(false)
+
+const classes = ref([])
+
+// 计算属性
+const filteredClasses = computed(() => {
+  // 首先根据用户权限过滤班级（老师只能看到被授权的班级）
+  let result = filterAuthorizedClasses(classes.value)
+
+  if (searchText.value) {
+    result = result.filter(c =>
+      c.name.includes(searchText.value) ||
+      c.description?.includes(searchText.value) ||
+      c.headTeacherName?.includes(searchText.value)
+    )
+  }
+
+  if (filterGrade.value) {
+    result = result.filter(c => c.grade === filterGrade.value)
+  }
+
+  if (filterMajor.value) {
+    result = result.filter(c => c.major === filterMajor.value)
+  }
+
+  if (filterSemester.value) {
+    result = result.filter(c => c.semester === filterSemester.value)
+  }
+
+  return result
+})
+
+const paginatedClasses = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredClasses.value.slice(start, end)
+})
+
+const totalStudents = computed(() => {
+  return classes.value.reduce((sum, c) => sum + c.studentCount, 0)
+})
+
+// 初始化模拟数据
+const initMockData = () => {
+  classes.value = [
+    {
+      id: 'class_001',
+      name: '一年级一班',
+      code: 'CLS001',
+      description: '小学一年级基础班',
+      headTeachers: [
+        { id: 'teacher_001', name: '王老师' },
+        { id: 'teacher_005', name: '陈老师' }
+      ],
+      grade: 'grade1',
+      studentCount: 30,
+      teacherCount: 3,
+      courseCount: 3,
+      status: 'active',
+      createdAt: '2024-09-01T10:00:00Z',
+      authorizedResources: {
+        courses: [],
+        assignments: [],
+        exams: []
+      }
+    },
+    {
+      id: 'class_002',
+      name: '五年级二班',
+      code: 'CLS002',
+      description: '小学五年级进阶班',
+      headTeachers: [
+        { id: 'teacher_002', name: '李老师' }
+      ],
+      grade: 'grade5',
+      studentCount: 28,
+      teacherCount: 2,
+      courseCount: 2,
+      status: 'active',
+      createdAt: '2024-09-01T10:00:00Z',
+      authorizedResources: {
+        courses: [],
+        assignments: [],
+        exams: []
+      }
+    },
+    {
+      id: 'class_003',
+      name: '初二一班',
+      code: 'CLS003',
+      description: '初中二年级班',
+      headTeachers: [
+        { id: 'teacher_003', name: '张老师' }
+      ],
+      grade: 'grade8',
+      studentCount: 25,
+      teacherCount: 2,
+      courseCount: 4,
+      status: 'active',
+      createdAt: '2024-03-01T10:00:00Z',
+      authorizedResources: {
+        courses: [],
+        assignments: [],
+        exams: []
+      }
+    },
+    {
+      id: 'class_004',
+      name: '高三三班',
+      code: 'CLS004',
+      description: '高中三年级毕业班',
+      headTeachers: [
+        { id: 'teacher_004', name: '赵老师' },
+        { id: 'teacher_006', name: '刘老师' }
+      ],
+      grade: 'grade12',
+      studentCount: 22,
+      teacherCount: 3,
+      courseCount: 3,
+      status: 'active',
+      createdAt: '2024-09-01T10:00:00Z',
+      authorizedResources: {
+        courses: [],
+        assignments: [],
+        exams: []
+      }
+    }
+  ]
+}
+
+// 方法
+const handleCreateClass = () => {
+  currentClass.value = null
+  classDialogVisible.value = true
+}
+
+const handleEdit = (classItem) => {
+  currentClass.value = { ...classItem }
+  classDialogVisible.value = true
+}
+
+const handleManageResources = (classItem) => {
+  currentClass.value = classItem
+  resourceDrawerVisible.value = true
+}
+
+const handleResourcesSave = (data) => {
+  if (currentClass.value) {
+    const index = classes.value.findIndex(c => c.id === currentClass.value.id)
+    if (index > -1) {
+      // 更新班级数据
+      classes.value[index].studentCount = data.students.length
+      classes.value[index].teacherCount = data.teachers.length
+      classes.value[index].courseCount = data.courses.length
+      classes.value[index].headTeachers = data.headTeachers
+      classes.value[index].authorizedResources = {
+        courses: data.courses,
+        assignments: data.assignments,
+        exams: data.exams
+      }
+    }
+  }
+  ElMessage.success('资源管理已保存')
+  resourceDrawerVisible.value = false
+}
+
+
+
+const handleBatchImport = () => {
+  ElMessage.info('批量导入功能开发中...')
+}
+
+const handleDeleteClass = (classItem) => {
+  ElMessageBox.confirm(
+    `确定要删除班级"${classItem.name}"吗？删除后无法恢复。`,
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'error'
+    }
+  ).then(() => {
+    const index = classes.value.findIndex(c => c.id === classItem.id)
+    if (index > -1) {
+      classes.value.splice(index, 1)
+      ElMessage.success('删除成功')
+    }
+  })
+}
+
+const handleSaveClass = (classData) => {
+  if (currentClass.value) {
+    // 更新班级
+    const index = classes.value.findIndex(c => c.id === currentClass.value.id)
+    if (index > -1) {
+      classes.value[index] = { ...classes.value[index], ...classData }
+    }
+    ElMessage.success('班级更新成功')
+  } else {
+    // 新建班级
+    const newClass = {
+      id: `class_${Date.now()}`,
+      ...classData,
+      studentCount: 0,
+      courseCount: 0,
+      status: 'active',
+      createdAt: new Date().toISOString()
+    }
+    classes.value.push(newClass)
+    ElMessage.success('班级创建成功')
+  }
+  classDialogVisible.value = false
+}
+
+const getGradeLabel = (grade) => {
+  const map = {
+    grade1: '一年级',
+    grade2: '二年级',
+    grade3: '三年级',
+    grade4: '四年级',
+    grade5: '五年级',
+    grade6: '六年级',
+    grade7: '初一',
+    grade8: '初二',
+    grade9: '初三',
+    grade10: '高一',
+    grade11: '高二',
+    grade12: '高三'
+  }
+  return map[grade] || grade
+}
+
+const getSemesterLabel = (semester) => {
+  const map = {
+    spring: '春季',
+    fall: '秋季'
+  }
+  return map[semester] || semester
+}
+
+const getStatusLabel = (status) => {
+  const map = {
+    active: '活跃',
+    inactive: '停用',
+    graduated: '已毕业'
+  }
+  return map[status] || status
+}
+
+const getStatusTagType = (status) => {
+  const map = {
+    active: 'success',
+    inactive: 'info',
+    graduated: 'warning'
+  }
+  return map[status] || ''
+}
+
+const getResourceCount = (classItem, resourceType) => {
+  return classItem.authorizedResources?.[resourceType]?.length || 0
+}
+
+onMounted(() => {
+  initMockData()
+})
+</script>
+
+<style lang="scss" scoped>
+.class-management-container {
+  min-height: calc(100vh - 60px);
+  background: var(--color-bg-primary);
+}
+
+.main-content {
+  display: flex;
+  gap: 20px;
+  padding: 24px;
+}
+
+/* 左侧工具栏 */
+.left-sidebar {
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .new-class-btn,
+    .import-btn {
+      width: 100%;
+    }
+  }
+
+  .filters {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-base);
+
+    .filter-section {
+      margin-bottom: 16px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .filter-label {
+        font-size: 13px;
+        color: var(--color-text-secondary);
+        margin-bottom: 8px;
+      }
+
+      .el-select {
+        width: 100%;
+      }
+    }
+  }
+
+  .search-section {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-base);
+  }
+}
+
+/* 右侧内容区 */
+.right-content {
+  flex: 1;
+
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .class-grid {
+    margin-bottom: 20px;
+  }
+}
+
+/* 班级卡片 */
+.class-card {
+  margin-bottom: 20px;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+
+    .class-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .class-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--color-text-primary);
+        margin: 0;
+      }
+    }
+  }
+
+  .card-description {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+    min-height: 40px;
+  }
+
+  .card-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--color-text-regular);
+
+      .el-icon {
+        color: var(--color-primary);
+        font-size: 16px;
+      }
+
+      &.class-code-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-top: 8px;
+        margin-top: 8px;
+        border-top: 1px solid var(--color-border-lighter);
+
+        .code-label {
+          color: var(--color-text-secondary);
+          font-weight: 500;
+          min-width: 50px;
+        }
+
+        .code-input {
+          flex: 1;
+          max-width: 150px;
+
+          :deep(.el-input__wrapper) {
+            padding: 4px 8px;
+          }
+
+          :deep(.el-input__inner) {
+            font-size: 12px;
+            font-family: monospace;
+          }
+        }
+
+        .el-button {
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+
+  .card-head-teachers {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+
+    .label {
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border-lighter);
+
+    .el-button {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+}
+</style>

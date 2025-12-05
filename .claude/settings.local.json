@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "WebSearch",
+      "mcp__web-search-prime__webSearchPrime",
+      "Bash(find:*)",
+      "Bash(rm:*)",
+      "Bash(git pull:*)",
+      "Bash(git restore:*)",
+      "mcp__web-reader__webReader"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

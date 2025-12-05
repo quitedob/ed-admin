@@ -1,0 +1,216 @@
+// ==========================================
+// Theme System for ed-admin
+// Light and Dark Theme Management
+// ==========================================
+
+// Theme Mixins
+@mixin theme-variables($theme: 'light') {
+  @if $theme == 'dark' {
+    // Dark theme specific overrides
+    --color-bg-primary: #1a1a1a;
+    --color-bg-secondary: #2a2a2a;
+    --color-bg-tertiary: #333333;
+    --color-bg-overlay: rgba(26, 26, 26, 0.8);
+    --color-bg-mask: rgba(0, 0, 0, 0.7);
+
+    --color-text-primary: #e0e0e0;
+    --color-text-secondary: #b0b0b0;
+    --color-text-tertiary: #808080;
+    --color-text-placeholder: #606060;
+
+    --color-border-light: #333333;
+    --color-border-base: #404040;
+    --color-border-dark: #4a4a4a;
+
+    --color-shadow-light: rgba(0, 0, 0, 0.2);
+    --color-shadow-base: rgba(0, 0, 0, 0.3);
+    --color-shadow-medium: rgba(0, 0, 0, 0.4);
+    --color-shadow-dark: rgba(0, 0, 0, 0.5);
+
+    // Adjusted gradients for dark mode
+    --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    --gradient-success: linear-gradient(135deg, #44a08d 0%, #3d8b7c 100%);
+    --gradient-warning: linear-gradient(135deg, #f368e0 0%, #e056d1 100%);
+    --gradient-danger: linear-gradient(135deg, #ee5a52 0%, #d64541 100%);
+  }
+}
+
+// Theme switching utility classes
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+// Dark theme selector
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    @include theme-variables('dark');
+  }
+}
+
+// Manual theme override
+[data-theme="dark"] {
+  @include theme-variables('dark');
+}
+
+[data-theme="light"] {
+  // Light theme variables are already set in :root
+}
+
+// Theme-aware component styles
+.theme-aware {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border-base);
+
+  &.theme-aware--secondary {
+    background-color: var(--color-bg-secondary);
+  }
+
+  &.theme-aware--tertiary {
+    background-color: var(--color-bg-tertiary);
+  }
+}
+
+// Text color utilities
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-inverse { color: var(--color-text-inverse); }
+
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-danger { color: var(--color-danger); }
+.text-info { color: var(--color-info); }
+
+// Background color utilities
+.bg-primary { background-color: var(--color-bg-primary); }
+.bg-secondary { background-color: var(--color-bg-secondary); }
+.bg-tertiary { background-color: var(--color-bg-tertiary); }
+
+.bg-success { background-color: var(--color-success-light); }
+.bg-warning { background-color: var(--color-warning-light); }
+.bg-danger { background-color: var(--color-danger-light); }
+.bg-info { background-color: var(--color-info-light); }
+
+// Border color utilities
+.border-light { border-color: var(--color-border-light); }
+.border-base { border-color: var(--color-border-base); }
+.border-dark { border-color: var(--color-border-dark); }
+
+// Shadow utilities
+.shadow-light { box-shadow: 0 2px 8px var(--color-shadow-light); }
+.shadow-base { box-shadow: 0 4px 20px var(--color-shadow-base); }
+.shadow-medium { box-shadow: 0 8px 32px var(--color-shadow-medium); }
+.shadow-dark { box-shadow: 0 16px 48px var(--color-shadow-dark); }
+
+// Background color utilities - 遵循 rule.txt 规范：禁止渐变，使用纯色背景
+.gradient-primary {
+  background-color: var(--color-primary-500);
+}
+.gradient-success {
+  background-color: var(--color-success);
+}
+.gradient-warning {
+  background-color: var(--color-warning);
+}
+.gradient-danger {
+  background-color: var(--color-danger);
+}
+.gradient-info {
+  background-color: var(--color-info);
+}
+
+// State-specific theme classes
+.state-excellent { color: var(--color-score-excellent); }
+.state-good { color: var(--color-score-good); }
+.state-average { color: var(--color-score-average); }
+.state-poor { color: var(--color-score-poor); }
+.state-fail { color: var(--color-score-fail); }
+
+// Chart color classes
+.chart-1 { color: var(--color-chart-1); background-color: var(--color-chart-1); }
+.chart-2 { color: var(--color-chart-2); background-color: var(--color-chart-2); }
+.chart-3 { color: var(--color-chart-3); background-color: var(--color-chart-3); }
+.chart-4 { color: var(--color-chart-4); background-color: var(--color-chart-4); }
+.chart-5 { color: var(--color-chart-5); background-color: var(--color-chart-5); }
+.chart-6 { color: var(--color-chart-6); background-color: var(--color-chart-6); }
+
+// Theme toggle button styles - 遵循 rule.txt 规范：禁止渐变，使用纯色背景
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary-500);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--color-text-inverse);
+
+  &:hover {
+    transform: scale(1.05);
+    background-color: var(--color-primary-600);
+    box-shadow: 0 6px 16px var(--color-shadow-primary-hover);
+  }
+
+  &:active {
+    transform: scale(0.95);
+    background-color: var(--color-primary-700);
+  }
+}
+
+// Dark mode specific enhancements
+[data-theme="dark"] {
+  // Enhanced shadows for dark mode
+  .shadow-dark-enhanced {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  }
+
+  // Glowing effects for dark mode
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+  }
+
+  .glow-success {
+    box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
+  }
+
+  .glow-warning {
+    box-shadow: 0 0 20px rgba(255, 159, 243, 0.4);
+  }
+
+  .glow-danger {
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+  }
+}
+
+// Light mode specific enhancements
+[data-theme="light"] {
+  // Subtle shadows for light mode
+  .shadow-light-enhanced {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Theme animation classes
+@keyframes theme-transition {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.theme-transition-enter-active,
+.theme-transition-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.theme-transition-enter-from,
+.theme-transition-leave-to {
+  opacity: 0;
+}
