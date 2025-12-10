@@ -15,6 +15,19 @@ const constantRoutes = [
     component: () => import('@/views/login/index.vue')
   },
   {
+    path: '/dashboard',
+    component: Layout,
+    redirect: '/dashboard/index',
+    children: [
+      {
+        path: 'index',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index.vue'),
+        meta: { title: '首页' }
+      }
+    ]
+  },
+  {
     path: '/course',
     component: () => import('@/layout/index.vue'),
     redirect: '/course/list',
@@ -23,6 +36,11 @@ const constantRoutes = [
         path: 'list',
         component: () => import('@/views/course/list/index.vue'),
         meta: { title: '课程列表' }
+      },
+      {
+        path: 'create',
+        component: () => import('@/views/course/create/index.vue'),
+        meta: { title: '创建课程' }
       },
       {
         path: 'detail',
@@ -148,6 +166,7 @@ const constantRoutes = [
   },
   {
     path: '/homework',
+    name: 'Homework',
     component: Layout,
     redirect: '/homework/list',
     children: [
@@ -156,11 +175,54 @@ const constantRoutes = [
         name: 'HomeworkList',
         component: () => import('@/views/homework/list/index.vue'),
         meta: { title: '作业列表' }
+      },
+      {
+        path: 'create',
+        name: 'HomeworkCreate',
+        component: () => import('@/views/homework/create/index.vue'),
+        meta: { title: '创建作业' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'HomeworkEdit',
+        component: () => import('@/views/homework/edit/index.vue'),
+        meta: { title: '编辑作业' }
+      },
+      {
+        path: 'detail/:id',
+        name: 'HomeworkDetail',
+        component: () => import('@/views/homework/detail/index.vue'),
+        meta: { title: '作业详情' }
+      },
+      {
+        path: 'grading/:id',
+        name: 'HomeworkGrading',
+        component: () => import('@/views/homework/grading/index.vue'),
+        meta: { title: '批改作业' }
+      },
+      {
+        path: 'review',
+        name: 'HomeworkReview',
+        component: () => import('@/views/homework/review/index.vue'),
+        meta: { title: '作业批改' }
+      },
+      {
+        path: 'statistics',
+        name: 'HomeworkStatistics',
+        component: () => import('@/views/homework/statistics/index.vue'),
+        meta: { title: '作业统计' }
+      },
+      {
+        path: 'preview/:id',
+        name: 'HomeworkPreview',
+        component: () => import('@/views/homework/preview/index.vue'),
+        meta: { title: '作业预览' }
       }
     ]
   },
   {
     path: '/exam',
+    name: 'Exam',
     component: Layout,
     redirect: '/exam/list',
     children: [
@@ -169,11 +231,66 @@ const constantRoutes = [
         name: 'ExamList',
         component: () => import('@/views/exam/list/index.vue'),
         meta: { title: '考试列表' }
+      },
+      {
+        path: 'create',
+        name: 'ExamCreate',
+        component: () => import('@/views/exam/create/index.vue'),
+        meta: { title: '创建考试' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'ExamEdit',
+        component: () => import('@/views/exam/create/index.vue'),
+        meta: { title: '编辑考试' }
+      },
+      {
+        path: 'detail/:id',
+        name: 'ExamDetail',
+        component: () => import('@/views/exam/detail/index.vue'),
+        meta: { title: '考试详情' }
+      },
+      {
+        path: 'grade/:id/paper/:submissionId',
+        name: 'ExamPaperView',
+        component: () => import('@/views/exam/grade/StudentPaper.vue'),
+        meta: { title: '查看答卷' }
+      },
+      {
+        path: 'grade/:id',
+        name: 'ExamGrade',
+        component: () => import('@/views/exam/grades/index.vue'),
+        meta: { title: '批改考试' }
+      },
+      {
+        path: 'monitor',
+        name: 'ExamMonitor',
+        component: () => import('@/views/exam/monitor/index.vue'),
+        meta: { title: '考试监控' }
+      },
+      {
+        path: 'grades',
+        name: 'ExamGrades',
+        component: () => import('@/views/exam/grades/index.vue'),
+        meta: { title: '成绩管理' }
+      },
+      {
+        path: 'preview/:id',
+        name: 'ExamPreview',
+        component: () => import('@/views/exam/preview/index.vue'),
+        meta: { title: '考试预览' }
+      },
+      {
+        path: 'questionbank',
+        name: 'ExamQuestionBank',
+        component: () => import('@/views/exam/questionbank/index.vue'),
+        meta: { title: '题目库管理' }
       }
     ]
   },
   {
     path: '/users',
+    name: 'Users',
     component: Layout,
     redirect: '/users/list',
     children: [
@@ -182,6 +299,30 @@ const constantRoutes = [
         name: 'UserList',
         component: () => import('@/views/users/list/index.vue'),
         meta: { title: '用户列表' }
+      },
+      {
+        path: 'detail/:id',
+        name: 'UserDetail',
+        component: () => import('@/views/users/detail/index.vue'),
+        meta: { title: '用户详情' }
+      },
+      {
+        path: 'detail/:id/homework',
+        name: 'UserHomeworkRecords',
+        component: () => import('@/views/users/detail/homework.vue'),
+        meta: { title: '作业记录' }
+      },
+      {
+        path: 'detail/:id/exam',
+        name: 'UserExamRecords',
+        component: () => import('@/views/users/detail/exam.vue'),
+        meta: { title: '考试记录' }
+      },
+      {
+        path: 'detail/:id/practice',
+        name: 'UserPracticeRecords',
+        component: () => import('@/views/users/detail/practice.vue'),
+        meta: { title: '题库记录' }
       }
     ]
   }
@@ -249,7 +390,7 @@ export function createNewRouter(data) {
   // 添加新的动态路由（跳过已存在的静态路由）
   for (const e of menuList) {
     // 跳过已存在的静态路由路径
-    const staticRoutePaths = ['/ai', '/course', '/material', '/assignments', '/class', '/homework', '/exam', '/users']
+    const staticRoutePaths = ['/dashboard', '/ai', '/course', '/material', '/assignments', '/class', '/homework', '/exam', '/users', '/aigc']
     if (staticRoutePaths.some(path => e.path.startsWith(path))) {
       console.log(`跳过静态路由路径: ${e.path}`)
       continue
@@ -301,28 +442,6 @@ export function createNewRouter(data) {
     { path: '/question-bank', redirect: '/question-bank' }
   ]
 
-  // AI 助教的子路由（因为 /ai 已在静态路由中定义）
-  const aiSubRoutes = [
-    {
-      path: 'assistant/upload-generate',
-      name: 'UploadGenerate',
-      component: () => import('@/views/ai/assistant/upload-generate/index.vue'),
-      meta: { title: '上传并生成' }
-    },
-    {
-      path: 'assistant/error-based',
-      name: 'ErrorBased',
-      component: () => import('@/views/ai/assistant/error-based/index.vue'),
-      meta: { title: '基于错题生成' }
-    },
-    {
-      path: 'assistant/custom-generate',
-      name: 'CustomGenerate',
-      component: () => import('@/views/ai/assistant/custom-generate/index.vue'),
-      meta: { title: '自定义生成' }
-    }
-  ]
-
   // 其他功能路由（不在静态路由中定义的）
   const featureRoutes = [
     {
@@ -367,147 +486,6 @@ export function createNewRouter(data) {
   featureRoutes.forEach(route => {
     try {
       router.addRoute(route)
-    } catch (error) {
-      // 忽略重复添加路由的错误
-    }
-  })
-
-  // 添加用户详情子路由（因为 /users 已在静态路由中定义）
-  const userDetailRoutes = [
-    {
-      path: 'detail/:id',
-      name: 'UserDetail',
-      component: () => import('@/views/users/detail/index.vue'),
-      meta: { title: '用户详情' }
-    },
-    {
-      path: 'detail/:id/homework',
-      name: 'UserHomeworkRecords',
-      component: () => import('@/views/users/detail/homework.vue'),
-      meta: { title: '作业记录' }
-    },
-    {
-      path: 'detail/:id/exam',
-      name: 'UserExamRecords',
-      component: () => import('@/views/users/detail/exam.vue'),
-      meta: { title: '考试记录' }
-    },
-    {
-      path: 'detail/:id/practice',
-      name: 'UserPracticeRecords',
-      component: () => import('@/views/users/detail/practice.vue'),
-      meta: { title: '题库记录' }
-    }
-  ]
-
-  // 添加用户详情路由
-  userDetailRoutes.forEach(route => {
-    try {
-      router.addRoute('/users', route)
-    } catch (error) {
-      // 忽略重复添加路由的错误
-    }
-  })
-
-  // 添加作业子路由（因为 /homework 已在静态路由中定义）
-  const homeworkSubRoutes = [
-    {
-      path: 'create',
-      name: 'HomeworkCreate',
-      component: () => import('@/views/homework/create/index.vue'),
-      meta: { title: '创建作业' }
-    },
-    {
-      path: 'edit/:id',
-      name: 'HomeworkEdit',
-      component: () => import('@/views/homework/edit/index.vue'),
-      meta: { title: '编辑作业' }
-    },
-    {
-      path: 'detail/:id',
-      name: 'HomeworkDetail',
-      component: () => import('@/views/homework/detail/index.vue'),
-      meta: { title: '作业详情' }
-    },
-    {
-      path: 'grading/:id',
-      name: 'HomeworkGrading',
-      component: () => import('@/views/homework/grading/index.vue'),
-      meta: { title: '批改作业' }
-    },
-    {
-      path: 'review',
-      name: 'HomeworkReview',
-      component: () => import('@/views/homework/review/index.vue'),
-      meta: { title: '作业批改' }
-    },
-    {
-      path: 'statistics',
-      name: 'HomeworkStatistics',
-      component: () => import('@/views/homework/statistics/index.vue'),
-      meta: { title: '作业统计' }
-    }
-  ]
-
-  // 添加考试子路由（因为 /exam 已在静态路由中定义）
-  const examSubRoutes = [
-    {
-      path: 'create',
-      name: 'ExamCreate',
-      component: () => import('@/views/exam/create/index.vue'),
-      meta: { title: '创建考试' }
-    },
-    {
-      path: 'edit/:id',
-      name: 'ExamEdit',
-      component: () => import('@/views/exam/create/index.vue'),
-      meta: { title: '编辑考试' }
-    },
-    {
-      path: 'detail/:id',
-      name: 'ExamDetail',
-      component: () => import('@/views/exam/detail/index.vue'),
-      meta: { title: '考试详情' }
-    },
-    {
-      path: 'grade/:id/paper/:submissionId',
-      name: 'ExamPaperView',
-      component: () => import('@/views/exam/grade/StudentPaper.vue'),
-      meta: { title: '查看答卷' }
-    },
-    {
-      path: 'grade/:id',
-      name: 'ExamGrade',
-      component: () => import('@/views/exam/grades/index.vue'),
-      meta: { title: '批改考试' }
-    },
-    {
-      path: 'monitor',
-      name: 'ExamMonitor',
-      component: () => import('@/views/exam/monitor/index.vue'),
-      meta: { title: '考试监控' }
-    },
-    {
-      path: 'grades',
-      name: 'ExamGrades',
-      component: () => import('@/views/exam/grades/index.vue'),
-      meta: { title: '成绩管理' }
-    }
-  ]
-
-  // 添加作业路由
-  homeworkSubRoutes.forEach(route => {
-    try {
-      router.addRoute('/homework', route)
-    } catch (error) {
-      // 忽略重复添加路由的错误
-    }
-  })
-
-  // 添加考试路由
-  examSubRoutes.forEach(route => {
-    try {
-      router.addRoute('/exam', route)
     } catch (error) {
       // 忽略重复添加路由的错误
     }

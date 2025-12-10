@@ -112,7 +112,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column label="操作" width="340" fixed="right">
           <template #default="scope">
             <div class="table-actions">
               <el-button v-if="hasPermission('lecturer:edit')" link type="primary" size="small" @click="handleEdit(scope.row)">
@@ -144,8 +144,8 @@
       </div>
     </div>
 
-    <!-- 统一授权管理对话框 -->
-    <UnifiedAuthorizeDialog
+    <!-- 统一授权管理抽屉 -->
+    <UnifiedAuthorizeDrawer
       v-model="authorizeDialogVisible"
       :teacher-data="selectedLecturer"
       :initial-authorized-classes="selectedLecturer?.authorizedClasses || []"
@@ -167,7 +167,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Delete } from '@element-plus/icons-vue'
-import UnifiedAuthorizeDialog from '../components/UnifiedAuthorizeDialog.vue'
+import UnifiedAuthorizeDrawer from '../components/UnifiedAuthorizeDrawer.vue'
 import TeacherForm from '../components/TeacherForm.vue'
 import { usePermission } from '@/composables/usePermission'
 
@@ -591,5 +591,12 @@ onMounted(() => {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 </style>

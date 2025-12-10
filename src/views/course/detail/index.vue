@@ -18,8 +18,8 @@
             <span class="level">难度：{{ getLevelText(courseInfo.basicInfo?.level) }}</span>
             <span class="duration">时长：{{ courseInfo.basicInfo?.duration }}小时</span>
             <span class="status">
-              <el-tag :type="getStatusType(courseInfo.schedule?.publishStatus)">
-                {{ getStatusText(courseInfo.schedule?.publishStatus) }}
+              <el-tag :type="getStatusType(courseInfo.basicInfo?.schedule?.publishStatus || courseInfo.schedule?.publishStatus)">
+                {{ getStatusText(courseInfo.basicInfo?.schedule?.publishStatus || courseInfo.schedule?.publishStatus) }}
               </el-tag>
             </span>
           </div>
@@ -34,8 +34,8 @@
             </el-tag>
           </div>
           <div class="course-schedule">
-            <span>开始时间：{{ courseInfo.schedule?.startDate }}</span>
-            <span>结束时间：{{ courseInfo.schedule?.endDate }}</span>
+            <span>开始时间：{{ courseInfo.basicInfo?.schedule?.startDate || courseInfo.schedule?.startDate }}</span>
+            <span>结束时间：{{ courseInfo.basicInfo?.schedule?.endDate || courseInfo.schedule?.endDate }}</span>
           </div>
         </div>
       </div>
@@ -144,7 +144,28 @@
                           练习题：{{ section.practice.questions }}道
                         </el-tag>
                       </div>
+                      <div v-if="section.hasHomework || section.homeworkId" class="homework-info">
+                        <el-tag size="small" type="success">
+                          课程作业
+                        </el-tag>
+                      </div>
+                      <div v-if="section.textContent" class="text-info">
+                        <el-tag size="small" type="info">
+                          文本内容
+                        </el-tag>
+                      </div>
                     </div>
+                    
+                    <!-- 展开查看详细内容 -->
+                    <el-collapse v-if="hasDetailContent(section)" class="section-detail-collapse">
+                      <el-collapse-item title="查看详细内容">
+                        <CourseResourceViewer
+                          :section="section"
+                          @start-homework="handleStartHomework"
+                          @start-practice="handleStartPractice"
+                        />
+                      </el-collapse-item>
+                    </el-collapse>
                   </div>
                 </div>
               </el-collapse-item>
@@ -208,6 +229,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { parseTime, formatTime } from '@/utils'
 import CourseContentRenderer from '@/components/Renderer/CourseContentRenderer.vue'
+import CourseResourceViewer from '@/components/Renderer/CourseResourceViewer.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -223,13 +245,37 @@ const viewMode = ref('renderer') // 'renderer' or 'list'
 
 // 获取课程详情
 const getCourseDetail = () => {
+  console.log('route.query:', route.query)
+  console.log('route.params:', route.params)
+  
   const courseId = route.query.courseId
-  if (!courseId) {
+  console.log('获取到的courseId:', courseId, '类型:', typeof courseId, '长度:', courseId?.length)
+  
+  // 检查 courseId 是否为空或空字符串
+  if (!courseId || courseId.trim() === '') {
+    console.error('缺少课程ID参数或ID为空，route.query:', route.query)
     proxy.$message.error('缺少课程ID参数')
     return
   }
 
-  // 使用模拟数据
+  // 首先尝试从临时存储中加载
+  const tempCourses = JSON.parse(sessionStorage.getItem('temp_courses') || '[]')
+  console.log('临时课程列表:', tempCourses)
+  console.log('查找课程ID:', courseId)
+  
+  const tempCourse = tempCourses.find(c => c.id === courseId)
+  
+  if (tempCourse) {
+    // 找到临时课程，直接使用
+    courseInfo.value = tempCourse
+    chapters.value = tempCourse.chapters || []
+    console.log('从临时存储加载课程:', courseId, tempCourse)
+    return
+  }
+  
+  console.log('未找到临时课程，使用模拟数据')
+
+  // 如果不是临时课程，使用模拟数据
   import('@/utils/mockData').then(({ mockApi }) => {
     mockApi.getCourseDetail(courseId).then(course => {
       courseInfo.value = course || {}
@@ -324,9 +370,37 @@ const getContentTypeText = (type) => {
     'video': '视频',
     'audio': '音频',
     'document': '文档',
-    'image': '图片'
+    'image': '图片',
+    'normal': '普通课程',
+    'programming': '编程课程',
+    'homework': '课程作业'
   }
-  return typeMap[type] || '未知'
+  return typeMap[type] || type || '未知'
+}
+
+// 检查小节是否有详细内容
+const hasDetailContent = (section) => {
+  return section.contentUrl ||
+         section.textContent ||
+         section.pdfUrl ||
+         section.images?.length > 0 ||
+         section.hasHomework ||
+         section.homeworkId ||
+         section.practice?.questions > 0 ||
+         section.programming ||
+         section.resources?.materials?.length > 0
+}
+
+// 开始作业
+const handleStartHomework = (section) => {
+  console.log('开始作业:', section)
+  proxy.$message.info('作业功能开发中...')
+}
+
+// 开始练习
+const handleStartPractice = (section) => {
+  console.log('开始练习:', section)
+  proxy.$message.info('练习功能开发中...')
 }
 
 const formatDate = (dateString) => {
@@ -553,8 +627,26 @@ onMounted(() => {
   margin-right: 5px;
 }
 
-.practice-info {
+.practice-info,
+.homework-info,
+.text-info {
   align-self: flex-start;
+}
+
+.section-detail-collapse {
+  margin-top: 12px;
+  margin-left: 20px;
+  
+  :deep(.el-collapse-item__header) {
+    font-size: 13px;
+    color: #409eff;
+    height: 36px;
+    line-height: 36px;
+  }
+  
+  :deep(.el-collapse-item__content) {
+    padding: 0;
+  }
 }
 
 .chart-card {

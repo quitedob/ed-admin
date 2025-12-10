@@ -483,12 +483,110 @@ const getExamDetail = () => {
     return
   }
 
-  // 使用模拟数据
+  // 首先从临时存储中查找
+  const tempExams = JSON.parse(sessionStorage.getItem('temp_exams') || '[]')
+  const tempExam = tempExams.find(e => e.id === examId)
+  
+  if (tempExam) {
+    // 使用临时存储的考试数据
+    examInfo.value = {
+      id: tempExam.id,
+      basicInfo: {
+        title: tempExam.title,
+        description: tempExam.description,
+        type: tempExam.type || 'quiz',
+        difficulty: 'medium'
+      },
+      metadata: {
+        version: '1.0',
+        createdAt: tempExam.createdAt,
+        updatedAt: tempExam.createdAt,
+        createdBy: '当前用户'
+      },
+      schedule: tempExam.schedule || {},
+      settings: {
+        totalScore: tempExam.totalScore || 0,
+        passingScore: tempExam.passingScore || 60,
+        showScoreAfterSubmit: true,
+        randomOrder: tempExam.settings?.randomOrder || false,
+        randomQuestions: tempExam.settings?.randomQuestions || false,
+        questionsPerBank: 0,
+        allowReview: true,
+        reviewDelay: 0,
+        proctorRequired: false,
+        cameraRequired: false
+      },
+      grading: tempExam.grading || {
+        autoGrade: true,
+        manualReviewRequired: false
+      },
+      questionBanks: tempExam.questionBanks || []
+    }
+    
+    // 首先检查是否有单独保存的题目库数据
+    const savedBanks = sessionStorage.getItem(`exam_banks_${examId}`)
+    if (savedBanks) {
+      // 使用单独保存的题目库数据
+      questionBanks.value = JSON.parse(savedBanks)
+      // 合并所有题目用于题目视图
+      examQuestions.value = questionBanks.value.flatMap(bank => bank.questions || [])
+    } else if (tempExam.questionBanks && tempExam.questionBanks.length > 0) {
+      // 将题目数据转换为题目库格式显示
+      // 按题型分组
+      const groupedQuestions = {}
+      tempExam.questionBanks.forEach(q => {
+        const type = q.type || 'mixed'
+        if (!groupedQuestions[type]) {
+          groupedQuestions[type] = []
+        }
+        groupedQuestions[type].push(q)
+      })
+      
+      // 转换为题目库格式
+      questionBanks.value = Object.keys(groupedQuestions).map((type, index) => ({
+        id: `bank_${index}`,
+        name: getQuestionTypeText(type) + '库',
+        type: type,
+        questionCount: groupedQuestions[type].length,
+        questions: groupedQuestions[type]
+      }))
+      
+      // 设置题目数据用于题目视图
+      examQuestions.value = tempExam.questionBanks || []
+    } else {
+      questionBanks.value = []
+      examQuestions.value = []
+    }
+    
+    // 模拟统计数据（临时考试没有真实统计）
+    examStats.value = {
+      actualParticipants: 0,
+      completionCount: 0,
+      averageScore: 0,
+      maxScore: 0,
+      minScore: 0,
+      completionRate: 0
+    }
+    
+    monitorStats.value = {
+      onlineCount: 0,
+      submittedCount: 0,
+      averageDuration: 0
+    }
+    
+    submissions.value = []
+    submissionTotal.value = 0
+    studentAnswers.value = []
+    
+    return
+  }
+
+  // 如果临时存储中没有，使用模拟数据
   import('@/utils/mockData').then(({ mockApi }) => {
     // 获取考试详情
     mockApi.getExamDetail(examId).then(exam => {
       examInfo.value = exam || {}
-      questionBanks.value = exam.questionBanks || []
+      questionBanks.value = exam?.questionBanks || []
       
       // 模拟统计数据
       examStats.value = {

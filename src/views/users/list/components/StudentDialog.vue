@@ -41,24 +41,6 @@
         </el-col>
       </el-row>
 
-      <!-- 班级信息只读显示，不允许在此处编辑 -->
-      <el-form-item label="所属班级">
-        <div class="class-display">
-          <el-tag
-            v-for="cls in displayClasses"
-            :key="cls.id"
-            size="small"
-            type="info"
-            style="margin-right: 8px"
-          >
-            {{ cls.name }}
-          </el-tag>
-          <span v-if="displayClasses.length === 0" style="color: #909399; font-size: 14px">
-            暂无班级（请在班级管理页面添加学生到班级）
-          </span>
-        </div>
-      </el-form-item>
-
       <el-form-item label="学生状态" prop="status">
         <el-select v-model="formData.status" placeholder="请选择学生状态" style="width: 100%">
           <el-option label="新生" value="new">
@@ -80,19 +62,6 @@
             <span style="color: #f56c6c; font-weight: 500">退费</span>
           </el-option>
         </el-select>
-      </el-form-item>
-
-      <el-form-item label="账号状态" prop="isDisabled">
-        <el-switch
-          v-model="formData.isDisabled"
-          :active-value="false"
-          :inactive-value="true"
-          active-text="启用"
-          inactive-text="禁用"
-        />
-        <span style="margin-left: 12px; font-size: 12px; color: #909399">
-          禁用后学生将无法登录系统
-        </span>
       </el-form-item>
     </el-form>
 
@@ -132,13 +101,7 @@ const formData = ref({
   name: '',
   phone: '',
   email: '',
-  status: 'new',
-  isDisabled: false
-})
-
-// 显示学生当前所属班级（只读）
-const displayClasses = computed(() => {
-  return props.studentData?.classes || []
+  status: 'new'
 })
 
 // 表单验证规则
@@ -163,22 +126,22 @@ const rules = {
 }
 
 // 计算属性
-const isEdit = computed(() => !!props.studentData)
+const isEdit = computed(() => !!props.studentData && typeof props.studentData === 'object')
 const dialogVisible = computed({
-  get: () => props.modelValue,
+  get: () => props.modelValue || false,
   set: (value) => emit('update:modelValue', value)
 })
 
 // 初始化表单数据
 const initFormData = () => {
-  if (props.studentData) {
+  const student = props.studentData
+  if (student && typeof student === 'object') {
     formData.value = {
-      studentId: props.studentData.studentId || '',
-      name: props.studentData.name || '',
-      phone: props.studentData.phone || '',
-      email: props.studentData.email || '',
-      status: props.studentData.status || 'new',
-      isDisabled: props.studentData.isDisabled ?? false
+      studentId: student.studentId || '',
+      name: student.name || '',
+      phone: student.phone || '',
+      email: student.email || '',
+      status: student.status || 'new'
     }
   } else {
     resetForm()
@@ -192,8 +155,7 @@ const resetForm = () => {
     name: '',
     phone: '',
     email: '',
-    status: 'new',
-    isDisabled: false
+    status: 'new'
   }
 }
 
@@ -207,14 +169,13 @@ const handleSave = async () => {
 
     saving.value = true
 
-    // 构建保存数据（不包含班级信息，班级关系在班级管理页面维护）
+    // 构建保存数据
     const saveData = {
       studentId: formData.value.studentId,
       name: formData.value.name,
       phone: formData.value.phone,
       email: formData.value.email,
-      status: formData.value.status,
-      isDisabled: formData.value.isDisabled
+      status: formData.value.status
     }
 
     emit('save', saveData)
@@ -226,10 +187,13 @@ const handleSave = async () => {
 }
 
 // 监听props变化来初始化表单
-watch(() => props.studentData, () => {
-  initFormData()
-}, { immediate: true })
+watch(() => props.studentData, (newVal) => {
+  if (newVal !== null && newVal !== undefined) {
+    initFormData()
+  }
+}, { immediate: true, deep: false })
 
+// 初始化表单
 initFormData()
 </script>
 
@@ -238,13 +202,5 @@ initFormData()
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-}
-
-.class-display {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 0;
 }
 </style>

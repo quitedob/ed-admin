@@ -189,24 +189,26 @@ export const PERMISSION_MODULES = [
     ]
   },
   {
-    label: '教师管理',
-    code: 'teacher',
+    label: '老师管理',
+    code: 'lecturer',
     permissions: [
       // 基础管理
-      { label: '查看教师', value: 'teacher:view', description: '查看教师列表' },
-      { label: '创建教师', value: 'teacher:create', description: '新增教师账号' },
-      { label: '编辑教师', value: 'teacher:edit', description: '修改教师基本信息' },
-      { label: '删除教师', value: 'teacher:delete', description: '删除教师账号' },
-      { label: '启用/禁用', value: 'teacher:toggle-status', description: '切换教师账号状态' },
+      { label: '查看老师', value: 'lecturer:view', description: '查看老师列表' },
+      { label: '创建老师', value: 'lecturer:create', description: '新增老师账号' },
+      { label: '编辑老师', value: 'lecturer:edit', description: '修改老师基本信息' },
+      { label: '删除老师', value: 'lecturer:delete', description: '删除老师账号' },
+      { label: '批量删除', value: 'lecturer:batch-delete', description: '批量删除老师账号' },
+      { label: '查看详情', value: 'lecturer:view-detail', description: '查看老师详细信息' },
+      { label: '启用/禁用', value: 'lecturer:status-toggle', description: '切换老师账号状态' },
 
       // 授权管理
       {
-        label: '授权教师',
-        value: 'teacher:authorize',
-        description: '为教师分配班级和资源',
+        label: '授权老师',
+        value: 'lecturer:authorize',
+        description: '为老师分配班级和资源',
         children: [
-          { label: '授权班级', value: 'teacher:authorize-class', description: '为教师分配班级权限' },
-          { label: '授权资源', value: 'teacher:authorize-resource', description: '为教师分配课程、作业、考试权限' }
+          { label: '授权班级', value: 'lecturer:authorize-class', description: '为老师分配班级权限' },
+          { label: '授权资源', value: 'lecturer:authorize-resource', description: '为老师分配课程、作业、考试权限' }
         ]
       }
     ]

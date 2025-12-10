@@ -82,6 +82,10 @@
                 @onCreated="handleEditorCreated"
               />
             </div>
+            <div v-if="formData.type === 'fill'" class="fill-blank-tip">
+              <el-icon><InfoFilled /></el-icon>
+              <span>填空题特别提示：请在题目内容中使用 <strong>___</strong>（三个下划线）表示需要填空的位置，系统会自动识别空格数量</span>
+            </div>
           </el-form-item>
 
           <el-form-item label="学科">
@@ -597,7 +601,7 @@
 <script setup name="QuestionManagementDrawer">
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Plus, PriceTag, Upload, Delete, FolderOpened, Document, View, Hide } from '@element-plus/icons-vue'
+import { Plus, PriceTag, Upload, Delete, FolderOpened, Document, View, Hide, InfoFilled } from '@element-plus/icons-vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { SUBJECT_OPTIONS, getSubjectLabel } from '@/constants/subjects.js'
 
@@ -619,15 +623,17 @@ const toolbarConfig = {
   excludeKeys: ['fullScreen']
 }
 
-const editorConfig = {
-  placeholder: '请输入题目内容...',
+const editorConfig = computed(() => ({
+  placeholder: formData.value.type === 'fill' 
+    ? '请输入题目内容（填空题请使用 ___ 表示空格位置）' 
+    : '请输入题目内容...',
   MENU_CONF: {
     uploadImage: {
       server: '/api/upload',
       fieldName: 'file'
     }
   }
-}
+}))
 
 const questionTypes = [
   { value: 'single', label: '单选题', icon: 'CircleCheckFilled', description: '选择一个正确答案' },
@@ -1186,6 +1192,34 @@ const removeExampleFile = () => {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
   overflow: hidden;
+}
+
+.fill-blank-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #0050b3;
+  line-height: 1.6;
+
+  .el-icon {
+    font-size: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: #0050b3;
+    font-weight: 600;
+    padding: 0 4px;
+    background: rgba(24, 144, 255, 0.1);
+    border-radius: 2px;
+  }
 }
 
 .section-header {

@@ -336,7 +336,8 @@ const initMockQuestions = () => {
       subject: 'python',
       tags: ['面向对象', '基础概念'],
       options: ['封装', '继承', '多态', '编译'],
-      correctAnswer: 'D'
+      correctAnswer: 'D',
+      explanation: '面向对象编程的三大特性是封装、继承和多态，编译是编程语言的实现方式，不是面向对象的特性。'
     },
     {
       id: 'q_002',
@@ -346,16 +347,25 @@ const initMockQuestions = () => {
       subject: 'python',
       tags: ['Python', '基础语法'],
       options: ['int', 'str', 'bool', 'float'],
-      correctAnswer: ['A', 'B', 'C', 'D']
+      correctAnswer: ['A', 'B', 'C', 'D'],
+      explanation: 'Python的基本数据类型包括整数(int)、字符串(str)、布尔值(bool)和浮点数(float)。'
     },
     {
       id: 'q_003',
       type: 'fill',
-      questionText: 'Python中，___是所有类的父类',
+      questionText: 'Python中，____是所有类的父类',
+      blanks: [
+        {
+          id: 1,
+          position: 'Python中，____是所有类的父类',
+          correctAnswer: 'object',
+          acceptableAnswers: ['object', 'Object']
+        }
+      ],
       difficulty: 'medium',
       subject: 'python',
       tags: ['Python', '面向对象'],
-      correctAnswer: 'object'
+      explanation: '在Python中，object是所有类的基类，所有类都直接或间接继承自object类。'
     },
     {
       id: 'q_004',
@@ -364,7 +374,8 @@ const initMockQuestions = () => {
       difficulty: 'medium',
       subject: 'python',
       tags: ['Python', '抽象基类'],
-      correctAnswer: true
+      correctAnswer: true,
+      explanation: 'Python的抽象基类(ABC)可以包含具体方法的实现，不仅仅是抽象方法。'
     },
     {
       id: 'q_005',
@@ -375,7 +386,13 @@ const initMockQuestions = () => {
       tags: ['算法', '字符串'],
       hojProblemId: '1001',
       timeLimit: 1000,
-      memoryLimit: 256
+      memoryLimit: 256,
+      testCases: [
+        { input: 'aba', expectedOutput: 'true' },
+        { input: 'abc', expectedOutput: 'false' },
+        { input: 'racecar', expectedOutput: 'true' }
+      ],
+      scoringCriteria: '通过所有测试用例得满分，部分通过按比例得分'
     },
     {
       id: 'q_006',
@@ -384,7 +401,9 @@ const initMockQuestions = () => {
       difficulty: 'hard',
       subject: 'cpp_programming',
       tags: ['设计模式', '架构'],
-      referenceAnswer: 'MVC将应用分为Model、View、Controller三层'
+      referenceAnswer: 'MVC将应用分为Model（模型）、View（视图）、Controller（控制器）三层。Model负责数据和业务逻辑，View负责界面展示，Controller负责协调两者。优点包括：1.分离关注点，提高代码可维护性；2.支持多视图；3.便于团队协作；4.易于测试。',
+      scoringCriteria: '答案需包含：1.MVC三层的定义和职责(40%)；2.至少两个优点的说明(40%)；3.表述清晰完整(20%)',
+      keyPoints: ['Model-数据和业务逻辑', 'View-界面展示', 'Controller-协调', '分离关注点', '可维护性', '多视图支持']
     },
     {
       id: 'q_007',
@@ -394,16 +413,25 @@ const initMockQuestions = () => {
       subject: 'math',
       tags: ['矩阵运算'],
       options: ['[1 2; 2 4]', '[1 0; 0 1]', '[0 0; 0 0]', '[1 1; 1 1]'],
-      correctAnswer: 'B'
+      correctAnswer: 'B',
+      explanation: '单位矩阵[1 0; 0 1]的行列式为1，非零，因此可逆。其他矩阵的行列式都为0，不可逆。'
     },
     {
       id: 'q_008',
       type: 'fill',
-      questionText: '设随机变量X服从正态分布N(2, 9)，则P(X≤5) = ___',
+      questionText: '设随机变量X服从正态分布N(2, 9)，则P(X≤5) = ____',
+      blanks: [
+        {
+          id: 1,
+          position: '设随机变量X服从正态分布N(2, 9)，则P(X≤5) = ____',
+          correctAnswer: '0.841',
+          acceptableAnswers: ['0.841', '0.8413', '84.1%', '84.13%']
+        }
+      ],
       difficulty: 'hard',
       subject: 'math',
       tags: ['概率计算'],
-      correctAnswer: '0.841'
+      explanation: '标准化后Z=(5-2)/3=1，查标准正态分布表得P(Z≤1)≈0.8413'
     },
     {
       id: 'q_009',
@@ -413,7 +441,8 @@ const initMockQuestions = () => {
       subject: 'english',
       tags: ['词汇辨析'],
       options: ['put', 'go', 'cut', 'run'],
-      correctAnswer: ['A', 'C']
+      correctAnswer: ['A', 'C'],
+      explanation: 'put和cut的过去式与原形相同，而go的过去式是went，run的过去式是ran。'
     },
     {
       id: 'q_010',
@@ -422,7 +451,8 @@ const initMockQuestions = () => {
       difficulty: 'medium',
       subject: 'english',
       tags: ['时态用法'],
-      correctAnswer: true
+      correctAnswer: true,
+      explanation: '现在完成时的用法之一就是表示从过去某时开始一直持续到现在的动作或状态，常与for、since等时间状语连用。'
     },
     {
       id: 'q_011',
@@ -430,7 +460,9 @@ const initMockQuestions = () => {
       questionText: '使用Scratch创建一个简单的动画故事',
       difficulty: 'easy',
       subject: 'graphical_programming',
-      tags: ['Scratch', '创意编程']
+      tags: ['Scratch', '创意编程'],
+      scoringCriteria: '评分标准：1.至少包含2个角色(20%)；2.有完整的故事情节(30%)；3.使用了移动、对话等基本功能(30%)；4.创意性和完整性(20%)',
+      requirements: ['至少2个角色', '完整故事情节', '使用基本动画功能', '有开始和结束']
     },
     {
       id: 'q_012',
@@ -440,16 +472,25 @@ const initMockQuestions = () => {
       subject: 'python',
       tags: ['算法', '数据结构'],
       options: ['O(n)', 'O(log n)', 'O(n²)', 'O(1)'],
-      correctAnswer: 'B'
+      correctAnswer: 'B',
+      explanation: '二分查找每次将搜索范围减半，时间复杂度为O(log n)。'
     },
     {
       id: 'q_013',
       type: 'fill',
-      questionText: '中国第一个朝代是___',
+      questionText: '中国第一个朝代是____',
+      blanks: [
+        {
+          id: 1,
+          position: '中国第一个朝代是____',
+          correctAnswer: '夏朝',
+          acceptableAnswers: ['夏朝', '夏', '夏代']
+        }
+      ],
       difficulty: 'easy',
       subject: 'history',
       tags: ['中国古代史'],
-      correctAnswer: '夏朝'
+      explanation: '夏朝是中国史书记载的第一个世袭制朝代，约公元前2070年-前1600年。'
     },
     {
       id: 'q_014',
@@ -459,7 +500,8 @@ const initMockQuestions = () => {
       subject: 'biology',
       tags: ['生物化学'],
       options: ['二氧化碳', '氧气', '氮气', '氢气'],
-      correctAnswer: 'B'
+      correctAnswer: 'B',
+      explanation: '光合作用的主要产物是氧气和葡萄糖，其中氧气是释放到大气中的主要产物。'
     },
     {
       id: 'q_015',
@@ -468,7 +510,58 @@ const initMockQuestions = () => {
       difficulty: 'easy',
       subject: 'geography',
       tags: ['中国地理'],
-      correctAnswer: true
+      correctAnswer: true,
+      explanation: '长江全长约6300公里，是中国第一长河，也是亚洲第一长河。'
+    },
+    {
+      id: 'q_016',
+      type: 'fill',
+      questionText: 'HTTP协议默认使用____端口，HTTPS协议默认使用____端口。',
+      blanks: [
+        {
+          id: 1,
+          position: 1,
+          label: '第1空',
+          correctAnswer: '80',
+          acceptableAnswers: ['80', '80端口']
+        },
+        {
+          id: 2,
+          position: 2,
+          label: '第2空',
+          correctAnswer: '443',
+          acceptableAnswers: ['443', '443端口']
+        }
+      ],
+      difficulty: 'easy',
+      subject: 'cpp_programming',
+      tags: ['网络协议', '基础知识'],
+      explanation: 'HTTP协议默认使用80端口，HTTPS协议默认使用443端口。'
+    },
+    {
+      id: 'q_017',
+      type: 'fill',
+      questionText: '在关系数据库中，____用于唯一标识表中的每一行记录，____用于建立表与表之间的联系。',
+      blanks: [
+        {
+          id: 1,
+          position: 1,
+          label: '第1空',
+          correctAnswer: '主键',
+          acceptableAnswers: ['主键', 'Primary Key', 'PK', '主关键字']
+        },
+        {
+          id: 2,
+          position: 2,
+          label: '第2空',
+          correctAnswer: '外键',
+          acceptableAnswers: ['外键', 'Foreign Key', 'FK', '外关键字']
+        }
+      ],
+      difficulty: 'medium',
+      subject: 'cpp_programming',
+      tags: ['数据库', '关系模型'],
+      explanation: '主键用于唯一标识表中的记录，外键用于建立表之间的关联关系。'
     }
   ]
 

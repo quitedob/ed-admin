@@ -1,5 +1,6 @@
 // 教育内容渲染组件导出
 export { default as CourseContentRenderer } from './CourseContentRenderer.vue'
+export { default as CourseResourceViewer } from './CourseResourceViewer.vue'
 export { default as HomeworkRenderer } from './HomeworkRenderer.vue'
 export { default as ExamRenderer } from './ExamRenderer.vue'
 

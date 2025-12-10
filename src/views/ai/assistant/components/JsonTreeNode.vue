@@ -27,7 +27,7 @@
         Array [{{ node.length }}]
       </span>
       <span v-else-if="typeof node === 'object'" class="node-value object-value">
-        Object {{{ Object.keys(node).length }}}
+        Object {{ '{' + Object.keys(node).length + '}' }}
       </span>
     </div>
 

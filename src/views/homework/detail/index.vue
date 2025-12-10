@@ -344,17 +344,64 @@ const averageCompletionRate = computed(() => {
 
 // 获取作业详情
 const getHomeworkDetail = () => {
-  const homeworkId = route.query.id
+  const homeworkId = route.query.id || route.params.id
   if (!homeworkId) {
     return
   }
 
-  // 使用模拟数据
+  // 首先从临时存储中查找
+  const tempHomeworks = JSON.parse(sessionStorage.getItem('temp_homeworks') || '[]')
+  const tempHomework = tempHomeworks.find(h => h.id === homeworkId)
+  
+  if (tempHomework) {
+    // 使用临时存储的作业数据
+    homeworkInfo.value = {
+      id: tempHomework.id,
+      basicInfo: {
+        title: tempHomework.title,
+        description: tempHomework.description,
+        type: 'exercise',
+        difficulty: 'medium'
+      },
+      metadata: {
+        version: '1.0',
+        createdAt: tempHomework.createdAt,
+        updatedAt: tempHomework.createdAt,
+        createdBy: '当前用户',
+        courseId: tempHomework.courseId
+      },
+      schedule: {
+        releaseDate: tempHomework.schedule?.releaseTime || tempHomework.releaseTime,
+        dueDate: tempHomework.schedule?.dueTime || tempHomework.dueTime
+      },
+      settings: {
+        allowLateSubmission: true,
+        latePenalty: 10,
+        randomOrder: false,
+        immediateGrading: tempHomework.settings?.autoGrade || true,
+        showCorrectAnswers: true,
+        reviewAfterSubmit: true
+      },
+      statistics: {
+        totalQuestions: tempHomework.questions?.length || 0
+      }
+    }
+    
+    // 设置题目数据
+    questions.value = tempHomework.questions || []
+    
+    // 临时作业没有真实提交数据
+    submissions.value = []
+    
+    return
+  }
+
+  // 如果临时存储中没有，使用模拟数据
   import('@/utils/mockData').then(({ mockApi }) => {
     // 获取作业详情
     mockApi.getHomeworkDetail(homeworkId).then(homework => {
       homeworkInfo.value = homework || {}
-      questions.value = homework.questions || []
+      questions.value = homework?.questions || []
     })
     
     // 获取课程列表

@@ -327,7 +327,13 @@ const examTotal = computed(() => filteredExams.value.length)
 
 // 方法
 const goBack = () => {
-  router.back()
+  // 检查是否有历史记录
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    // 如果没有历史记录，返回学生列表页
+    router.push('/users')
+  }
 }
 
 const formatDate = (dateString) => {

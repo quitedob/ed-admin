@@ -229,10 +229,18 @@
 
     <!-- 添加课程对话框 -->
     <CourseBindDialog
-    <CoursePacingDialog      v-model="pacingDialogVisible"      :class-id="classId"      :course-id="currentCourse?.id"      :course-name="currentCourse?.name"      @saved="handlePacingSaved"    />
       v-model="courseDialogVisible"
       :class-id="classId"
       @bind="handleBindCourse"
+    />
+
+    <!-- 课程进度对话框 -->
+    <CoursePacingDialog
+      v-model="pacingDialogVisible"
+      :class-id="classId"
+      :course-id="currentCourse?.id"
+      :course-name="currentCourse?.name"
+      @saved="handlePacingSaved"
     />
   </div>
 </template>
@@ -254,7 +262,6 @@ import {
 import { useMockStore } from '@/stores/mockStore'
 import StudentDialog from './components/StudentDialog.vue'
 import CourseBindDialog from './components/CourseBindDialog.vue'
-    <CoursePacingDialog      v-model="pacingDialogVisible"      :class-id="classId"      :course-id="currentCourse?.id"      :course-name="currentCourse?.name"      @saved="handlePacingSaved"    />
 import CoursePacingDialog from './components/CoursePacingDialog.vue'
 
 const router = useRouter()
@@ -270,7 +277,8 @@ const studentPageSize = ref(10)
 const selectedStudents = ref([])
 const studentDialogVisible = ref(false)
 const courseDialogVisible = ref(false)
-const pacingDialogVisible = ref(false)const currentCourse = ref(null)
+const pacingDialogVisible = ref(false)
+const currentCourse = ref(null)
 const currentStudent = ref(null)
 
 const classInfo = ref(null)
@@ -500,7 +508,16 @@ const handleBindCourse = (courseData) => {
   classInfo.value.courseCount++
   ElMessage.success('课程绑定成功')
   courseDialogVisible.value = false
-const handleManagePacing = (course) => {  currentCourse.value = course  pacingDialogVisible.value = true}const handlePacingSaved = (config) => {  console.log('课程进度配置已保存:', config)  ElMessage.success('课程进度权限已更新')}
+}
+
+const handleManagePacing = (course) => {
+  currentCourse.value = course
+  pacingDialogVisible.value = true
+}
+
+const handlePacingSaved = (config) => {
+  console.log('课程进度配置已保存:', config)
+  ElMessage.success('课程进度权限已更新')
 }
 
 const getGradeLabel = (grade) => {

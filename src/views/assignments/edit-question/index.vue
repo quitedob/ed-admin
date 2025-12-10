@@ -322,6 +322,7 @@ const rules = {
   type: [{ required: true, message: '请选择题型', trigger: 'change' }],
   difficulty: [{ required: true, message: '请选择难度', trigger: 'change' }],
   questionText: [{ required: true, message: '请输入题目内容', trigger: 'blur' }],
+}
 
 // 方法
 const getTypeTitle = () => {

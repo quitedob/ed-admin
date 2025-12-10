@@ -1,4 +1,4 @@
-<template>
+                                            <template>
   <div class="login-container">
     <div class="login-content">
       <div class="login-info">
@@ -26,9 +26,10 @@
           <el-form-item class="form-group" prop="mobilePwd">
             <el-input v-model="loginForm.mobilePwd" placeholder="密码" type="password" show-password />
           </el-form-item>
-          <el-form-item class="form-group" prop="verCode">
+          <el-form-item class="form-group vercode-group" prop="verCode">
             <el-input v-model="loginForm.verCode" class="var-input" placeholder="验证码" />
-            <img class="var-img" :src="verImg" alt="" @click="getCaptcha" />
+            <img v-if="verImg" class="var-img" :src="verImg" alt="验证码" @click="getCaptcha" />
+            <div v-else class="var-img-placeholder" @click="getCaptcha">点击获取</div>
           </el-form-item>
           <el-button class="login-button" type="primary" @click="handleLogin">登 录</el-button>
           
@@ -105,9 +106,9 @@
   // 站点信息
   const service = ref({
     websiteCopyright: '© 2024 芝麻信奥教育系统',
-    websiteIcp: '浙ICP备12345678号',
-    websitePrn: '浙公网安备330000000000号',
-    websitePrnNo: '330000000000'
+    websiteIcp: '粤ICP备12345678号',
+    websitePrn: '粤公网安备440000000000号',
+    websitePrnNo: '440000000000'
   })
   onMounted(() => {
     console.log(`打开文件: ${location.pathname} -> views/login/index.vue`);
@@ -498,149 +499,214 @@
 
 <style lang="scss" scoped>
   .login-container {
-    height: 100vh;
-    background: var(--gradient-primary);
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    box-sizing: border-box;
   }
 
   .login-content {
-    position: absolute;
-    top: calc((100vh - 520px) / 2);
-    left: 0;
-    right: 0;
-    width: 800px;
-    margin: 0 auto;
+    width: 960px;
+    max-width: 100%;
+    display: flex;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+  }
 
-    .login-info {
-      float: left;
-      width: 350px;
-      padding: 25px;
-      min-height: 450px;
-      color: var(--color-text-inverse);
-      background: var(--color-primary-800);
-      border-radius: 12px 0 0 12px;
+  .login-info {
+    width: 380px;
+    flex-shrink: 0;
+    padding: 40px 30px;
+    background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
-      .title {
-        font-size: 20px;
-        font-weight: 700;
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .info {
+      font-size: 14px;
+      line-height: 24px;
+      opacity: 0.9;
+    }
+  }
+
+  .login-panel {
+    flex: 1;
+    background: white;
+    padding: 40px;
+
+    .login-head {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .demo-badge {
+      text-align: center;
+      margin-bottom: 25px;
+
+      .white-tag {
+        background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 500;
       }
 
-      .info {
-        font-size: 15px;
-        font-weight: 300;
-        line-height: 25px;
+      .demo-icon {
+        margin-right: 5px;
       }
     }
 
-    .login-panel {
-      float: right;
-      background: var(--color-bg-primary);
-      min-height: 450px;
-      width: 350px;
-      padding: 25px;
-      border-radius: 0 12px 12px 0;
+    .login-button {
+      width: 100%;
+      height: 46px;
+      background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 5px;
 
-      .login-head {
-        text-align: center;
-        font-size: 28px;
-        font-weight: 700;
+      &:hover {
+        opacity: 0.9;
       }
+    }
 
-      .demo-badge {
-        text-align: center;
-        margin-bottom: 20px;
-
-        .demo-icon {
-          margin-right: 5px;
-          font-size: 16px;
-        }
-      }
-
-      .login-button {
-        width: 350px;
-        height: 45px;
-        background: var(--gradient-primary);
-        border-radius: var(--radius-base);
-        font-size: 16px;
-        font-weight: 700;
-        text-align: center;
-        color: var(--color-text-inverse);
-        line-height: 50px;
-        cursor: pointer;
-        border: none;
-        box-shadow: 0 4px 12px var(--color-shadow-primary);
-        transition: var(--transition);
-
-        &:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px var(--color-shadow-primary-hover);
-        }
-      }
-
-      .tip {
-        margin-top: 20px;
-        font-size: 14px;
-      }
+    .tip {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f5f7fa;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.8;
     }
   }
 
   .footer {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    color: var(--color-text-inverse);
+    color: white;
     text-align: center;
-    padding-bottom: 20px;
-    font-size: 13px;
-    line-height: 25px;
+    padding: 15px;
+    font-size: 12px;
+    line-height: 22px;
+    background: rgba(0, 0, 0, 0.15);
 
     a {
       text-decoration: none;
-      color: var(--color-text-inverse);
+      color: white;
     }
+
     .website-prn {
-      width: auto;
+      height: 14px;
+      vertical-align: middle;
     }
+  }
+
+  // 表单项间距
+  :deep(.el-form-item) {
+    margin-bottom: 20px;
+  }
+
+  // 验证码行
+  .vercode-group :deep(.el-form-item__content) {
+    display: flex;
+    gap: 10px;
   }
 
   .var-input {
-    width: 200px;
+    flex: 1;
+  }
+
+  .var-img,
+  .var-img-placeholder {
+    width: 100px;
+    height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
   }
 
   .var-img {
-    margin-left: 20px;
-    width: 80px;
-    height: auto;
+    object-fit: contain;
+    background: #f5f7fa;
+    border: 1px solid #dcdfe6;
   }
 
-  .el-input {
+  .var-img-placeholder {
+    background: #f5f7fa;
+    border: 1px dashed #dcdfe6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #909399;
+    font-size: 12px;
+
+    &:hover {
+      border-color: #1e90ff;
+      color: #1e90ff;
+    }
+  }
+
+  // 输入框样式
+  :deep(.el-input__wrapper) {
     height: 40px;
+    border-radius: 6px;
+    background-color: #fff;
+  }
+
+  :deep(.el-input__inner) {
+    color: #333;
   }
 
   .quick-login {
     margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px dashed #ddd;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
 
     .quick-login-title {
       font-size: 13px;
       color: #666;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       text-align: center;
     }
 
     .quick-login-buttons {
       display: flex;
-      justify-content: space-between;
       gap: 10px;
 
       .el-button {
         flex: 1;
+        border-radius: 6px;
       }
     }
   }
 
   .custom-permission {
     margin-top: 12px;
+
+    .el-button {
+      border-radius: 6px;
+    }
   }
 </style>

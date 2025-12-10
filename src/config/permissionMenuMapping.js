@@ -32,7 +32,7 @@ export const MENU_ID_PERMISSION_PREFIX = {
   9: 'class',          // 班级管理
   10: 'material',      // 素材管理
   12: 'system',        // 系统管理
-  13: 'teacher'        // 老师管理
+  13: 'lecturer'       // 老师管理（使用lecturer前缀）
 }
 
 /**
@@ -88,6 +88,7 @@ export const PERMISSION_PREFIX_LABELS = {
   'class': '班级管理',
   'course': '课程管理',
   'teacher': '老师管理',
+  'lecturer': '老师管理',
   'student': '学生管理',
   'question': '题库管理',
   'homework': '作业管理',

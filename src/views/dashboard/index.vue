@@ -1,10 +1,7 @@
 <template>
   <div id="dashboard-container" class="dashboard-container">
     <el-row :gutter="20">
-      <el-col v-if="hasPermission('stat:data')" :span="12">
-        <stat-data />
-      </el-col>
-      <el-col :span="12">
+      <el-col :span="24">
         <el-card class="info">
           <template #header>芝麻编程的管理系统介绍</template>
           <div id="info-body" class="info-body">
@@ -33,10 +30,9 @@
   </div>
 </template>
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted } from 'vue'
   import StatVod from './StatVod.vue'
   import StatLogin from './StatLogin.vue'
-  import StatData from './StatData.vue'
   import { Platform } from '@element-plus/icons-vue'
   import { hasPermission } from '@/utils/permission.js'
 

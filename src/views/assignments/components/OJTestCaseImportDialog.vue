@@ -226,8 +226,6 @@ const fieldDocs = [
     description: '期望输出结果'
   },
   {
-  },
-  {
     field: 'isSample',
     type: 'boolean',
     required: false,
@@ -270,15 +268,13 @@ const handleValidateJson = () => {
     const errors = []
     let totalScore = 0
     let sampleCount = 0
-    
+
     data.testCases.forEach((tc, index) => {
       if (tc.input === undefined || tc.input === null) {
         errors.push(`测试用例${index + 1}: 缺少input字段`)
       }
       if (tc.output === undefined || tc.output === null) {
         errors.push(`测试用例${index + 1}: 缺少output字段`)
-      }
-      } else {
       }
       if (tc.isSample) {
         sampleCount++
@@ -335,6 +331,8 @@ const handleImportJson = () => {
       isSample: Boolean(tc.isSample)
     }))
 
+    // 计算总分（假设每个测试用例10分）
+    const totalScore = testCases.length * 10
 
     emit('import', {
       testCases,

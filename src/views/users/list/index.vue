@@ -96,7 +96,7 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="300" fixed="right">
           <template #default="scope">
             <div class="table-actions">
               <el-button link type="primary" size="small" @click="handleViewDetail(scope.row)">
@@ -585,5 +585,12 @@ onMounted(() => {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 </style>

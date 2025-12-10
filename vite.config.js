@@ -7,7 +7,8 @@ export default defineConfig({
   base: './',
   telemetry: false,
   server: {
-    port: 3002, // 服务启动端口号（从9528改为8080）
+    host: '0.0.0.0', // 监听所有网络接口，允许外部访问
+    port: 3002, // 服务启动端口号
     open: true, // 服务启动时是否自动打开浏览器
     proxy: {
       '/gateway': {

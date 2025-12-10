@@ -483,7 +483,13 @@ const initMockData = () => {
 
 // 方法
 const handleBack = () => {
-  router.back()
+  // 检查是否有历史记录
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    // 如果没有历史记录，返回作业列表页
+    router.push('/homework/list')
+  }
 }
 
 const handleViewModeChange = () => {

@@ -10,6 +10,10 @@
         <span class="page-title">创建作业</span>
       </div>
       <div class="action-buttons">
+        <el-button @click="handlePreview">
+          <el-icon><View /></el-icon>
+          预览
+        </el-button>
         <el-button @click="handleSaveDraft">保存草稿</el-button>
         <el-button type="primary" @click="handlePublish">发布作业</el-button>
       </div>
@@ -95,6 +99,7 @@
 
           <HomeworkQuestionBuilder
             v-model:questions="homeworkForm.questions"
+            @open-question-selector="handleOpenQuestionSelector"
           />
         </el-card>
 
@@ -120,6 +125,13 @@
         </el-card>
       </el-form>
     </div>
+
+    <!-- 题库选择对话框 -->
+    <QuestionSelectorDialog
+      v-model="questionDialogVisible"
+      :initial-selected-questions="homeworkForm.questions"
+      @confirm="handleQuestionSelect"
+    />
   </div>
 </template>
 
@@ -127,11 +139,13 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ArrowLeft, View } from '@element-plus/icons-vue'
 import HomeworkQuestionBuilder from './components/HomeworkQuestionBuilder.vue'
+import QuestionSelectorDialog from '@/views/course/update/components/QuestionSelectorDialog.vue'
 
 const router = useRouter()
 const formRef = ref()
+const questionDialogVisible = ref(false)
 
 // 表单数据
 const homeworkForm = ref({
@@ -158,12 +172,87 @@ const rules = {
   dueTime: [{ required: true, message: '请选择截止时间', trigger: 'change' }]
 }
 
+const getClassName = (classId) => {
+  const classMap = {
+    'class_001': '前端开发一班',
+    'class_002': '前端开发二班',
+    'class_003': '数据科学班'
+  }
+  return classMap[classId] || ''
+}
+
+const getCourseName = (courseId) => {
+  const courseMap = {
+    'course_001': '前端开发基础',
+    'course_002': 'Vue.js框架',
+    'course_003': 'React基础'
+  }
+  return courseMap[courseId] || ''
+}
+
 // 方法
 const handleBack = () => {
-  router.back()
+  // 检查是否有历史记录
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    // 如果没有历史记录，返回作业列表页
+    router.push('/homework/list')
+  }
+}
+
+// 打开题目选择器
+const handleOpenQuestionSelector = () => {
+  questionDialogVisible.value = true
+}
+
+// 处理题目选择
+const handleQuestionSelect = (selectedQuestions) => {
+  // 过滤掉已经存在的题目
+  const existingIds = homeworkForm.value.questions.map(q => q.id)
+  const newQuestions = selectedQuestions.filter(q => !existingIds.includes(q.id))
+
+  // 添加新题目
+  homeworkForm.value.questions = [...homeworkForm.value.questions, ...newQuestions]
+
+  ElMessage.success(`成功添加 ${newQuestions.length} 道题目到作业`)
+}
+
+const handlePreview = () => {
+  // 将当前作业数据存储到sessionStorage
+  const previewData = {
+    id: `temp_${Date.now()}`,
+    ...homeworkForm.value,
+    className: getClassName(homeworkForm.value.classId),
+    courseName: getCourseName(homeworkForm.value.courseId)
+  }
+  sessionStorage.setItem('temp_homework_preview', JSON.stringify(previewData))
+  
+  // 打开预览页面
+  const routeData = router.resolve({ path: `/homework/preview/${previewData.id}` })
+  window.open(routeData.href, '_blank')
 }
 
 const handleSaveDraft = () => {
+  // 保存到临时存储
+  const homeworkData = {
+    id: `hw_temp_${Date.now()}`,
+    ...homeworkForm.value,
+    className: getClassName(homeworkForm.value.classId),
+    courseName: getCourseName(homeworkForm.value.courseId),
+    schedule: {
+      releaseTime: homeworkForm.value.releaseTime,
+      dueTime: homeworkForm.value.dueTime
+    },
+    status: 'draft',
+    createdAt: new Date().toISOString()
+  }
+  
+  // 保存到sessionStorage
+  const tempHomeworks = JSON.parse(sessionStorage.getItem('temp_homeworks') || '[]')
+  tempHomeworks.push(homeworkData)
+  sessionStorage.setItem('temp_homeworks', JSON.stringify(tempHomeworks))
+  
   ElMessage.success('草稿保存成功')
 }
 
@@ -180,6 +269,25 @@ const handlePublish = () => {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        // 保存到临时存储
+        const homeworkData = {
+          id: `hw_${Date.now()}`,
+          ...homeworkForm.value,
+          className: getClassName(homeworkForm.value.classId),
+          courseName: getCourseName(homeworkForm.value.courseId),
+          schedule: {
+            releaseTime: homeworkForm.value.releaseTime,
+            dueTime: homeworkForm.value.dueTime
+          },
+          status: 'published',
+          createdAt: new Date().toISOString()
+        }
+        
+        // 保存到sessionStorage
+        const tempHomeworks = JSON.parse(sessionStorage.getItem('temp_homeworks') || '[]')
+        tempHomeworks.push(homeworkData)
+        sessionStorage.setItem('temp_homeworks', JSON.stringify(tempHomeworks))
+        
         ElMessage.success('作业发布成功')
         router.push('/homework/list')
       })

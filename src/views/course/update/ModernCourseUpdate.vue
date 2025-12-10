@@ -429,16 +429,11 @@
                         <div v-if="section.contentConfig.text.enabled" class="resource-item">
                           <div class="resource-header">
                             <el-icon class="resource-icon"><Document /></el-icon>
-                            <span class="resource-title">文本内容</span>
+                            <span class="resource-title">文本内容（富文本）</span>
                           </div>
                           <div class="resource-content">
                             <el-form-item label="文本内容">
-                              <el-input
-                                v-model="section.textContent"
-                                type="textarea"
-                                :rows="8"
-                                placeholder="请输入文本学习内容"
-                              />
+                              <RichTextEditor v-model="section.textContent" />
                             </el-form-item>
                           </div>
                         </div>
@@ -951,6 +946,7 @@ import ClassChapterPeriodControl from './components/ClassChapterPeriodControl.vu
 import SelectHomeworkDialog from './components/SelectHomeworkDialog.vue'
 import QuestionSelectorDialog from './components/QuestionSelectorDialog.vue'
 import { SUBJECT_OPTIONS } from '@/constants/subjects.js'
+import RichTextEditor from '@/components/Editor/index.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -1535,6 +1531,32 @@ const buildCourseJSON = () => {
 
     return homeworkData
   })
+
+  // 返回完整的课程JSON数据
+  return {
+    id: courseData.id || `course_${Date.now()}`,
+    type: 'course',
+    metadata: {
+      version: courseData.metadata?.version || '1.0',
+      createdAt: courseData.metadata?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: courseData.metadata?.createdBy || 'current_user'
+    },
+    basicInfo: {
+      title: courseData.basicInfo.title,
+      description: courseData.basicInfo.description,
+      cover: courseData.basicInfo.cover,
+      duration: courseData.basicInfo.duration,
+      level: courseData.basicInfo.level,
+      teacher: courseData.basicInfo.teacher,
+      tags: courseData.basicInfo.tags,
+      subject: courseData.basicInfo.subject,
+      schedule: courseData.basicInfo.schedule
+    },
+    schedule: courseData.basicInfo.schedule,
+    chapters,
+    homeworks
+  }
 }
 
 // 题目相关处理函数
@@ -1630,16 +1652,56 @@ const handleSave = async () => {
     // 构建符合规范的JSON数据
     const courseJSON = buildCourseJSON()
 
-    console.log('保存课程数据:', JSON.stringify(courseJSON, null, 2))
+    console.log('=== 编辑页面保存课程 ===')
+    console.log('courseJSON.id:', courseJSON?.id)
+    console.log('courseData.id:', courseData.id)
+    console.log('完整 courseJSON:', courseJSON)
 
-    // 这里调用API保存数据
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // 保存到临时存储
+    const tempCourses = JSON.parse(sessionStorage.getItem('temp_courses') || '[]')
+    const courseIndex = tempCourses.findIndex(c => c.id === courseData.id)
+    
+    // 构建完整的课程数据（包含列表页需要的字段）
+    const fullCourseData = {
+      ...courseJSON,
+      courseName: courseData.basicInfo.title,
+      courseLogo: courseData.basicInfo.cover,
+      courseOriginal: 0,
+      courseDiscount: 0,
+      countStudy: 0,
+      statusId: courseData.basicInfo.schedule?.publishStatus === 'published' ? 1 : 0,
+      responsiblePerson: courseData.basicInfo.teacher.name,
+      lecturerName: courseData.basicInfo.teacher.name
+    }
+    
+    console.log('fullCourseData.id:', fullCourseData.id)
+    console.log('fullCourseData.courseName:', fullCourseData.courseName)
+    
+    if (courseIndex > -1) {
+      // 更新现有课程
+      tempCourses[courseIndex] = fullCourseData
+      console.log('更新临时课程:', courseData.id)
+    } else {
+      // 新增课程
+      tempCourses.push(fullCourseData)
+      console.log('新增临时课程:', courseData.id)
+    }
+    
+    sessionStorage.setItem('temp_courses', JSON.stringify(tempCourses))
+
+    // 尝试调用API保存数据（可能失败）
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500))
+      // await courseApi.courseEdit(courseJSON)
+    } catch (e) {
+      console.log('API调用失败，已保存到临时存储')
+    }
 
     ElMessage.success('课程保存成功！')
 
     // 如果是新建课程，跳转到详情页
     if (!route.query.courseId) {
-      router.push(`/course/detail/modern?courseId=${courseData.id}`)
+      router.push(`/course/detail?courseId=${courseData.id}`)
     }
   } catch (error) {
     ElMessage.error('保存失败，请重试')
@@ -2104,8 +2166,63 @@ const getContentTypeTagType = (type) => {
   return map[type] || ''
 }
 
+  // 加载课程数据
+  const loadCourseData = () => {
+    const courseId = route.query.courseId
+    if (!courseId) {
+      console.log('新建课程模式')
+      return
+    }
+
+    // 首先尝试从临时存储中加载
+    const tempCourses = JSON.parse(sessionStorage.getItem('temp_courses') || '[]')
+    console.log('临时课程列表:', tempCourses)
+    console.log('查找课程ID:', courseId)
+    
+    const tempCourse = tempCourses.find(c => c.id === courseId)
+    
+    if (tempCourse) {
+      // 找到临时课程，加载数据
+      console.log('从临时存储加载课程:', courseId, tempCourse)
+      
+      // 设置课程ID
+      courseData.id = tempCourse.id
+      
+      // 映射数据到 courseData
+      if (tempCourse.basicInfo) {
+        Object.assign(courseData.basicInfo, tempCourse.basicInfo)
+      }
+      if (tempCourse.metadata) {
+        Object.assign(courseData.metadata, tempCourse.metadata)
+      }
+      if (tempCourse.chapters) {
+        courseData.chapters = tempCourse.chapters
+      }
+      
+      // 兼容旧格式数据
+      if (tempCourse.courseName && !courseData.basicInfo.title) {
+        courseData.basicInfo.title = tempCourse.courseName
+      }
+      if (tempCourse.courseLogo && !courseData.basicInfo.cover) {
+        courseData.basicInfo.cover = tempCourse.courseLogo
+      }
+      if (tempCourse.responsiblePerson && !courseData.basicInfo.teacher.name) {
+        courseData.basicInfo.teacher.name = tempCourse.responsiblePerson
+      }
+      
+      console.log('加载后的课程数据:', courseData)
+      ElMessage.success('课程数据加载成功')
+      return
+    }
+
+    // 如果不是临时课程，尝试从API加载（这里可以添加API调用）
+    console.log('未找到临时课程，从API加载:', courseId)
+    ElMessage.info('正在加载课程数据...')
+  }
+
   onMounted(() => {
     console.log(`打开文件: ${location.pathname} -> views/course/update/ModernCourseUpdate.vue`);
+    loadCourseData()
   });
 
 </script>

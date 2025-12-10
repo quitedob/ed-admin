@@ -10,6 +10,10 @@
         <span class="page-title">编辑作业</span>
       </div>
       <div class="action-buttons">
+        <el-button @click="handlePreview">
+          <el-icon><View /></el-icon>
+          预览
+        </el-button>
         <el-button @click="handleSaveDraft">保存草稿</el-button>
         <el-button type="primary" @click="handleSave">保存</el-button>
       </div>
@@ -142,7 +146,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ArrowLeft, View } from '@element-plus/icons-vue'
+import { useMockStore } from '@/stores/mockStore'
 import HomeworkQuestionBuilder from '../create/components/HomeworkQuestionBuilder.vue'
 import QuestionSelectorDialog from '@/views/course/update/components/QuestionSelectorDialog.vue'
 import { SUBJECT_OPTIONS, getSubjectLabel } from '@/constants/subjects.js'
@@ -151,6 +156,7 @@ const router = useRouter()
 const route = useRoute()
 const formRef = ref()
 const questionDialogVisible = ref(false)
+const mockStore = useMockStore()
 
 // 表单数据
 const homeworkForm = ref({
@@ -209,7 +215,13 @@ const loadHomework = () => {
 
 // 方法
 const handleBack = () => {
-  router.back()
+  // 检查是否有历史记录
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    // 如果没有历史记录，返回作业列表页
+    router.push('/homework/list')
+  }
 }
 
 // 打开题目选择器
@@ -229,7 +241,60 @@ const handleQuestionSelect = (selectedQuestions) => {
   ElMessage.success(`成功添加 ${newQuestions.length} 道题目到作业`)
 }
 
+const handlePreview = () => {
+  // 将当前作业数据存储到sessionStorage
+  const previewData = {
+    id: route.params.id || `temp_${Date.now()}`,
+    ...homeworkForm.value,
+    className: getClassName(homeworkForm.value.classId),
+    courseName: getCourseName(homeworkForm.value.courseId)
+  }
+  sessionStorage.setItem('temp_homework_preview', JSON.stringify(previewData))
+  
+  // 打开预览页面
+  const routeData = router.resolve({ path: `/homework/preview/${previewData.id}` })
+  window.open(routeData.href, '_blank')
+}
+
+const getClassName = (classId) => {
+  const classMap = {
+    'class_001': '前端开发一班',
+    'class_002': '前端开发二班',
+    'class_003': '数据科学班'
+  }
+  return classMap[classId] || ''
+}
+
+const getCourseName = (courseId) => {
+  const courseMap = {
+    'course_001': '前端开发基础',
+    'course_002': 'Vue.js框架',
+    'course_003': 'React基础'
+  }
+  return courseMap[courseId] || ''
+}
+
 const handleSaveDraft = () => {
+  // 保存到临时存储
+  const homeworkData = {
+    id: route.params.id || `hw_temp_${Date.now()}`,
+    ...homeworkForm.value,
+    className: getClassName(homeworkForm.value.classId),
+    courseName: getCourseName(homeworkForm.value.courseId),
+    status: 'draft',
+    createdAt: new Date().toISOString()
+  }
+  
+  // 保存到sessionStorage（临时存储，刷新后消失）
+  const tempHomeworks = JSON.parse(sessionStorage.getItem('temp_homeworks') || '[]')
+  const existingIndex = tempHomeworks.findIndex(h => h.id === homeworkData.id)
+  if (existingIndex > -1) {
+    tempHomeworks[existingIndex] = homeworkData
+  } else {
+    tempHomeworks.push(homeworkData)
+  }
+  sessionStorage.setItem('temp_homeworks', JSON.stringify(tempHomeworks))
+  
   ElMessage.success('草稿保存成功')
 }
 
@@ -240,6 +305,30 @@ const handleSave = () => {
         ElMessage.warning('请至少添加一道题目')
         return
       }
+      
+      // 保存到临时存储
+      const homeworkData = {
+        id: route.params.id || `hw_${Date.now()}`,
+        ...homeworkForm.value,
+        className: getClassName(homeworkForm.value.classId),
+        courseName: getCourseName(homeworkForm.value.courseId),
+        schedule: {
+          releaseTime: homeworkForm.value.releaseTime,
+          dueTime: homeworkForm.value.dueTime
+        },
+        status: 'published',
+        createdAt: new Date().toISOString()
+      }
+      
+      // 保存到sessionStorage
+      const tempHomeworks = JSON.parse(sessionStorage.getItem('temp_homeworks') || '[]')
+      const existingIndex = tempHomeworks.findIndex(h => h.id === homeworkData.id)
+      if (existingIndex > -1) {
+        tempHomeworks[existingIndex] = homeworkData
+      } else {
+        tempHomeworks.push(homeworkData)
+      }
+      sessionStorage.setItem('temp_homeworks', JSON.stringify(tempHomeworks))
       
       ElMessage.success('作业保存成功')
       router.push('/homework/list')

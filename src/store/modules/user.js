@@ -247,7 +247,7 @@ export const useUserStore = defineStore({
         'system:config:view', 'system:config:edit',
 
         // 课程管理权限
-        'course:view', 'course:add', 'course:edit', 'course:delete', 'course:copy', 'course:analytics',
+        'course:view', 'course:save', 'course:add', 'course:edit', 'course:delete', 'course:copy', 'course:analytics',
         'course:chapter:view', 'course:chapter:add', 'course:chapter:edit', 'course:chapter:delete',
         'course:period:view', 'course:period:add', 'course:period:edit', 'course:period:delete',
         'course:record:view',
@@ -256,6 +256,9 @@ export const useUserStore = defineStore({
         'users:view', 'users:add', 'users:edit', 'users:delete',
         'users:lecturer:view', 'users:lecturer:add', 'users:lecturer:edit', 'users:lecturer:delete',
         'users:record:view',
+        
+        // 老师管理权限
+        'lecturer:view', 'lecturer:create', 'lecturer:edit', 'lecturer:delete', 'lecturer:batch-delete',
 
         // AIGC管理权限
         'aigc:works:view', 'aigc:works:add', 'aigc:works:edit', 'aigc:works:delete', 'aigc:works:audit',
@@ -271,6 +274,17 @@ export const useUserStore = defineStore({
         // AI助教权限
         'ai:assistant:view', 'ai:assistant:config', 'ai:assistant:feedback',
 
+        // 班级管理权限
+        'class:view', 'class:create', 'class:edit', 'class:delete', 'class:import',
+        
+        // 作业管理权限
+        'homework:view', 'homework:create', 'homework:edit', 'homework:delete', 'homework:grade',
+        
+        // 考试管理权限
+        'exam:view', 'exam:create', 'exam:edit', 'exam:delete', 'exam:grade',
+        
+        // 题库管理权限
+        'question:view', 'question:create', 'question:edit', 'question:delete', 'question:import', 'question:manage-tags',
   
         // 学习报告权限
         'learning:report:view', 'learning:report:generate', 'learning:report:export',

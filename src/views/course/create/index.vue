@@ -241,7 +241,12 @@ const formDefault = {
       name: '',
       avatar: ''
     },
-    tags: []
+    tags: [],
+    schedule: {
+      startDate: '',
+      endDate: '',
+      publishStatus: 'draft'
+    }
   },
   schedule: {
     startDate: '',
@@ -287,8 +292,63 @@ const onSubmit = async () => {
       await courseApi.courseCopy(copyData)
       ElMessage.success('课程复制成功')
     } else {
-      // 创建新课程
-      await courseApi.courseSave(formModel)
+      // 创建新课程 - 同时保存到临时存储
+      // 生成课程ID
+      const newCourseId = `course_${Date.now()}`
+      
+      // 确保 schedule 数据在两个位置都存在
+      if (!formModel.basicInfo.schedule) {
+        formModel.basicInfo.schedule = { ...formModel.schedule }
+      } else {
+        // 同步 schedule 数据
+        formModel.basicInfo.schedule.startDate = formModel.schedule.startDate
+        formModel.basicInfo.schedule.endDate = formModel.schedule.endDate
+        formModel.basicInfo.schedule.publishStatus = formModel.schedule.publishStatus
+      }
+      
+      // 构建课程数据，不使用展开运算符避免 id 被覆盖
+      const courseData = {
+        id: newCourseId,  // 首先设置 ID
+        type: formModel.type,
+        metadata: { ...formModel.metadata },
+        basicInfo: { ...formModel.basicInfo },
+        schedule: { ...formModel.schedule },
+        chapters: [...(formModel.chapters || [])],
+        // 列表页需要的字段
+        courseName: formModel.basicInfo.title,
+        courseLogo: formModel.basicInfo.cover,
+        courseOriginal: 0,
+        courseDiscount: 0,
+        countStudy: 0,
+        statusId: formModel.schedule.publishStatus === 'published' ? 1 : 0,
+        responsiblePerson: formModel.basicInfo.teacher.name
+      }
+      
+      console.log('=== 保存课程到临时存储 ===')
+      console.log('课程ID:', courseData.id)
+      console.log('课程名称:', courseData.courseName)
+      console.log('完整数据:', JSON.stringify(courseData, null, 2))
+      
+      // 保存到sessionStorage
+      const tempCourses = JSON.parse(sessionStorage.getItem('temp_courses') || '[]')
+      tempCourses.push(courseData)
+      sessionStorage.setItem('temp_courses', JSON.stringify(tempCourses))
+      
+      // 验证保存
+      const savedCourses = JSON.parse(sessionStorage.getItem('temp_courses') || '[]')
+      const savedCourse = savedCourses[savedCourses.length - 1]
+      console.log('=== 验证保存结果 ===')
+      console.log('临时课程总数:', savedCourses.length)
+      console.log('最新保存的课程ID:', savedCourse?.id)
+      console.log('最新保存的课程名称:', savedCourse?.courseName)
+      console.log('最新保存的完整数据:', savedCourse)
+      
+      // 尝试调用API（可能失败）
+      try {
+        await courseApi.courseSave(formModel)
+      } catch (e) {
+        console.log('API调用失败，使用临时存储')
+      }
       ElMessage.success('课程创建成功')
     }
 

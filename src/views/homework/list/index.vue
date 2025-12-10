@@ -95,15 +95,15 @@
               </div>
               <div class="info-item">
                 <el-icon><Calendar /></el-icon>
-                <span>开始: {{ formatDate(homework.schedule.releaseTime) }}</span>
+                <span>开始: {{ formatDate(homework.schedule?.releaseTime || homework.releaseTime) }}</span>
               </div>
               <div class="info-item">
                 <el-icon><Calendar /></el-icon>
-                <span>截止: {{ formatDate(homework.schedule.dueTime) }}</span>
+                <span>截止: {{ formatDate(homework.schedule?.dueTime || homework.dueTime) }}</span>
               </div>
               <div class="info-item">
                 <el-icon><Document /></el-icon>
-                <span>{{ homework.questions.length }}道题</span>
+                <span>{{ homework.questions?.length || 0 }}道题</span>
               </div>
             </div>
 
@@ -111,6 +111,10 @@
               <el-button v-if="hasPermission('homework:edit')" link type="primary" @click="handleEdit(homework)">
                 <el-icon><Edit /></el-icon>
                 编辑
+              </el-button>
+              <el-button link type="info" @click="handlePreview(homework)">
+                <el-icon><View /></el-icon>
+                预览
               </el-button>
               <el-button v-if="hasPermission('homework:grade')" link type="success" @click="handleGrade(homework)">
                 <el-icon><Document /></el-icon>
@@ -152,7 +156,8 @@ import {
   Document,
   Delete,
   Calendar,
-  CopyDocument
+  CopyDocument,
+  View
 } from '@element-plus/icons-vue'
 import { usePermission } from '@/composables/usePermission'
 
@@ -206,7 +211,11 @@ const filteredHomeworks = computed(() => {
 
 // 初始化模拟数据
 const initMockData = () => {
+  // 加载临时存储的作业
+  const tempHomeworks = JSON.parse(sessionStorage.getItem('temp_homeworks') || '[]')
+  
   homeworks.value = [
+    ...tempHomeworks,
     {
       id: 'hw_001',
       classId: 'class_001',
@@ -340,6 +349,15 @@ const handleGrade = (homework) => {
   router.push(`/homework/grading/${homework.id}`)
 }
 
+const handlePreview = (homework) => {
+  // 将作业数据存储到sessionStorage
+  sessionStorage.setItem('temp_homework_preview', JSON.stringify(homework))
+  
+  // 打开预览页面
+  const routeData = router.resolve({ path: `/homework/preview/${homework.id}` })
+  window.open(routeData.href, '_blank')
+}
+
 const handleDelete = (homework) => {
   ElMessageBox.confirm('确定要删除该作业吗？删除后无法恢复。', '警告', {
     confirmButtonText: '确定',
@@ -349,6 +367,15 @@ const handleDelete = (homework) => {
     const index = homeworks.value.findIndex(hw => hw.id === homework.id)
     if (index > -1) {
       homeworks.value.splice(index, 1)
+      
+      // 同时从临时存储中删除
+      const tempHomeworks = JSON.parse(sessionStorage.getItem('temp_homeworks') || '[]')
+      const tempIndex = tempHomeworks.findIndex(h => h.id === homework.id)
+      if (tempIndex > -1) {
+        tempHomeworks.splice(tempIndex, 1)
+        sessionStorage.setItem('temp_homeworks', JSON.stringify(tempHomeworks))
+      }
+      
       ElMessage.success('删除成功')
     }
   })
@@ -356,7 +383,7 @@ const handleDelete = (homework) => {
 
 const getStatusIcon = (homework) => {
   const now = new Date()
-  const dueTime = new Date(homework.schedule.dueTime)
+  const dueTime = new Date(homework.schedule?.dueTime || homework.dueTime)
   
   if (homework.status === 'draft') return Clock
   if (homework.submitRate === 100) return CircleCheck
@@ -366,7 +393,7 @@ const getStatusIcon = (homework) => {
 
 const getStatusClass = (homework) => {
   const now = new Date()
-  const dueTime = new Date(homework.schedule.dueTime)
+  const dueTime = new Date(homework.schedule?.dueTime || homework.dueTime)
   
   if (homework.status === 'draft') return 'status-draft'
   if (homework.submitRate === 100) return 'status-complete'

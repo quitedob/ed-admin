@@ -10,6 +10,10 @@
         <span class="page-title">{{ isEdit ? '编辑考试' : '创建考试' }}</span>
       </div>
       <div id="exam-action-buttons" class="action-buttons">
+        <el-button @click="handlePreview">
+          <el-icon><View /></el-icon>
+          预览
+        </el-button>
         <el-button @click="handleSaveDraft">保存草稿</el-button>
         <el-button type="primary" @click="handlePublish">发布考试</el-button>
       </div>
@@ -322,7 +326,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ArrowLeft, View } from '@element-plus/icons-vue'
 import PaperBuilder from './components/PaperBuilder.vue'
 import QuestionSelectorDialog from '@/views/course/update/components/QuestionSelectorDialog.vue'
 import { SUBJECT_OPTIONS } from '@/constants/subjects.js'
@@ -382,7 +386,13 @@ const rules = {
 
 // 方法
 const handleBack = () => {
-  router.back()
+  // 检查是否有历史记录
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    // 如果没有历史记录，返回考试列表页
+    router.push('/exam/list')
+  }
 }
 
 const handlePrevStep = () => {
@@ -416,7 +426,62 @@ const handleNextStep = () => {
   }
 }
 
+const getClassName = (classId) => {
+  const classMap = {
+    'class_001': '前端开发一班',
+    'class_002': '前端开发二班'
+  }
+  return classMap[classId] || ''
+}
+
+const handlePreview = () => {
+  // 将当前考试数据存储到sessionStorage
+  const previewData = {
+    id: route.params.id || `temp_${Date.now()}`,
+    ...examForm.value,
+    className: getClassName(examForm.value.classId)
+  }
+  sessionStorage.setItem('temp_exam_preview', JSON.stringify(previewData))
+  
+  // 打开预览页面
+  const routeData = router.resolve({ path: `/exam/preview/${previewData.id}` })
+  window.open(routeData.href, '_blank')
+}
+
 const handleSaveDraft = () => {
+  // 保存到临时存储
+  const examData = {
+    id: route.params.id || `exam_temp_${Date.now()}`,
+    title: examForm.value.title,
+    description: examForm.value.description,
+    subject: examForm.value.subject,
+    type: examForm.value.type || 'quiz',
+    className: getClassName(examForm.value.classId),
+    classId: examForm.value.classId,
+    schedule: {
+      startTime: examForm.value.startTime,
+      endTime: examForm.value.endTime,
+      duration: examForm.value.duration
+    },
+    questionBanks: examForm.value.questionBanks,
+    totalScore: examForm.value.totalScore,
+    passingScore: examForm.value.passingScore,
+    grading: examForm.value.grading,
+    settings: examForm.value.settings,
+    status: 'draft',
+    createdAt: new Date().toISOString()
+  }
+  
+  // 保存到sessionStorage
+  const tempExams = JSON.parse(sessionStorage.getItem('temp_exams') || '[]')
+  const existingIndex = tempExams.findIndex(e => e.id === examData.id)
+  if (existingIndex > -1) {
+    tempExams[existingIndex] = examData
+  } else {
+    tempExams.push(examData)
+  }
+  sessionStorage.setItem('temp_exams', JSON.stringify(tempExams))
+  
   ElMessage.success('草稿保存成功')
 }
 
@@ -426,6 +491,39 @@ const handlePublish = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
+    // 保存到临时存储
+    const examData = {
+      id: route.params.id || `exam_${Date.now()}`,
+      title: examForm.value.title,
+      description: examForm.value.description,
+      subject: examForm.value.subject,
+      type: examForm.value.type || 'quiz',
+      className: getClassName(examForm.value.classId),
+      classId: examForm.value.classId,
+      schedule: {
+        startTime: examForm.value.startTime,
+        endTime: examForm.value.endTime,
+        duration: examForm.value.duration
+      },
+      questionBanks: examForm.value.questionBanks,
+      totalScore: examForm.value.totalScore,
+      passingScore: examForm.value.passingScore,
+      grading: examForm.value.grading,
+      settings: examForm.value.settings,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    }
+    
+    // 保存到sessionStorage
+    const tempExams = JSON.parse(sessionStorage.getItem('temp_exams') || '[]')
+    const existingIndex = tempExams.findIndex(e => e.id === examData.id)
+    if (existingIndex > -1) {
+      tempExams[existingIndex] = examData
+    } else {
+      tempExams.push(examData)
+    }
+    sessionStorage.setItem('temp_exams', JSON.stringify(tempExams))
+    
     ElMessage.success('考试发布成功')
     router.push('/exam/list')
   })

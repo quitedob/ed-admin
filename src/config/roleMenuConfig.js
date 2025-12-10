@@ -366,6 +366,13 @@ export const ROLE_INFO = {
 // 管理员权限 - 全部权限
 export const adminPermissions = ['*']
 
+// 讲师管理权限（用于管理员和班主任）
+export const lecturerManagePermissions = [
+  'lecturer:view', 'lecturer:create', 'lecturer:edit', 'lecturer:delete', 
+  'lecturer:batch-delete', 'lecturer:view-detail', 'lecturer:authorize-class', 
+  'lecturer:authorize-resource', 'lecturer:status-toggle'
+]
+
 // 班主任权限 - 没有系统管理和老师管理权限，有全局视角
 export const headTeacherPermissions = [
   // 数据视角权限 - 班主任有全局视角，可以看到所有班级

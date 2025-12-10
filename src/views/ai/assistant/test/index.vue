@@ -154,7 +154,7 @@ import JsonPreview from '../components/JsonPreview.vue'
 import SettingsPanel from '../components/SettingsPanel.vue'
 import { JsonHandler } from '../utils/jsonHandler'
 import { Validator } from '../utils/validator'
-import type { GenerateConfig, Homework, Exam } from '../types'
+import type { GenerateConfig, Homework, Exam } from '../types/index'
 
 const router = useRouter()
 

@@ -76,11 +76,11 @@
             <div class="exam-info">
               <div class="info-item">
                 <el-icon><Calendar /></el-icon>
-                <span>{{ formatDateTime(exam.schedule.startTime) }}</span>
+                <span>{{ formatDateTime(exam.schedule?.startTime || exam.startTime) }}</span>
               </div>
               <div class="info-item">
                 <el-icon><Clock /></el-icon>
-                <span>{{ exam.schedule.duration }}分钟</span>
+                <span>{{ exam.schedule?.duration || exam.duration || 0 }}分钟</span>
               </div>
               <div class="info-item">
                 <el-icon><Document /></el-icon>
@@ -96,6 +96,10 @@
               <el-button v-if="hasPermission('exam:edit')" link type="primary" @click="handleEdit(exam)">
                 <el-icon><Edit /></el-icon>
                 编辑
+              </el-button>
+              <el-button link type="warning" @click="handlePreview(exam)">
+                <el-icon><Monitor /></el-icon>
+                预览
               </el-button>
               <el-button v-if="hasPermission('exam:view')" link type="success" @click="handleView(exam)">
                 <el-icon><View /></el-icon>
@@ -144,7 +148,8 @@ import {
   Edit,
   View,
   DocumentChecked,
-  Delete
+  Delete,
+  Monitor
 } from '@element-plus/icons-vue'
 import { usePermission } from '@/composables/usePermission'
 
@@ -189,7 +194,11 @@ const total = computed(() => filteredExams.value.length)
 
 // 初始化模拟数据
 const initMockData = () => {
+  // 加载临时存储的考试
+  const tempExams = JSON.parse(sessionStorage.getItem('temp_exams') || '[]')
+  
   exams.value = [
+    ...tempExams,
     {
       id: 'exam_001',
       title: 'JavaScript期中考试',
@@ -280,6 +289,15 @@ const handleGrade = (exam) => {
   router.push(`/exam/grade/${exam.id}`)
 }
 
+const handlePreview = (exam) => {
+  // 将考试数据存储到sessionStorage
+  sessionStorage.setItem('temp_exam_preview', JSON.stringify(exam))
+  
+  // 打开预览页面
+  const routeData = router.resolve({ path: `/exam/preview/${exam.id}` })
+  window.open(routeData.href, '_blank')
+}
+
 const handleDelete = (exam) => {
   ElMessageBox.confirm('确定要删除该考试吗？删除后无法恢复。', '警告', {
     confirmButtonText: '确定',
@@ -289,13 +307,30 @@ const handleDelete = (exam) => {
     const index = exams.value.findIndex(e => e.id === exam.id)
     if (index > -1) {
       exams.value.splice(index, 1)
+      
+      // 同时从临时存储中删除
+      const tempExams = JSON.parse(sessionStorage.getItem('temp_exams') || '[]')
+      const tempIndex = tempExams.findIndex(e => e.id === exam.id)
+      if (tempIndex > -1) {
+        tempExams.splice(tempIndex, 1)
+        sessionStorage.setItem('temp_exams', JSON.stringify(tempExams))
+      }
+      
       ElMessage.success('删除成功')
     }
   })
 }
 
 const getTotalQuestions = (exam) => {
-  return exam.questionBanks.reduce((sum, bank) => sum + bank.selectedCount, 0)
+  if (!exam.questionBanks) return 0
+  // 兼容两种数据结构：
+  // 1. 原有结构：questionBanks 是题目库数组，每个有 selectedCount
+  // 2. 临时考试结构：questionBanks 直接是题目数组
+  if (exam.questionBanks.length > 0 && exam.questionBanks[0].selectedCount !== undefined) {
+    return exam.questionBanks.reduce((sum, bank) => sum + (bank.selectedCount || 0), 0)
+  }
+  // 临时考试的 questionBanks 直接是题目数组
+  return exam.questionBanks.length
 }
 
 const getTypeLabel = (type) => {
